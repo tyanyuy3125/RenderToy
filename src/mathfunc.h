@@ -116,6 +116,24 @@ namespace OpenPT
 
     const Vector4f operator*(const float lambda, const Vector4f &a);
 
+    class Matrix4x4f
+    {
+    private:
+        Vector4f row[4];
+
+    public:
+        Matrix4x4f();
+        Matrix4x4f(Vector4f r1, Vector4f r2, Vector4f r3, Vector4f r4);
+        Matrix4x4f(std::array<Vector4f, 4> quadruple);
+
+        Vector4f &operator[](const int i);
+
+        Vector4f operator*(const Vector4f &a) const;
+        Matrix4x4f operator*(const Matrix4x4f &a) const;
+
+        void Transpose();
+        Matrix4x4f Transposed() const;
+    };
 };
 
 #endif

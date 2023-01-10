@@ -300,4 +300,8 @@ namespace OpenPT
         // TODO <tianyu@illumiart.net>: Implement 4D-vector cross product using matrix operation.
         return Vector4f(0.0f,0.0f,0.0f,0.0f);
     }
+
+    Vector4f &Matrix4x4f::operator[](const int i){
+        return row[i];
+    }
 }

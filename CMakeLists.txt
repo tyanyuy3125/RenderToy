@@ -24,7 +24,7 @@
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #             Buddha bless, never bug.
 
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.10)
 project(OPENPT LANGUAGES CXX VERSION 0.1)
 
 set(cmake_cxx_standard 17)

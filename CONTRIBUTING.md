@@ -54,3 +54,4 @@ Commenting specifications for functions and classes are TBD.
 ## Object Oriented Programming Conventions
 * **Declaring / Defining multiple classes in the same file** is permitted but not recommended, unless the classes have extreme functional similarity, or are only coupled within the same file.
 * **Place everything in the same namespace called `OpenPT`**.
+* **Always avoid global variables / functions**.

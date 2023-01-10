@@ -1,3 +1,10 @@
+/*
+ *  OpenPT - Math Function Unit Test
+ *  File created on 2023/1/10
+ *  Last edited on 2023/1/10
+ *  Tianyu Huang <tianyu@illumiart.net>
+ */
+
 #define CATCH_CONFIG_MAIN
 #include "../lib/Catch2/catch.hpp"
 #include "../src/mathfunc.h"
@@ -50,7 +57,7 @@ TEST_CASE("Vector3f value-modifying test")
     REQUIRE(a[2] == initializer[2]);
 }
 
-TEST_CASE("Vector operation test")
+TEST_CASE("Vector3f operation test")
 {
     SECTION("Normalize")
     {
@@ -95,5 +102,12 @@ TEST_CASE("Vector operation test")
         auto c = Vector3f::Cross(a, b);
         REQUIRE(std::abs(Vector3f::Dot(a, c)) < EPS);
         REQUIRE(std::abs(Vector3f::Dot(b, c)) < EPS);
+    }
+}
+
+TEST_CASE("Vector3f security"){
+    SECTION("Index overflow"){
+        Vector3f a = initializer;
+        a[999999] = 10.0f;
     }
 }
