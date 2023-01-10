@@ -10,57 +10,83 @@
 
 using namespace OpenPT;
 
-Vector3f::Vector3f(const float x, const float y, const float z)
-{
-    value[0] = x;
-    value[1] = y;
-    value[2] = z;
-}
-
+Vector3f::Vector3f(const float x_, const float y_, const float z_) : x(x_), y(y_), z(z_) {}
 Vector3f::Vector3f() : Vector3f(0.0f, 0.0f, 0.0f) {}
-
 Vector3f::Vector3f(const std::array<float, 3> &triple) : Vector3f(triple[0], triple[1], triple[2]) {}
 
-float &Vector3f::x()
+float Vector3f::Length()
 {
-    return value[0];
+    return sqrt(x * x + y * y + z * z);
 }
 
-float &Vector3f::y()
+void Vector3f::Normalize()
 {
-    return value[1];
+    (*this) /= Length();
 }
 
-float &Vector3f::z()
+const Vector3f Vector3f::Normalized()
 {
-    return value[2];
+    return Vector3f(*this) / Length();
 }
 
-// float Vector3f::Length()
-// {
-//     return sqrt(value[0] * value[0] +
-//                 value[1] * value[1] +
-//                 value[2] * value[2]);
-// }
+float &Vector3f::operator[](const int i)
+{
+    return *((&x) + i);
+}
 
-// void Vector3f::Normalize(){
-//     (*this) /= Length();
-// }
+const Vector3f Vector3f::operator+(const Vector3f &a)
+{
+    return Vector3f(x + a.x, y + a.y, z + a.z);
+}
 
-// const Vector3f Normalized(){
-    
-// }
+const Vector3f Vector3f::operator-(const Vector3f &a)
+{
+    return Vector3f(x - a.x, y - a.y, z - a.z);
+}
 
-// const Vector3f &Vector3f::operator*=(const float a){
-//     value[0] *= a;
-//     value[1] *= a;
-//     value[2] *= a;
-//     return (*this);
-// }
+const Vector3f Vector3f::operator*(const float &a)
+{
+    return Vector3f(x * a, y * a, z * a);
+}
 
-// const Vector3f &Vector3f::operator/=(const float a){
-//     value[0] /= a;
-//     value[1] /= a;
-//     value[2] /= a;
-//     return (*this);
-// }
+const Vector3f Vector3f::operator/(const float &a)
+{
+    return Vector3f(x / a, y / a, z / a);
+}
+
+const Vector3f &Vector3f::operator+=(const Vector3f &a)
+{
+    x += a.x;
+    y += a.y;
+    z += a.z;
+    return (*this);
+}
+
+const Vector3f &Vector3f::operator-=(const Vector3f &a)
+{
+    x -= a.x;
+    y -= a.y;
+    z -= a.z;
+    return (*this);
+}
+
+const Vector3f &Vector3f::operator*=(const float a)
+{
+    x *= a;
+    y *= a;
+    z *= a;
+    return (*this);
+}
+
+const Vector3f &Vector3f::operator/=(const float a)
+{
+    x /= a;
+    y /= a;
+    z /= a;
+    return (*this);
+}
+
+const bool Vector3f::operator==(const Vector3f &a)
+{
+    return ((x == a.x) && (y == a.y) && (z == a.z));
+}

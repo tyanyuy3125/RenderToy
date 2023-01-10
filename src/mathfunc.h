@@ -13,37 +13,31 @@ namespace OpenPT
 {
     class Vector3f
     {
-    private:
-        float value[3];
-
     public:
+        float x, y, z;
+
         Vector3f();
-        Vector3f(const float x, const float y, const float z);
-        Vector3f(const std::array<float,3> &triple);
+        Vector3f(const float x_, const float y_, const float z_);
+        Vector3f(const std::array<float, 3> &triple);
 
-        float &x();
-        float &y();
-        float &z();
+        float Length();
 
-        // float Length();
+        void Normalize();
+        const Vector3f Normalized();
 
-        // void Normalize();
-        // const Vector3f Normalized();
+        float &operator[](const int i);
 
-        // float & operator[](const int i);
+        const Vector3f operator+(const Vector3f &a);
+        const Vector3f operator-(const Vector3f &a);
+        const Vector3f operator*(const float &a);
+        const Vector3f operator/(const float &a);
 
-        // const Vector3f operator+(const float &a);
-        // const Vector3f operator-(const float &a);
-        // const Vector3f operator*(const float &a);
-        // const Vector3f operator/(const float &a);
+        const Vector3f &operator+=(const Vector3f &a);
+        const Vector3f &operator-=(const Vector3f &a);
+        const Vector3f &operator*=(const float a);
+        const Vector3f &operator/=(const float a);
 
-        // const Vector3f &operator+=(const Vector3f &a);
-        // const Vector3f &operator-=(const Vector3f &a);
-        // const Vector3f &operator*=(const float a);
-        // const Vector3f &operator/=(const float a);
-
-        // const bool operator==(const float &a);
-        // const bool operator=(const float &a);
+        const bool operator==(const Vector3f &a);
     };
 };
 
