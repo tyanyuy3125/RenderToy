@@ -7,6 +7,9 @@
 #ifndef MATHFUNC_H
 #define MATHFUNC_H
 
+#define EPS 1e-5
+#define PI 3.14159265358979323846L
+
 #include <array>
 
 namespace OpenPT
@@ -27,18 +30,23 @@ namespace OpenPT
 
         float &operator[](const int i);
 
-        const Vector3f operator+(const Vector3f &a);
-        const Vector3f operator-(const Vector3f &a);
-        const Vector3f operator*(const float &a);
-        const Vector3f operator/(const float &a);
+        const Vector3f operator+(const Vector3f &a) const;
+        const Vector3f operator-(const Vector3f &a) const;
+        const Vector3f operator*(const float a) const;
+        const Vector3f operator/(const float a) const;
 
         const Vector3f &operator+=(const Vector3f &a);
         const Vector3f &operator-=(const Vector3f &a);
         const Vector3f &operator*=(const float a);
         const Vector3f &operator/=(const float a);
 
-        const bool operator==(const Vector3f &a);
+        const bool operator==(const Vector3f &a) const;
+
+        const static float Dot(const Vector3f &a, const Vector3f &b);
+        const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
     };
+
+    const Vector3f operator*(const float lambda, const Vector3f &a);
 };
 
 #endif
