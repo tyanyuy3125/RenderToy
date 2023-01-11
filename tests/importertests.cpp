@@ -8,6 +8,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../lib/Catch2/catch.hpp"
 #include "../src/mathfunc.h"
+#include "../src/importer.h"
 
 #include <sstream>
 #include <string>
@@ -39,4 +40,9 @@ TEST_CASE("SStream Functionality Test")
         REQUIRE(b == 4);
         REQUIRE(c == 1);
     }
+}
+
+TEST_CASE("Import test")
+{
+    
 }

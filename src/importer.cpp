@@ -66,5 +66,7 @@ namespace OpenPT
             }
         }
         ret.push_back(current_mesh);
+
+        return ret;
     }
 };

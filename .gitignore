@@ -12,6 +12,9 @@ CTestTestfile.cmake
 _deps
 build
 
+# VSCode
+.vscode
+
 # Prerequisites
 *.d
 
