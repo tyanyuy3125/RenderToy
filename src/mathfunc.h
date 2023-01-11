@@ -11,6 +11,7 @@
 #define PI 3.14159265358979323846L
 
 #include <array>
+#include <istream>
 
 namespace OpenPT
 {
@@ -47,6 +48,7 @@ namespace OpenPT
     };
 
     const Vector3f operator*(const float lambda, const Vector3f &a);
+    std::istream &operator>>(std::istream &is, Vector3f &a);
 
     class Vector2f
     {
@@ -81,6 +83,7 @@ namespace OpenPT
     };
 
     const Vector2f operator*(const float lambda, const Vector2f &a);
+    std::istream &operator>>(std::istream &is, Vector2f &a);
 
     class Vector4f
     {

@@ -108,6 +108,12 @@ namespace OpenPT
                         a.x * b.y - a.y * b.x);
     }
 
+    std::istream &operator>>(std::istream &is, Vector3f &a)
+    {
+        is >> a.x >> a.y >> a.z;
+        return is;
+    }
+
     Vector2f::Vector2f(const float x_, const float y_) : x(x_), y(y_) {}
     Vector2f::Vector2f() : Vector2f(0.0f, 0.0f) {}
     Vector2f::Vector2f(const std::array<float, 2> &tuple) : Vector2f(tuple[0], tuple[1]) {}
@@ -200,13 +206,19 @@ namespace OpenPT
         return a.x * b.y - a.y * b.x;
     }
 
+    std::istream &operator>>(std::istream &is, Vector2f &a)
+    {
+        is >> a.x >> a.y;
+        return is;
+    }
+
     Vector4f::Vector4f(const float x_, const float y_, const float z_, const float w_) : x(x_), y(y_), z(z_), w(w_) {}
     Vector4f::Vector4f() : Vector4f(0.0f, 0.0f, 0.0f, 0.0f) {}
     Vector4f::Vector4f(const std::array<float, 4> &quadruple) : Vector4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
 
     float Vector4f::Length() const
     {
-        return sqrt(x * x + y * y + z * z + w*w);
+        return sqrt(x * x + y * y + z * z + w * w);
     }
 
     void Vector4f::Normalize()
@@ -231,17 +243,17 @@ namespace OpenPT
 
     const Vector4f Vector4f::operator-(const Vector4f &a) const
     {
-        return Vector4f(x - a.x, y - a.y, z - a.z, w-a.w);
+        return Vector4f(x - a.x, y - a.y, z - a.z, w - a.w);
     }
 
     const Vector4f Vector4f::operator*(const float a) const
     {
-        return Vector4f(x * a, y * a, z * a, w*a);
+        return Vector4f(x * a, y * a, z * a, w * a);
     }
 
     const Vector4f Vector4f::operator/(const float a) const
     {
-        return Vector4f(x / a, y / a, z / a, w/a);
+        return Vector4f(x / a, y / a, z / a, w / a);
     }
 
     const Vector4f &Vector4f::operator+=(const Vector4f &a)
@@ -298,10 +310,11 @@ namespace OpenPT
     const Vector4f Vector4f::Cross(const Vector4f &a, const Vector4f &b)
     {
         // TODO <tianyu@illumiart.net>: Implement 4D-vector cross product using matrix operation.
-        return Vector4f(0.0f,0.0f,0.0f,0.0f);
+        return Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    Vector4f &Matrix4x4f::operator[](const int i){
+    Vector4f &Matrix4x4f::operator[](const int i)
+    {
         return row[i];
     }
 }

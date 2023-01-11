@@ -5,3 +5,6 @@
 #
 
 add_library(MathFunc mathfunc.cpp mathfunc.h)
+add_library(Importer importer.cpp importer.h)
+add_library(MeshObj meshobj.cpp meshobj.h)
+add_library(World world.cpp world.h)
