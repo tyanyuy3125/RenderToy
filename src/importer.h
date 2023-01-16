@@ -19,6 +19,8 @@ namespace OpenPT
     {
     public:
         Importer() = delete;
+        Importer(Importer&) = delete;
+        Importer(Importer&&) = delete;
         Importer(std::string path_);
 
         // https://stackoverflow.com/questions/15704565/efficient-way-to-return-a-stdvector-in-c

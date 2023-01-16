@@ -18,6 +18,11 @@ namespace OpenPT
     class Vector3f
     {
     public:
+        const static Vector3f O;
+        const static Vector3f X;
+        const static Vector3f Y;
+        const static Vector3f Z;
+
         float x, y, z;
 
         Vector3f();
@@ -30,6 +35,7 @@ namespace OpenPT
         const Vector3f Normalized() const;
 
         float &operator[](const int i);
+        const float operator[](const int i) const;
 
         const Vector3f operator+(const Vector3f &a) const;
         const Vector3f operator-(const Vector3f &a) const;
@@ -53,6 +59,10 @@ namespace OpenPT
     class Vector2f
     {
     public:
+        const static Vector2f O;
+        const static Vector2f X;
+        const static Vector2f Y;
+
         float x, y;
 
         Vector2f();
@@ -65,6 +75,7 @@ namespace OpenPT
         const Vector2f Normalized() const;
 
         float &operator[](const int i);
+        const float operator[](const int i) const;
 
         const Vector2f operator+(const Vector2f &a) const;
         const Vector2f operator-(const Vector2f &a) const;
@@ -88,6 +99,12 @@ namespace OpenPT
     class Vector4f
     {
     public:
+        const static Vector4f O;
+        const static Vector4f X;
+        const static Vector4f Y;
+        const static Vector4f Z;
+        const static Vector4f W;
+
         float x, y, z, w;
 
         Vector4f();
@@ -100,6 +117,7 @@ namespace OpenPT
         const Vector4f Normalized() const;
 
         float &operator[](const int i);
+        const float operator[](const int i) const;
 
         const Vector4f operator+(const Vector4f &a) const;
         const Vector4f operator-(const Vector4f &a) const;
@@ -126,16 +144,20 @@ namespace OpenPT
 
     public:
         Matrix4x4f();
-        Matrix4x4f(Vector4f r1, Vector4f r2, Vector4f r3, Vector4f r4);
+        Matrix4x4f(const Matrix4x4f &a);
+        Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
         Matrix4x4f(std::array<Vector4f, 4> quadruple);
 
         Vector4f &operator[](const int i);
+        const Vector4f &operator[](const int i) const;
 
-        Vector4f operator*(const Vector4f &a) const;
-        Matrix4x4f operator*(const Matrix4x4f &a) const;
+        const bool operator==(const Matrix4x4f &a) const;
 
+        const Vector4f operator*(const Vector4f &a) const;
+        const Matrix4x4f operator*(const Matrix4x4f &a) const;
+        
         void Transpose();
-        Matrix4x4f Transposed() const;
+        const Matrix4x4f Transposed() const;
     };
 };
 

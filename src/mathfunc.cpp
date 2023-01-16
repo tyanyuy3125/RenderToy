@@ -1,6 +1,7 @@
 /*
  *  OpenPT - Math Function Module
  *  File created on 2023/1/10
+ *  Last edited on 2023/1/12
  *  Tianyu Huang <tianyu@illumiart.net>
  */
 
@@ -13,6 +14,11 @@ namespace OpenPT
     Vector3f::Vector3f(const float x_, const float y_, const float z_) : x(x_), y(y_), z(z_) {}
     Vector3f::Vector3f() : Vector3f(0.0f, 0.0f, 0.0f) {}
     Vector3f::Vector3f(const std::array<float, 3> &triple) : Vector3f(triple[0], triple[1], triple[2]) {}
+
+    const Vector3f Vector3f::O = Vector3f();
+    const Vector3f Vector3f::X = Vector3f(1.0f, 0.0f, 0.0f);
+    const Vector3f Vector3f::Y = Vector3f(0.0f, 1.0f, 0.0f);
+    const Vector3f Vector3f::Z = Vector3f(0.0f, 0.0f, 1.0f);
 
     float Vector3f::Length() const
     {
@@ -30,6 +36,11 @@ namespace OpenPT
     }
 
     float &Vector3f::operator[](const int i)
+    {
+        return *((&x) + i);
+    }
+
+    const float Vector3f::operator[](const int i) const
     {
         return *((&x) + i);
     }
@@ -118,6 +129,10 @@ namespace OpenPT
     Vector2f::Vector2f() : Vector2f(0.0f, 0.0f) {}
     Vector2f::Vector2f(const std::array<float, 2> &tuple) : Vector2f(tuple[0], tuple[1]) {}
 
+    const Vector2f Vector2f::O = Vector2f();
+    const Vector2f Vector2f::X = Vector2f(1.0f, 0.0f);
+    const Vector2f Vector2f::Y = Vector2f(0.0f, 1.0f);
+
     float Vector2f::Length() const
     {
         return sqrt(x * x + y * y);
@@ -134,6 +149,11 @@ namespace OpenPT
     }
 
     float &Vector2f::operator[](const int i)
+    {
+        return *((&x) + i);
+    }
+
+    const float Vector2f::operator[](const int i) const
     {
         return *((&x) + i);
     }
@@ -216,6 +236,12 @@ namespace OpenPT
     Vector4f::Vector4f() : Vector4f(0.0f, 0.0f, 0.0f, 0.0f) {}
     Vector4f::Vector4f(const std::array<float, 4> &quadruple) : Vector4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
 
+    const Vector4f Vector4f::O = Vector4f();
+    const Vector4f Vector4f::X = Vector4f(1.0f, 0.0f, 0.0f, 0.0f);
+    const Vector4f Vector4f::Y = Vector4f(0.0f, 1.0f, 0.0f, 0.0f);
+    const Vector4f Vector4f::Z = Vector4f(0.0f, 0.0f, 1.0f, 0.0f);
+    const Vector4f Vector4f::W = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
+
     float Vector4f::Length() const
     {
         return sqrt(x * x + y * y + z * z + w * w);
@@ -232,6 +258,11 @@ namespace OpenPT
     }
 
     float &Vector4f::operator[](const int i)
+    {
+        return *((&x) + i);
+    }
+
+    const float Vector4f::operator[](const int i) const
     {
         return *((&x) + i);
     }
@@ -313,8 +344,85 @@ namespace OpenPT
         return Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
+    Matrix4x4f::Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3)
+    {
+        row[0] = r0;
+        row[1] = r1;
+        row[2] = r2;
+        row[3] = r3;
+    }
+
+    Matrix4x4f::Matrix4x4f(std::array<Vector4f, 4> quadruple) : Matrix4x4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
+
+    Matrix4x4f::Matrix4x4f() : Matrix4x4f(Vector4f::O, Vector4f::O, Vector4f::O, Vector4f::O) {}
+
+    Matrix4x4f::Matrix4x4f(const Matrix4x4f &a)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            row[i] = a[i];
+        }
+    }
+
     Vector4f &Matrix4x4f::operator[](const int i)
     {
         return row[i];
+    }
+
+    const Vector4f &Matrix4x4f::operator[](const int i) const
+    {
+        return row[i];
+    }
+
+    const bool Matrix4x4f::operator==(const Matrix4x4f &a) const
+    {
+        return (row[0] == a[0] && row[1] == a[1] && row[2] == a[2] && row[3] == a[3]);
+    }
+
+    const Vector4f Matrix4x4f::operator*(const Vector4f &a) const
+    {
+        Vector4f ret;
+        for (int i = 0; i < 4; ++i)
+        {
+            for (int j = 0; j < 4; ++j)
+            {
+                ret[i] += row[i][j] * a[j];
+            }
+        }
+        return ret;
+    }
+
+    const Matrix4x4f Matrix4x4f::operator*(const Matrix4x4f &a) const
+    {
+        Matrix4x4f ret;
+        for (int i = 0; i < 4; ++i)
+        {
+            for (int j = 0; j < 4; ++j)
+            {
+                for (int k = 0; k < 4; ++k)
+                {
+                    ret[i][j] += row[i][k] * a[k][j];
+                }
+            }
+        }
+        return ret;
+    }
+
+    void Matrix4x4f::Transpose()
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            for (int j = 0; j < 4; ++j)
+            {
+                row[i][j] = row[j][i];
+            }
+        }
+    }
+
+    const Matrix4x4f Matrix4x4f::Transposed() const
+    {
+        Matrix4x4f ret = (*this);
+        ret.Transpose();
+        return ret;
     }
 }

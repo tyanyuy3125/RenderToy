@@ -111,3 +111,10 @@ TEST_CASE("Vector3f security"){
         a[999999] = 10.0f;
     }
 }
+
+TEST_CASE("Vector constant test"){
+    SECTION("Vector3f"){
+        Vector3f ret = Vector3f::O + Vector3f::X + Vector3f::Y + Vector3f::Z;
+        REQUIRE(ret == Vector3f(1.0f, 1.0f, 1.0f));
+    }
+}

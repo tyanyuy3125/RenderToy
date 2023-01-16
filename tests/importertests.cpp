@@ -9,10 +9,13 @@
 #include "../lib/Catch2/catch.hpp"
 #include "../src/mathfunc.h"
 #include "../src/importer.h"
+#include "../src/meshobj.h"
 
 #include <sstream>
 #include <string>
 #include <cmath>
+
+using namespace OpenPT;
 
 TEST_CASE("SStream Functionality Test")
 {
@@ -40,9 +43,4 @@ TEST_CASE("SStream Functionality Test")
         REQUIRE(b == 4);
         REQUIRE(c == 1);
     }
-}
-
-TEST_CASE("Import test")
-{
-    
 }
