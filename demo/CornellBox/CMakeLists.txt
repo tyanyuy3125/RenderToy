@@ -5,3 +5,6 @@
 #
 
 add_executable(CornellBox main.cpp)
+target_link_libraries(CornellBox PRIVATE MathFunc Importer)
+configure_file(testfile.in ${EXECUTABLE_OUTPUT_PATH} testfile.in COPYONLY)
+

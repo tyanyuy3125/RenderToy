@@ -39,6 +39,7 @@ namespace OpenPT
 
         const Vector3f operator+(const Vector3f &a) const;
         const Vector3f operator-(const Vector3f &a) const;
+        const Vector3f operator-(void) const;
         const Vector3f operator*(const float a) const;
         const Vector3f operator/(const float a) const;
 
@@ -79,6 +80,7 @@ namespace OpenPT
 
         const Vector2f operator+(const Vector2f &a) const;
         const Vector2f operator-(const Vector2f &a) const;
+        const Vector2f operator-(void) const;
         const Vector2f operator*(const float a) const;
         const Vector2f operator/(const float a) const;
 
@@ -121,6 +123,7 @@ namespace OpenPT
 
         const Vector4f operator+(const Vector4f &a) const;
         const Vector4f operator-(const Vector4f &a) const;
+        const Vector4f operator-(void) const;
         const Vector4f operator*(const float a) const;
         const Vector4f operator/(const float a) const;
 
@@ -143,6 +146,9 @@ namespace OpenPT
         Vector4f row[4];
 
     public:
+        const static Matrix4x4f I;
+        const static Matrix4x4f O;
+
         Matrix4x4f();
         Matrix4x4f(const Matrix4x4f &a);
         Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
@@ -153,11 +159,81 @@ namespace OpenPT
 
         const bool operator==(const Matrix4x4f &a) const;
 
+        const Matrix4x4f operator+(const Matrix4x4f &a) const;
+        const Matrix4x4f operator-(const Matrix4x4f &a) const;
+        const Matrix4x4f operator-(void) const;
         const Vector4f operator*(const Vector4f &a) const;
         const Matrix4x4f operator*(const Matrix4x4f &a) const;
-        
+
+        const Matrix4x4f &operator+=(const Matrix4x4f &a);
+        const Matrix4x4f &operator-=(const Matrix4x4f &a);
+
         void Transpose();
         const Matrix4x4f Transposed() const;
+    };
+
+    class Matrix3x3f
+    {
+    private:
+        Vector3f row[3];
+
+    public:
+        const static Matrix3x3f I;
+        const static Matrix3x3f O;
+
+        Matrix3x3f();
+        Matrix3x3f(const Matrix3x3f &a);
+        Matrix3x3f(Vector3f r0, Vector3f r1, Vector3f r2);
+        Matrix3x3f(std::array<Vector3f, 3> triple);
+
+        Vector3f &operator[](const int i);
+        const Vector3f &operator[](const int i) const;
+
+        const bool operator==(const Matrix3x3f &a) const;
+
+        const Matrix3x3f operator+(const Matrix3x3f &a) const;
+        const Matrix3x3f operator-(const Matrix3x3f &a) const;
+        const Matrix3x3f operator-(void) const;
+        const Vector3f operator*(const Vector3f &a) const;
+        const Matrix3x3f operator*(const Matrix3x3f &a) const;
+
+        const Matrix3x3f &operator+=(const Matrix3x3f &a);
+        const Matrix3x3f &operator-=(const Matrix3x3f &a);
+
+        void Transpose();
+        const Matrix3x3f Transposed() const;
+    };
+
+    class Matrix2x2f
+    {
+    private:
+        Vector2f row[2];
+
+    public:
+        const static Matrix2x2f I;
+        const static Matrix2x2f O;
+
+        Matrix2x2f();
+        Matrix2x2f(const Matrix2x2f &a);
+        Matrix2x2f(Vector2f r0, Vector2f r1);
+        Matrix2x2f(std::array<Vector2f, 2> tuple);
+
+        Vector2f &operator[](const int i);
+        const Vector2f &operator[](const int i) const;
+
+        const bool operator==(const Matrix2x2f &a) const;
+
+        const Matrix2x2f operator+(const Matrix2x2f &a) const;
+        const Matrix2x2f operator-(const Matrix2x2f &a) const;
+        const Matrix2x2f operator-(void) const;
+        const Vector2f operator*(const Vector2f &a) const;
+        const Matrix2x2f operator*(const Matrix2x2f &a) const;
+
+        const Matrix2x2f &operator+=(const Matrix2x2f &a);
+        const Matrix2x2f &operator-=(const Matrix2x2f &a);
+
+        void Transpose();
+        const Matrix2x2f Transposed() const;
     };
 };
 

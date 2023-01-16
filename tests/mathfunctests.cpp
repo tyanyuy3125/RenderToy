@@ -105,16 +105,42 @@ TEST_CASE("Vector3f operation test")
     }
 }
 
-TEST_CASE("Vector3f security"){
-    SECTION("Index overflow"){
+TEST_CASE("Vector3f security")
+{
+    SECTION("Index overflow")
+    {
         Vector3f a = initializer;
         a[999999] = 10.0f;
     }
 }
 
-TEST_CASE("Vector constant test"){
-    SECTION("Vector3f"){
+TEST_CASE("Vector constant test")
+{
+    SECTION("Vector3f")
+    {
         Vector3f ret = Vector3f::O + Vector3f::X + Vector3f::Y + Vector3f::Z;
         REQUIRE(ret == Vector3f(1.0f, 1.0f, 1.0f));
     }
+}
+
+TEST_CASE("Vector test")
+{
+    Vector4f a = {1.0f, 2.0f, 3.0f, 4.0f};
+    a = -a;
+    REQUIRE(a[0] == -1.0f);
+}
+
+TEST_CASE("Matrix4x4f test")
+{
+    Matrix4x4f a = Matrix4x4f::I;
+    Vector4f vec1 = {1.0f, 2.0f, 3.0f, 4.0f};
+    Vector4f vec2 = vec1;
+    REQUIRE(a * vec1 == vec2);
+
+    Matrix4x4f b = {{0.0f, 0.0f, 0.0f, 1.0f},
+                    {0.0f, 0.0f, 1.0f, 0.0f},
+                    {0.0f, 1.0f, 0.0f, 0.0f},
+                    {1.0f, 0.0f, 0.0f, 0.0f}};
+    REQUIRE(b * b == Matrix4x4f::I);
+    REQUIRE(b * vec1 == (Vector4f){4.0f, 3.0f, 2.0f, 1.0f});
 }

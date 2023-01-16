@@ -1,7 +1,7 @@
 /*
  *  OpenPT - Math Function Module
  *  File created on 2023/1/10
- *  Last edited on 2023/1/12
+ *  Last edited on 2023/1/16
  *  Tianyu Huang <tianyu@illumiart.net>
  */
 
@@ -53,6 +53,11 @@ namespace OpenPT
     const Vector3f Vector3f::operator-(const Vector3f &a) const
     {
         return Vector3f(x - a.x, y - a.y, z - a.z);
+    }
+
+    const Vector3f Vector3f::operator-(void) const
+    {
+        return Vector3f(-x, -y, -z);
     }
 
     const Vector3f Vector3f::operator*(const float a) const
@@ -168,6 +173,11 @@ namespace OpenPT
         return Vector2f(x - a.x, y - a.y);
     }
 
+    const Vector2f Vector2f::operator-(void) const
+    {
+        return Vector2f(-x, -y);
+    }
+
     const Vector2f Vector2f::operator*(const float a) const
     {
         return Vector2f(x * a, y * a);
@@ -277,6 +287,11 @@ namespace OpenPT
         return Vector4f(x - a.x, y - a.y, z - a.z, w - a.w);
     }
 
+    const Vector4f Vector4f::operator-(void) const
+    {
+        return Vector4f(-x, -y, -z, -w);
+    }
+
     const Vector4f Vector4f::operator*(const float a) const
     {
         return Vector4f(x * a, y * a, z * a, w * a);
@@ -356,6 +371,9 @@ namespace OpenPT
 
     Matrix4x4f::Matrix4x4f() : Matrix4x4f(Vector4f::O, Vector4f::O, Vector4f::O, Vector4f::O) {}
 
+    const Matrix4x4f Matrix4x4f::I = Matrix4x4f(Vector4f::X, Vector4f::Y, Vector4f::Z, Vector4f::W);
+    const Matrix4x4f Matrix4x4f::O = Matrix4x4f();
+
     Matrix4x4f::Matrix4x4f(const Matrix4x4f &a)
     {
         for (int i = 0; i < 4; ++i)
@@ -377,6 +395,31 @@ namespace OpenPT
     const bool Matrix4x4f::operator==(const Matrix4x4f &a) const
     {
         return (row[0] == a[0] && row[1] == a[1] && row[2] == a[2] && row[3] == a[3]);
+    }
+
+    const Matrix4x4f Matrix4x4f::operator+(const Matrix4x4f &a) const
+    {
+        Matrix4x4f ret;
+        for (int i = 0; i < 4; ++i)
+        {
+            ret[i] = row[i] + a[i];
+        }
+        return ret;
+    }
+
+    const Matrix4x4f Matrix4x4f::operator-(const Matrix4x4f &a) const
+    {
+        Matrix4x4f ret;
+        for (int i = 0; i < 4; ++i)
+        {
+            ret[i] = row[i] - a[i];
+        }
+        return ret;
+    }
+
+    const Matrix4x4f Matrix4x4f::operator-(void) const
+    {
+        return Matrix4x4f(-row[0], -row[1], -row[2], -row[3]);
     }
 
     const Vector4f Matrix4x4f::operator*(const Vector4f &a) const
@@ -408,6 +451,24 @@ namespace OpenPT
         return ret;
     }
 
+    const Matrix4x4f &Matrix4x4f::operator+=(const Matrix4x4f &a)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            row[i] += a[i];
+        }
+        return (*this);
+    }
+
+    const Matrix4x4f &Matrix4x4f::operator-=(const Matrix4x4f &a)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            row[i] -= a[i];
+        }
+        return (*this);
+    }
+
     void Matrix4x4f::Transpose()
     {
         for (int i = 0; i < 4; ++i)
@@ -425,4 +486,245 @@ namespace OpenPT
         ret.Transpose();
         return ret;
     }
+
+    Matrix3x3f::Matrix3x3f(std::array<Vector3f, 3> triple) : Matrix3x3f(triple[0], triple[1], triple[2]) {}
+
+    Matrix3x3f::Matrix3x3f() : Matrix3x3f(Vector3f::O, Vector3f::O, Vector3f::O) {}
+
+    const Matrix3x3f Matrix3x3f::I = Matrix3x3f(Vector3f::X, Vector3f::Y, Vector3f::Z);
+    const Matrix3x3f Matrix3x3f::O = Matrix3x3f();
+
+    Matrix3x3f::Matrix3x3f(const Matrix3x3f &a)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            row[i] = a[i];
+        }
+    }
+
+    Vector3f &Matrix3x3f::operator[](const int i)
+    {
+        return row[i];
+    }
+
+    const Vector3f &Matrix3x3f::operator[](const int i) const
+    {
+        return row[i];
+    }
+
+    const bool Matrix3x3f::operator==(const Matrix3x3f &a) const
+    {
+        return (row[0] == a[0] && row[1] == a[1] && row[2] == a[2]);
+    }
+
+    const Matrix3x3f Matrix3x3f::operator+(const Matrix3x3f &a) const
+    {
+        Matrix3x3f ret;
+        for (int i = 0; i < 3; ++i)
+        {
+            ret[i] = row[i] + a[i];
+        }
+        return ret;
+    }
+
+    const Matrix3x3f Matrix3x3f::operator-(const Matrix3x3f &a) const
+    {
+        Matrix3x3f ret;
+        for (int i = 0; i < 3; ++i)
+        {
+            ret[i] = row[i] - a[i];
+        }
+        return ret;
+    }
+
+    const Matrix3x3f Matrix3x3f::operator-(void) const
+    {
+        return Matrix3x3f(-row[0], -row[1], -row[2]);
+    }
+
+    const Vector3f Matrix3x3f::operator*(const Vector3f &a) const
+    {
+        Vector3f ret;
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                ret[i] += row[i][j] * a[j];
+            }
+        }
+        return ret;
+    }
+
+    const Matrix3x3f Matrix3x3f::operator*(const Matrix3x3f &a) const
+    {
+        Matrix3x3f ret;
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                for (int k = 0; k < 3; ++k)
+                {
+                    ret[i][j] += row[i][k] * a[k][j];
+                }
+            }
+        }
+        return ret;
+    }
+
+    const Matrix3x3f &Matrix3x3f::operator+=(const Matrix3x3f &a)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            row[i] += a[i];
+        }
+        return (*this);
+    }
+
+    const Matrix3x3f &Matrix3x3f::operator-=(const Matrix3x3f &a)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            row[i] -= a[i];
+        }
+        return (*this);
+    }
+
+    void Matrix3x3f::Transpose()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                row[i][j] = row[j][i];
+            }
+        }
+    }
+
+    const Matrix3x3f Matrix3x3f::Transposed() const
+    {
+        Matrix3x3f ret = (*this);
+        ret.Transpose();
+        return ret;
+    }
+
+    Matrix2x2f::Matrix2x2f(std::array<Vector2f, 2> tuple) : Matrix2x2f(tuple[0], tuple[1]) {}
+
+    Matrix2x2f::Matrix2x2f() : Matrix2x2f(Vector2f::O, Vector2f::O) {}
+
+    const Matrix2x2f Matrix2x2f::I = Matrix2x2f(Vector2f::X, Vector2f::Y);
+    const Matrix2x2f Matrix2x2f::O = Matrix2x2f();
+
+    Matrix2x2f::Matrix2x2f(const Matrix2x2f &a)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            row[i] = a[i];
+        }
+    }
+
+    Vector2f &Matrix2x2f::operator[](const int i)
+    {
+        return row[i];
+    }
+
+    const Vector2f &Matrix2x2f::operator[](const int i) const
+    {
+        return row[i];
+    }
+
+    const bool Matrix2x2f::operator==(const Matrix2x2f &a) const
+    {
+        return (row[0] == a[0] && row[1] == a[1]);
+    }
+
+    const Matrix2x2f Matrix2x2f::operator+(const Matrix2x2f &a) const
+    {
+        Matrix2x2f ret;
+        for (int i = 0; i < 2; ++i)
+        {
+            ret[i] = row[i] + a[i];
+        }
+        return ret;
+    }
+
+    const Matrix2x2f Matrix2x2f::operator-(const Matrix2x2f &a) const
+    {
+        Matrix2x2f ret;
+        for (int i = 0; i < 2; ++i)
+        {
+            ret[i] = row[i] - a[i];
+        }
+        return ret;
+    }
+
+    const Matrix2x2f Matrix2x2f::operator-(void) const
+    {
+        return Matrix2x2f(-row[0], -row[1]);
+    }
+
+    const Vector2f Matrix2x2f::operator*(const Vector2f &a) const
+    {
+        Vector2f ret;
+        for (int i = 0; i < 2; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                ret[i] += row[i][j] * a[j];
+            }
+        }
+        return ret;
+    }
+
+    const Matrix2x2f Matrix2x2f::operator*(const Matrix2x2f &a) const
+    {
+        Matrix2x2f ret;
+        for (int i = 0; i < 2; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                for (int k = 0; k < 2; ++k)
+                {
+                    ret[i][j] += row[i][k] * a[k][j];
+                }
+            }
+        }
+        return ret;
+    }
+
+    const Matrix2x2f &Matrix2x2f::operator+=(const Matrix2x2f &a)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            row[i] += a[i];
+        }
+        return (*this);
+    }
+
+    const Matrix2x2f &Matrix2x2f::operator-=(const Matrix2x2f &a)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            row[i] -= a[i];
+        }
+        return (*this);
+    }
+
+    void Matrix2x2f::Transpose()
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                row[i][j] = row[j][i];
+            }
+        }
+    }
+
+    const Matrix2x2f Matrix2x2f::Transposed() const
+    {
+        Matrix2x2f ret = (*this);
+        ret.Transpose();
+        return ret;
+    }
+
 }
