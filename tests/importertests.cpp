@@ -44,3 +44,9 @@ TEST_CASE("SStream Functionality Test")
         REQUIRE(c == 1);
     }
 }
+
+TEST_CASE("Importer"){
+    Importer importer("./cube.obj");
+    
+    REQUIRE(importer.Import().size() == 1);
+}

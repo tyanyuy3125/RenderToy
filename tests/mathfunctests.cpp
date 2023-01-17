@@ -23,6 +23,7 @@ TEST_CASE("Testing framework is working fine")
 
 TEST_CASE("Vector3f initialization")
 {
+    Vector3f hanging_vector;
     Vector3f a = initializer;
     SECTION("Initialization check")
     {

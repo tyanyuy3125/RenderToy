@@ -1,4 +1,6 @@
 #include "importer.h"
+#include "meshobj.h"
+#include "mathfunc.h"
 
 #include <fstream>
 #include <string>

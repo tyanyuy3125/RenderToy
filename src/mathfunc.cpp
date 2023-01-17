@@ -368,7 +368,6 @@ namespace OpenPT
     }
 
     Matrix4x4f::Matrix4x4f(std::array<Vector4f, 4> quadruple) : Matrix4x4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
-
     Matrix4x4f::Matrix4x4f() : Matrix4x4f(Vector4f::O, Vector4f::O, Vector4f::O, Vector4f::O) {}
 
     const Matrix4x4f Matrix4x4f::I = Matrix4x4f(Vector4f::X, Vector4f::Y, Vector4f::Z, Vector4f::W);
@@ -487,8 +486,14 @@ namespace OpenPT
         return ret;
     }
 
-    Matrix3x3f::Matrix3x3f(std::array<Vector3f, 3> triple) : Matrix3x3f(triple[0], triple[1], triple[2]) {}
+    Matrix3x3f::Matrix3x3f(Vector3f r0, Vector3f r1, Vector3f r2)
+    {
+        row[0] = r0;
+        row[1] = r1;
+        row[2] = r2;
+    }
 
+    Matrix3x3f::Matrix3x3f(std::array<Vector3f, 3> triple) : Matrix3x3f(triple[0], triple[1], triple[2]) {}
     Matrix3x3f::Matrix3x3f() : Matrix3x3f(Vector3f::O, Vector3f::O, Vector3f::O) {}
 
     const Matrix3x3f Matrix3x3f::I = Matrix3x3f(Vector3f::X, Vector3f::Y, Vector3f::Z);
@@ -607,8 +612,12 @@ namespace OpenPT
         return ret;
     }
 
+    Matrix2x2f::Matrix2x2f(Vector2f r0, Vector2f r1)
+    {
+        row[0] = r0;
+        row[1] = r1;
+    }
     Matrix2x2f::Matrix2x2f(std::array<Vector2f, 2> tuple) : Matrix2x2f(tuple[0], tuple[1]) {}
-
     Matrix2x2f::Matrix2x2f() : Matrix2x2f(Vector2f::O, Vector2f::O) {}
 
     const Matrix2x2f Matrix2x2f::I = Matrix2x2f(Vector2f::X, Vector2f::Y);

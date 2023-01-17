@@ -5,3 +5,4 @@
 #
 
 add_subdirectory(CornellBox)
+add_subdirectory(Cube)
