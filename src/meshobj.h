@@ -20,12 +20,6 @@ namespace OpenPT
     class Mesh
     {
     public:
-        std::string &get_name();
-        std::vector<Vector3f> &get_geo_vert();
-        std::vector<Vector3f> &get_vert_norm();
-        std::vector<Vector2f> &get_vert_tex();
-
-    private:
         std::string name;
         std::vector<Vector3f> geo_vert;
         std::vector<Vector3f> vert_norm;

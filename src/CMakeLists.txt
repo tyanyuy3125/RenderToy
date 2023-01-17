@@ -4,10 +4,7 @@
 # Tianyu Huang <tianyu@illumiart.net>
 #
 
-add_library(MathFunc mathfunc.cpp mathfunc.h)
-add_library(MeshObj meshobj.cpp meshobj.h)
-add_library(Importer importer.cpp importer.h)
-add_library(World world.cpp world.h)
+add_library(OpenPT mathfunc.cpp mathfunc.h meshobj.cpp meshobj.h importer.cpp importer.h world.cpp world.h)
 # set(SOURCES
 #     importer.cpp
 #     mathfunc.cpp

@@ -24,38 +24,39 @@ namespace OpenPT
         std::string identifier;
         Vector3f tmp_vec3;
         Vector2f tmp_vec2;
+        char slash;
         std::array<std::array<int, 3>, 3> tmp_facedef;
         while (!fs.eof())
         {
             fs >> identifier;
             if (identifier == "o")
             {
-                if (!current_mesh.get_name().empty())
+                if (!current_mesh.name.empty())
                 {
                     ret.push_back(current_mesh);
                 }
-                fs >> current_mesh.get_name();
+                fs >> current_mesh.name;
                 continue;
             }
 
             if (identifier == "v")
             {
                 fs >> tmp_vec3;
-                current_mesh.get_geo_vert().push_back(tmp_vec3);
+                current_mesh.geo_vert.push_back(tmp_vec3);
                 continue;
             }
 
             if (identifier == "vn")
             {
                 fs >> tmp_vec3;
-                current_mesh.get_vert_norm().push_back(tmp_vec3);
+                current_mesh.vert_norm.push_back(tmp_vec3);
                 continue;
             }
 
             if (identifier == "vt")
             {
                 fs >> tmp_vec2;
-                current_mesh.get_vert_tex().push_back(tmp_vec2);
+                current_mesh.vert_tex.push_back(tmp_vec2);
                 continue;
             }
 
@@ -63,8 +64,9 @@ namespace OpenPT
             {
                 for (int i = 0; i < 3; ++i)
                 {
-                    fs >> tmp_facedef[i][0] >> tmp_facedef[i][1] >> tmp_facedef[i][1];
+                    fs >> tmp_facedef[i][0] >> slash >> tmp_facedef[i][1] >> slash >> tmp_facedef[i][2];
                 }
+                current_mesh.face.push_back(tmp_facedef);
             }
         }
         ret.push_back(current_mesh);
