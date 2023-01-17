@@ -7,6 +7,7 @@
 #include <sstream>
 #include <array>
 #include <tuple>
+#include <limits>
 
 namespace OpenPT
 {
@@ -67,7 +68,10 @@ namespace OpenPT
                     fs >> tmp_facedef[i][0] >> slash >> tmp_facedef[i][1] >> slash >> tmp_facedef[i][2];
                 }
                 current_mesh.face.push_back(tmp_facedef);
+                continue;
             }
+
+            fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         ret.push_back(current_mesh);
 

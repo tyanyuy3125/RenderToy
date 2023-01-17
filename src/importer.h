@@ -31,4 +31,4 @@ namespace OpenPT
     };
 };
 
-#endif
+#endif // IMPORTER_H

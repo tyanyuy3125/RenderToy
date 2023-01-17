@@ -16,6 +16,7 @@
 
 namespace OpenPT
 {
+#pragma region Basic Vector Math
     class Vector3f
     {
     public:
@@ -141,6 +142,9 @@ namespace OpenPT
 
     const Vector4f operator*(const float lambda, const Vector4f &a);
 
+#pragma endregion
+
+#pragma region Basic Matrix Math
     class Matrix4x4f
     {
     private:
@@ -171,6 +175,10 @@ namespace OpenPT
 
         void Transpose();
         const Matrix4x4f Transposed() const;
+
+        // This function DOES NOT check input matrix.
+        // TODO : Implement.
+        const static Matrix4x4f InvertOrthonormalAffineMatrix(const Matrix4x4f &mat);
     };
 
     class Matrix3x3f
@@ -203,6 +211,8 @@ namespace OpenPT
 
         void Transpose();
         const Matrix3x3f Transposed() const;
+
+        const static float Determinant(const Matrix3x3f &mat);
     };
 
     class Matrix2x2f
@@ -235,7 +245,14 @@ namespace OpenPT
 
         void Transpose();
         const Matrix2x2f Transposed() const;
+
+        const static float Determinant(const Matrix2x2f &mat);
     };
+#pragma endregion
+
+#pragma region Unit Conversion
+    void InchToMM(float &inch);
+#pragma endregion
 };
 
-#endif
+#endif // MATHFUNC_H

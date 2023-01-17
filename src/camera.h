@@ -1,3 +1,6 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include "mathfunc.h"
 #include "geoobj.h"
 
@@ -18,5 +21,7 @@ namespace OpenPT
                 float far_clipping_plane_);
     };
 
-    static const Camera AcademyCamera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825, 0.446), 0.1, 1000);
+    static const Camera AcademyCamera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825f, 0.446f), 0.1f, 1000.0f);
 }
+
+#endif // CAMERA_H

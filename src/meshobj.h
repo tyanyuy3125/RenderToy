@@ -9,6 +9,7 @@
 #define MESHOBJ_H
 
 #include "mathfunc.h"
+#include "geoobj.h"
 
 #include <vector>
 #include <string>
@@ -17,7 +18,7 @@
 
 namespace OpenPT
 {
-    class Mesh
+    class Mesh : public GeoObj
     {
     public:
         std::string name;
@@ -28,7 +29,9 @@ namespace OpenPT
         // Currently, we only support triangulated mesh!
         // TODO <tianyu@illumiart.net>: Too ugly! Needs refactor.
         std::vector<std::array<std::array<int, 3>, 3>> face;
+
+        bool Intersect(Vector3f r_o, Vector3f r_d);
     };
 };
 
-#endif
+#endif // MESHOBJ_H

@@ -1,7 +1,7 @@
 /*
  *  OpenPT - Math Function Module
  *  File created on 2023/1/10
- *  Last edited on 2023/1/16
+ *  Last edited on 2023/1/17
  *  Tianyu Huang <tianyu@illumiart.net>
  */
 
@@ -348,6 +348,11 @@ namespace OpenPT
         return a * lambda;
     }
 
+    void InchToMM(float &inch)
+    {
+        inch *= 25.4f;
+    }
+
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
@@ -612,6 +617,13 @@ namespace OpenPT
         return ret;
     }
 
+    const float Matrix3x3f::Determinant(const Matrix3x3f &mat)
+    {
+        return mat[0][0] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][1], mat[1][2]},{mat[2][1],mat[2][2]}})
+                - mat[0][1] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0], mat[1][2]}, {mat[2][0], mat[2][2]}})
+                + mat[0][2] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0],mat[1][1]},{mat[2][0],mat[2][1]}});
+    }
+
     Matrix2x2f::Matrix2x2f(Vector2f r0, Vector2f r1)
     {
         row[0] = r0;
@@ -736,4 +748,8 @@ namespace OpenPT
         return ret;
     }
 
+    const float Matrix2x2f::Determinant(const Matrix2x2f &mat)
+    {
+        return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+    }
 }

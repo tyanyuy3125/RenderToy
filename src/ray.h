@@ -1,3 +1,6 @@
+#ifndef RAY_H
+#define RAY_H
+
 #include "mathfunc.h"
 
 namespace OpenPT
@@ -11,3 +14,5 @@ namespace OpenPT
             Vector3f direction;
     };
 }
+
+#endif // RAY_H

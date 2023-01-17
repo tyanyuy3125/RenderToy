@@ -145,3 +145,16 @@ TEST_CASE("Matrix4x4f test")
     REQUIRE(b * b == Matrix4x4f::I);
     REQUIRE(b * vec1 == (Vector4f){4.0f, 3.0f, 2.0f, 1.0f});
 }
+
+TEST_CASE("Determinant")
+{
+    float det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
+                                                     {4.0f, 5.0f, 6.0f},
+                                                     {7.0f, 8.0f, 9.0f}});
+    REQUIRE(std::abs(det - 0.0f) < EPS);
+
+    det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
+                                               {4.0f, 5.0f, 6.0f},
+                                               {15.0f, 8.0f, 9.0f}});
+    REQUIRE(std::abs(det + 24.0f) < EPS);
+}
