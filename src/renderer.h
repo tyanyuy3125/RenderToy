@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <ostream>
+
 #include "world.h"
 
 namespace OpenPT
@@ -15,14 +17,14 @@ namespace OpenPT
         IRenderer(const IRenderer &) = delete;
         IRenderer(const IRenderer &&) = delete;
         IRenderer(World *world_);
-        virtual void Render(int camera_id, Vector2f resolution);
+        virtual void Render(int camera_id, Vector2f resolution, Vector3f *buffer);
     };
 
     class IntersectTestRenderer : public IRenderer
     {
     public:
         IntersectTestRenderer(World *world_);
-        virtual void Render(int camera_id, Vector2f resolution) override final;
+        virtual void Render(int camera_id, Vector2f resolution, Vector3f *buffer) override final;
     };
 }
 
