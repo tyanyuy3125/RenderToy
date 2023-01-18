@@ -19,6 +19,7 @@ namespace OpenPT
     const Vector3f Vector3f::X = Vector3f(1.0f, 0.0f, 0.0f);
     const Vector3f Vector3f::Y = Vector3f(0.0f, 1.0f, 0.0f);
     const Vector3f Vector3f::Z = Vector3f(0.0f, 0.0f, 1.0f);
+    const Vector3f Vector3f::White = Vector3f(1.0f, 1.0f, 1.0f);
 
     float Vector3f::Length() const
     {
@@ -133,6 +134,11 @@ namespace OpenPT
     Vector2f::Vector2f(const float x_, const float y_) : x(x_), y(y_) {}
     Vector2f::Vector2f() : Vector2f(0.0f, 0.0f) {}
     Vector2f::Vector2f(const std::array<float, 2> &tuple) : Vector2f(tuple[0], tuple[1]) {}
+
+    Vector2f::Vector2f(const Point &p)
+        : x(p.x), y(p.y)
+    {
+    }
 
     const Vector2f Vector2f::O = Vector2f();
     const Vector2f Vector2f::X = Vector2f(1.0f, 0.0f);

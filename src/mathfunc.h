@@ -24,6 +24,7 @@ namespace OpenPT
         const static Vector3f X;
         const static Vector3f Y;
         const static Vector3f Z;
+        const static Vector3f White;
 
         float x, y, z;
 
@@ -71,6 +72,7 @@ namespace OpenPT
         Vector2f();
         Vector2f(const float x_, const float y_);
         Vector2f(const std::array<float, 2> &tuple);
+        Vector2f(const Point &p);
 
         float Length() const;
 

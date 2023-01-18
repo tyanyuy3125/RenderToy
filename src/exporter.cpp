@@ -58,7 +58,7 @@ namespace OpenPT
             uint16_t numberOfColorPlanes = 1;
             uint16_t colorDepth = 24;
             uint32_t compressionMethod = 0;
-            uint32_t rawBitmapDataSize = 0;
+            uint32_t rawBitmapDataSize = 0; // Ignore
             int32_t horizontalResolution = 3780;
             int32_t verticalResolution = 3780;
             uint32_t colorTableEntries = 0;
@@ -96,7 +96,7 @@ namespace OpenPT
                 pixel.blue = int(255.99f * b);
                 os.write((char *)&pixel, 3);
             }
-            os.write(0x0, padding_len);
+            os.write(0x00, padding_len);
         }
     }
 
