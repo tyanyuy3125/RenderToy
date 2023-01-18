@@ -158,3 +158,15 @@ TEST_CASE("Determinant")
                                                {15.0f, 8.0f, 9.0f}});
     REQUIRE(std::abs(det + 24.0f) < EPS);
 }
+
+TEST_CASE("Complement Minor")
+{
+    Matrix4x4f b = {{0.0f, 0.0f, 0.0f, 1.0f},
+                    {0.0f, 0.0f, 1.0f, 0.0f},
+                    {0.0f, 1.0f, 0.0f, 0.0f},
+                    {1.0f, 0.0f, 0.0f, 0.0f}};
+    Matrix3x3f minor = {{0.0f, 1.0f, 0.0f},
+                        {1.0f, 0.0f, 0.0f},
+                        {0.0f, 0.0f, 0.0f}};
+    REQUIRE(b.ComplementMinor(0,0) == minor);
+}

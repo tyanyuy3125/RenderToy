@@ -2,6 +2,5 @@
 
 namespace OpenPT
 {
-    // TODO: assert when not normalized.
-    Ray::Ray(Vector3f src_, Vector3f direction_) : src(src_), direction(direction_) {}
+    Ray::Ray(Vector3f src_, Vector3f normalized_direction_) : src(src_), direction(normalized_direction_) {}
 }

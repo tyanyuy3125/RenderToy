@@ -2,16 +2,21 @@
 #define RAY_H
 
 #include "mathfunc.h"
+#include "geoobj.h"
 
 namespace OpenPT
 {
-    class Ray
+    struct Ray
     {
-        public:
-            Ray(Vector3f src_, Vector3f direction_);
+        Ray() = delete;
 
-            Vector3f src;
-            Vector3f direction;
+        /// @brief Constructor of Ray class.
+        /// @param src_ Ray source.
+        /// @param normalized_direction_ NORMALIZED ray direction.
+        Ray(Vector3f src_, Vector3f normalized_direction_);
+
+        Vector3f src;
+        Vector3f direction;
     };
 }
 

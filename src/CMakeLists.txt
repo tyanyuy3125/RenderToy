@@ -13,6 +13,8 @@ add_library(OpenPT
             geoobj.h geoobj.cpp
             renderer.h renderer.cpp
             exporter.h exporter.cpp
-            camera.h camera.cpp)
+            camera.h camera.cpp
+            procedural.h procedural.cpp
+            ray.h ray.cpp)
 
 set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)

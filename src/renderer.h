@@ -12,7 +12,7 @@ namespace OpenPT
     struct FormatSettings
     {
         Size resolution = Size(1920, 1080);
-        Vector2f aspect = Vector2f(16.0f, 9.0f);
+        Vector2f aspect = Vector2f(1.0f, 1.0f); // Don't touch it!
 
         FormatSettings() = default;
         FormatSettings(Size resolution_, Vector2f aspect_);
@@ -20,7 +20,7 @@ namespace OpenPT
 
     class IRenderer
     {
-    private:
+    protected:
         World *world;
 
     public:

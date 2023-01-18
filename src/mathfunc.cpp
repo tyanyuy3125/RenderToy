@@ -15,6 +15,11 @@ namespace OpenPT
     Vector3f::Vector3f() : Vector3f(0.0f, 0.0f, 0.0f) {}
     Vector3f::Vector3f(const std::array<float, 3> &triple) : Vector3f(triple[0], triple[1], triple[2]) {}
 
+    Vector3f::Vector3f(const Vector2f &vec2, float val3)
+        : x(vec2.x), y(vec2.y), z(val3)
+    {
+    }
+
     const Vector3f Vector3f::O = Vector3f();
     const Vector3f Vector3f::X = Vector3f(1.0f, 0.0f, 0.0f);
     const Vector3f Vector3f::Y = Vector3f(0.0f, 1.0f, 0.0f);
@@ -252,6 +257,11 @@ namespace OpenPT
     Vector4f::Vector4f() : Vector4f(0.0f, 0.0f, 0.0f, 0.0f) {}
     Vector4f::Vector4f(const std::array<float, 4> &quadruple) : Vector4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
 
+    Vector4f::Vector4f(const Vector3f &vec3, float val4)
+        : Vector4f(vec3[0], vec3[1], vec3[2], val4)
+    {
+    }
+
     const Vector4f Vector4f::O = Vector4f();
     const Vector4f Vector4f::X = Vector4f(1.0f, 0.0f, 0.0f, 0.0f);
     const Vector4f Vector4f::Y = Vector4f(0.0f, 1.0f, 0.0f, 0.0f);
@@ -354,9 +364,9 @@ namespace OpenPT
         return a * lambda;
     }
 
-    void InchToMM(float &inch)
+    const float InchToMM(const float inch)
     {
-        inch *= 25.4f;
+        return inch * 25.4f;
     }
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
@@ -494,6 +504,29 @@ namespace OpenPT
     {
         Matrix4x4f ret = (*this);
         ret.Transpose();
+        return ret;
+    }
+
+    const Matrix3x3f Matrix4x4f::ComplementMinor(const int i, const int j) const
+    {
+        Matrix3x3f ret;
+        for (int x = 0, ret_x = 0; x < 4; ++x)
+        {
+            if (x == i)
+            {
+                continue;
+            }
+            for (int y = 0, ret_y = 0; y < 4; ++y)
+            {
+                if (y == j)
+                {
+                    continue;
+                }
+                ret[ret_x][ret_y] = row[x][y];
+                ++ret_y;
+            }
+            ++ret_x;
+        }
         return ret;
     }
 
@@ -800,5 +833,10 @@ namespace OpenPT
     const int Size::Area() const
     {
         return width * height;
+    }
+
+    const float Size::AspectRatio() const
+    {
+        return float(width) / float(height);
     }
 }

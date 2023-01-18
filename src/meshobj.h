@@ -10,6 +10,7 @@
 
 #include "mathfunc.h"
 #include "geoobj.h"
+#include "ray.h"
 
 #include <vector>
 #include <string>
@@ -30,7 +31,7 @@ namespace OpenPT
         // TODO <tianyu@illumiart.net>: Too ugly! Needs refactor.
         std::vector<std::array<std::array<int, 3>, 3>> face;
 
-        bool Intersect(Vector3f r_o, Vector3f r_d);
+        bool Intersect(const Ray &ray);
     };
 };
 

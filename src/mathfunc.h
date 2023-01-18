@@ -16,50 +16,10 @@
 
 namespace OpenPT
 {
+    struct Size;
+    struct Point;
+
 #pragma region Basic Vector Math
-    class Vector3f
-    {
-    public:
-        const static Vector3f O;
-        const static Vector3f X;
-        const static Vector3f Y;
-        const static Vector3f Z;
-        const static Vector3f White;
-
-        float x, y, z;
-
-        Vector3f();
-        Vector3f(const float x_, const float y_, const float z_);
-        Vector3f(const std::array<float, 3> &triple);
-
-        float Length() const;
-
-        void Normalize();
-        const Vector3f Normalized() const;
-
-        float &operator[](const int i);
-        const float operator[](const int i) const;
-
-        const Vector3f operator+(const Vector3f &a) const;
-        const Vector3f operator-(const Vector3f &a) const;
-        const Vector3f operator-(void) const;
-        const Vector3f operator*(const float a) const;
-        const Vector3f operator/(const float a) const;
-
-        const Vector3f &operator+=(const Vector3f &a);
-        const Vector3f &operator-=(const Vector3f &a);
-        const Vector3f &operator*=(const float a);
-        const Vector3f &operator/=(const float a);
-
-        const bool operator==(const Vector3f &a) const;
-
-        const static float Dot(const Vector3f &a, const Vector3f &b);
-        const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
-    };
-
-    const Vector3f operator*(const float lambda, const Vector3f &a);
-    std::istream &operator>>(std::istream &is, Vector3f &a);
-
     class Vector2f
     {
     public:
@@ -102,6 +62,50 @@ namespace OpenPT
     const Vector2f operator*(const float lambda, const Vector2f &a);
     std::istream &operator>>(std::istream &is, Vector2f &a);
 
+    class Vector3f
+    {
+    public:
+        const static Vector3f O;
+        const static Vector3f X;
+        const static Vector3f Y;
+        const static Vector3f Z;
+        const static Vector3f White;
+
+        float x, y, z;
+
+        Vector3f();
+        Vector3f(const float x_, const float y_, const float z_);
+        Vector3f(const std::array<float, 3> &triple);
+        Vector3f(const Vector2f &vec2, float val3);
+
+        float Length() const;
+
+        void Normalize();
+        const Vector3f Normalized() const;
+
+        float &operator[](const int i);
+        const float operator[](const int i) const;
+
+        const Vector3f operator+(const Vector3f &a) const;
+        const Vector3f operator-(const Vector3f &a) const;
+        const Vector3f operator-(void) const;
+        const Vector3f operator*(const float a) const;
+        const Vector3f operator/(const float a) const;
+
+        const Vector3f &operator+=(const Vector3f &a);
+        const Vector3f &operator-=(const Vector3f &a);
+        const Vector3f &operator*=(const float a);
+        const Vector3f &operator/=(const float a);
+
+        const bool operator==(const Vector3f &a) const;
+
+        const static float Dot(const Vector3f &a, const Vector3f &b);
+        const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
+    };
+
+    const Vector3f operator*(const float lambda, const Vector3f &a);
+    std::istream &operator>>(std::istream &is, Vector3f &a);
+
     class Vector4f
     {
     public:
@@ -116,6 +120,7 @@ namespace OpenPT
         Vector4f();
         Vector4f(const float x_, const float y_, const float z_, const float w_);
         Vector4f(const std::array<float, 4> &quadruple);
+        Vector4f(const Vector3f &vec3, float val4);
 
         float Length() const;
 
@@ -147,42 +152,6 @@ namespace OpenPT
 #pragma endregion
 
 #pragma region Basic Matrix Math
-    class Matrix4x4f
-    {
-    private:
-        Vector4f row[4];
-
-    public:
-        const static Matrix4x4f I;
-        const static Matrix4x4f O;
-
-        Matrix4x4f();
-        Matrix4x4f(const Matrix4x4f &a);
-        Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
-        Matrix4x4f(std::array<Vector4f, 4> quadruple);
-
-        Vector4f &operator[](const int i);
-        const Vector4f &operator[](const int i) const;
-
-        const bool operator==(const Matrix4x4f &a) const;
-
-        const Matrix4x4f operator+(const Matrix4x4f &a) const;
-        const Matrix4x4f operator-(const Matrix4x4f &a) const;
-        const Matrix4x4f operator-(void) const;
-        const Vector4f operator*(const Vector4f &a) const;
-        const Matrix4x4f operator*(const Matrix4x4f &a) const;
-
-        const Matrix4x4f &operator+=(const Matrix4x4f &a);
-        const Matrix4x4f &operator-=(const Matrix4x4f &a);
-
-        void Transpose();
-        const Matrix4x4f Transposed() const;
-
-        // This function DOES NOT check input matrix.
-        // TODO : Implement.
-        const static Matrix4x4f InvertOrthonormalAffineMatrix(const Matrix4x4f &mat);
-    };
-
     class Matrix3x3f
     {
     private:
@@ -215,6 +184,39 @@ namespace OpenPT
         const Matrix3x3f Transposed() const;
 
         const static float Determinant(const Matrix3x3f &mat);
+    };
+
+    class Matrix4x4f
+    {
+    private:
+        Vector4f row[4];
+
+    public:
+        const static Matrix4x4f I;
+        const static Matrix4x4f O;
+
+        Matrix4x4f();
+        Matrix4x4f(const Matrix4x4f &a);
+        Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
+        Matrix4x4f(std::array<Vector4f, 4> quadruple);
+
+        Vector4f &operator[](const int i);
+        const Vector4f &operator[](const int i) const;
+
+        const bool operator==(const Matrix4x4f &a) const;
+
+        const Matrix4x4f operator+(const Matrix4x4f &a) const;
+        const Matrix4x4f operator-(const Matrix4x4f &a) const;
+        const Matrix4x4f operator-(void) const;
+        const Vector4f operator*(const Vector4f &a) const;
+        const Matrix4x4f operator*(const Matrix4x4f &a) const;
+
+        const Matrix4x4f &operator+=(const Matrix4x4f &a);
+        const Matrix4x4f &operator-=(const Matrix4x4f &a);
+
+        void Transpose();
+        const Matrix4x4f Transposed() const;
+        const Matrix3x3f ComplementMinor(const int i, const int j) const;
     };
 
     class Matrix2x2f
@@ -253,7 +255,7 @@ namespace OpenPT
 #pragma endregion
 
 #pragma region Unit Conversion
-    void InchToMM(float &inch);
+    const float InchToMM(const float inch);
 #pragma endregion
 
 #pragma region Drawing Math
@@ -277,7 +279,9 @@ namespace OpenPT
         Size(const std::array<int, 2> &tuple);
 
         const int Area() const;
+        const float AspectRatio() const;
     };
+
 #pragma endregion
 }
 #endif // MATHFUNC_H
