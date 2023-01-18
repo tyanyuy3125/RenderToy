@@ -5,4 +5,5 @@
 #include "../../src/meshobj.h"
 #include "../../src/ray.h"
 #include "../../src/renderer.h"
+#include "../../src/exporter.h"
 #include "../../src/world.h"

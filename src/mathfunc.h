@@ -253,6 +253,29 @@ namespace OpenPT
 #pragma region Unit Conversion
     void InchToMM(float &inch);
 #pragma endregion
-};
 
+#pragma region Drawing Math
+    struct Point
+    {
+        int x, y;
+
+        Point();
+        Point(int x_, int y_);
+        Point(const Vector2f &vec);
+        Point(const std::array<int, 2> &tuple);
+    };
+
+    struct Size
+    {
+        int width, height;
+
+        Size();
+        Size(int width_, int height_);
+        Size(const Vector2f &vec);
+        Size(const std::array<int, 2> &tuple);
+
+        const int Area() const;
+    };
+#pragma endregion
+}
 #endif // MATHFUNC_H

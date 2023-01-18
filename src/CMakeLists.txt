@@ -5,4 +5,14 @@
 # Tianyu Huang <tianyu@illumiart.net>
 #
 
-add_library(OpenPT mathfunc.cpp mathfunc.h meshobj.cpp meshobj.h importer.cpp importer.h world.cpp world.h geoobj.h geoobj.cpp)
+add_library(OpenPT 
+            mathfunc.cpp mathfunc.h 
+            meshobj.cpp meshobj.h
+            importer.cpp importer.h 
+            world.cpp world.h 
+            geoobj.h geoobj.cpp
+            renderer.h renderer.cpp
+            exporter.h exporter.cpp
+            camera.h camera.cpp)
+
+set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)

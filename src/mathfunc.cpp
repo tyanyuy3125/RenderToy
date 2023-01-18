@@ -619,9 +619,7 @@ namespace OpenPT
 
     const float Matrix3x3f::Determinant(const Matrix3x3f &mat)
     {
-        return mat[0][0] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][1], mat[1][2]},{mat[2][1],mat[2][2]}})
-                - mat[0][1] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0], mat[1][2]}, {mat[2][0], mat[2][2]}})
-                + mat[0][2] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0],mat[1][1]},{mat[2][0],mat[2][1]}});
+        return mat[0][0] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][1], mat[1][2]}, {mat[2][1], mat[2][2]}}) - mat[0][1] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0], mat[1][2]}, {mat[2][0], mat[2][2]}}) + mat[0][2] * Matrix2x2f::Determinant((Matrix2x2f){{mat[1][0], mat[1][1]}, {mat[2][0], mat[2][1]}});
     }
 
     Matrix2x2f::Matrix2x2f(Vector2f r0, Vector2f r1)
@@ -751,5 +749,50 @@ namespace OpenPT
     const float Matrix2x2f::Determinant(const Matrix2x2f &mat)
     {
         return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+    }
+
+    Point::Point()
+        : x(0), y(0)
+    {
+    }
+
+    Point::Point(int x_, int y_)
+        : x(x_), y(y_)
+    {
+    }
+
+    Point::Point(const Vector2f &vec)
+        : x(int(vec.x)), y(int(vec.y))
+    {
+    }
+
+    Point::Point(const std::array<int, 2> &tuple)
+        : x(tuple[0]), y(tuple[1])
+    {
+    }
+
+    Size::Size()
+        : width(0), height(0)
+    {
+    }
+
+    Size::Size(int x_, int y_)
+        : width(x_), height(y_)
+    {
+    }
+
+    Size::Size(const Vector2f &vec)
+        : width(int(vec.x)), height(int(vec.y))
+    {
+    }
+
+    Size::Size(const std::array<int, 2> &tuple)
+        : width(tuple[0]), height(tuple[1])
+    {
+    }
+
+    const int Size::Area() const
+    {
+        return width * height;
     }
 }
