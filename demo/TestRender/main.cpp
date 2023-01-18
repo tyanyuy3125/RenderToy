@@ -7,11 +7,11 @@ int main(){
     OpenPT::Vector3f *buffer;
     OpenPT::TestRenderer tr;
     tr.Render(0, buffer);
-    OpenPT::PPMExporter ppm_exporter;
+    OpenPT::BMPExporter exporter;
 
     std::ofstream os;
-    os.open("./testimage.ppm");
-    ppm_exporter.Export(os, buffer);
+    os.open("./testimage.bmp");
+    exporter.Export(os, buffer);
     os.close();
 
     std::cout<<"Render completed.\n";
