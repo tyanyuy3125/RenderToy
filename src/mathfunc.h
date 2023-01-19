@@ -102,6 +102,9 @@ namespace OpenPT
 
         const static float Dot(const Vector3f &a, const Vector3f &b);
         const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
+
+        const float Dot(const Vector3f &a) const;
+        const Vector3f Cross(const Vector3f &a) const;
     };
 
     const Vector3f operator*(const float lambda, const Vector3f &a);

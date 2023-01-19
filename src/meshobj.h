@@ -19,6 +19,11 @@
 
 namespace OpenPT
 {
+    struct Triangle
+    {
+         
+    };
+
     class Model : public GeoObj
     {
     public:

@@ -1,42 +1,86 @@
 #include "meshobj.h"
 
+#include <limits>
+
+#define CULLING
+
 namespace OpenPT
 {
-    // TODO: return accurate beta & gamma with depth test.
+    // TODO: Implement M-T Algorithm.
     // TODO: Optimize the following using BVH and other accelerating methods.
-    const bool Mesh::Intersect(const Ray &ray)
+    const bool Mesh::Intersect(const Ray &ray, float &t, float &u, float &v)
     {
         auto r_o = ray.src;
         auto r_d = ray.direction;
-        // Naive approach.
+        // t = std::numeric_limits<float>::max();
+        bool flag = false;
         for (auto f : face)
         {
-            // TODO: The following process might be ill-conditioned.
             Vector3f a = geo_vert[f[0][0] - 1];
             Vector3f b = geo_vert[f[1][0] - 1];
             Vector3f c = geo_vert[f[2][0] - 1];
-            // f[0][0]-1 f[1][0]-1 f[2][0]-1
-            auto A = Matrix3x3f::Determinant((Matrix3x3f){{a.x - b.x, a.x - c.x, r_d.x},
-                                                          {a.y - b.y, a.y - c.y, r_d.y},
-                                                          {a.z - b.z, a.z - c.z, r_d.z}});
-            auto beta = Matrix3x3f::Determinant((Matrix3x3f){{a.x - r_o.x, a.x - c.x, r_d.x},
-                                                             {a.y - r_o.y, a.y - c.y, r_d.y},
-                                                             {a.z - r_o.z, a.z - c.z, r_d.z}}) /
-                        A;
-            auto gamma = Matrix3x3f::Determinant((Matrix3x3f){{a.x - b.x, a.x - r_o.x, r_d.x},
-                                                              {a.y - b.y, a.y - r_o.y, r_d.y},
-                                                              {a.z - b.z, a.z - r_o.z, r_d.z}}) /
-                         A;
-            // auto t = Matrix3x3f::Determinant((Matrix3x3f){{a.x - b.x, a.x - c.x, a.x - r_o.x},
-            //                                               {a.y - b.y, a.y - c.y, a.y - r_o.y},
-            //                                               {a.z - b.z, a.z - c.z, a.z - r_o.z}}) /
-            //          A;
-            if (beta + gamma <= 1.0f && beta >= 0.0f && gamma >= 0.0f)
+
+            Vector3f v0v1 = b - a;
+            Vector3f v0v2 = c - a;
+            Vector3f N = v0v1.Cross(v0v2);
+
+            #ifdef CULLING
+            if (Vector3f::Dot(r_d, N) > 0)
             {
-                return true;
-                break;
+                continue;
             }
+            #endif
+
+            float denom = N.Dot(N);
+            float NdotRayDirection = N.Dot(r_d);
+
+            if (std::abs(NdotRayDirection) < EPS)
+            {
+                continue;
+            }
+            float d = -N.Dot(a);
+            t = -(N.Dot(r_o) + d) / NdotRayDirection;
+            if (t < 0)
+            {
+                continue;
+            }
+            Vector3f P = r_o + t * r_d;
+            Vector3f C;
+            Vector3f edge0 = b - a;
+            Vector3f vp0 = P - a;
+            C = edge0.Cross(vp0);
+            if (N.Dot(C) < 0)
+            {
+                continue;
+            }
+
+            Vector3f edge1 = c - b;
+            Vector3f vp1 = P - b;
+            C = edge1.Cross(vp1);
+            if ((u = N.Dot(C)) < 0)
+            {
+                continue;
+            }
+
+            Vector3f edge2 = a - c;
+            Vector3f vp2 = P - c;
+            C = edge2.Cross(vp2);
+            if ((v = N.Dot(C)) < 0)
+            {
+                continue;
+            }
+
+            u /= denom;
+            v /= denom;
+
+            flag = true;
+            continue;
         }
+        return flag;
+    }
+
+    const bool IdealSphere::Intersect(const Ray &ray, float &t, float &u, float &v)
+    {
         return false;
     }
 }

@@ -130,6 +130,18 @@ namespace OpenPT
                         a.x * b.y - a.y * b.x);
     }
 
+    const float Vector3f::Dot(const Vector3f &a) const
+    {
+        return x * a.x + y * a.y + z * a.z;
+    }
+
+    const Vector3f Vector3f::Cross(const Vector3f &a) const
+    {
+        return Vector3f(y * a.z - z * a.y,
+                        z * a.x - x * a.z,
+                        x * a.y - y * a.x);
+    }
+
     std::istream &operator>>(std::istream &is, Vector3f &a)
     {
         is >> a.x >> a.y >> a.z;

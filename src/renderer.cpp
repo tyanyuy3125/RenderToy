@@ -72,7 +72,8 @@ namespace OpenPT
                     cast_ray.direction -= cast_ray.src; // Temporal solution!
                     cast_ray.direction.Normalize(); // Temporal solution!
 
-                    if (mesh_obj.Intersect(cast_ray))
+                    float placeholder;
+                    if (mesh_obj.Intersect(cast_ray, placeholder, placeholder, placeholder))
                     {
                         intersected = true;
                         mat_stack.Pop();
