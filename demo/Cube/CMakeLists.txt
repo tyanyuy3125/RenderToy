@@ -7,3 +7,4 @@
 add_executable(CubeDemo main.cpp)
 target_link_libraries(CubeDemo PRIVATE OpenPT)
 configure_file(cube.obj ${EXECUTABLE_OUTPUT_PATH} cube.obj COPYONLY)
+configure_file(sphere.obj ${EXECUTABLE_OUTPUT_PATH} sphere.obj COPYONLY)

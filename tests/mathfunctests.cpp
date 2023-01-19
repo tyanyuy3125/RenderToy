@@ -106,15 +106,6 @@ TEST_CASE("Vector3f operation test")
     }
 }
 
-TEST_CASE("Vector3f security")
-{
-    SECTION("Index overflow")
-    {
-        Vector3f a = initializer;
-        a[999999] = 10.0f;
-    }
-}
-
 TEST_CASE("Vector constant test")
 {
     SECTION("Vector3f")

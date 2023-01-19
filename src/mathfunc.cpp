@@ -41,12 +41,12 @@ namespace OpenPT
         return Vector3f(*this) / Length();
     }
 
-    float &Vector3f::operator[](const int i)
+    float &Vector3f::operator[](const size_t i)
     {
         return *((&x) + i);
     }
 
-    const float Vector3f::operator[](const int i) const
+    const float Vector3f::operator[](const size_t i) const
     {
         return *((&x) + i);
     }
@@ -164,12 +164,12 @@ namespace OpenPT
         return Vector2f(*this) / Length();
     }
 
-    float &Vector2f::operator[](const int i)
+    float &Vector2f::operator[](const size_t i)
     {
         return *((&x) + i);
     }
 
-    const float Vector2f::operator[](const int i) const
+    const float Vector2f::operator[](const size_t i) const
     {
         return *((&x) + i);
     }
@@ -283,12 +283,12 @@ namespace OpenPT
         return Vector4f(*this) / Length();
     }
 
-    float &Vector4f::operator[](const int i)
+    float &Vector4f::operator[](const size_t i)
     {
         return *((&x) + i);
     }
 
-    const float Vector4f::operator[](const int i) const
+    const float Vector4f::operator[](const size_t i) const
     {
         return *((&x) + i);
     }
@@ -364,9 +364,14 @@ namespace OpenPT
         return a * lambda;
     }
 
-    const float InchToMM(const float inch)
+    const float Convert::InchToMM(const float inch)
     {
         return inch * 25.4f;
+    }
+
+    const float Convert::DegreeToRadians(const float deg)
+    {
+        return deg * (PI / 180);
     }
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
@@ -376,7 +381,7 @@ namespace OpenPT
 
     const Vector4f Vector4f::Cross(const Vector4f &a, const Vector4f &b)
     {
-        // TODO <tianyu@illumiart.net>: Implement 4D-vector cross product using matrix operation.
+        // TODO <tianyu@illumiart.net>: Implement 4D-vector cross product ustd::sing matrix operation.
         return Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
@@ -402,12 +407,12 @@ namespace OpenPT
         }
     }
 
-    Vector4f &Matrix4x4f::operator[](const int i)
+    Vector4f &Matrix4x4f::operator[](const size_t i)
     {
         return row[i];
     }
 
-    const Vector4f &Matrix4x4f::operator[](const int i) const
+    const Vector4f &Matrix4x4f::operator[](const size_t i) const
     {
         return row[i];
     }
@@ -551,12 +556,12 @@ namespace OpenPT
         }
     }
 
-    Vector3f &Matrix3x3f::operator[](const int i)
+    Vector3f &Matrix3x3f::operator[](const size_t i)
     {
         return row[i];
     }
 
-    const Vector3f &Matrix3x3f::operator[](const int i) const
+    const Vector3f &Matrix3x3f::operator[](const size_t i) const
     {
         return row[i];
     }
@@ -680,12 +685,12 @@ namespace OpenPT
         }
     }
 
-    Vector2f &Matrix2x2f::operator[](const int i)
+    Vector2f &Matrix2x2f::operator[](const size_t i)
     {
         return row[i];
     }
 
-    const Vector2f &Matrix2x2f::operator[](const int i) const
+    const Vector2f &Matrix2x2f::operator[](const size_t i) const
     {
         return row[i];
     }
@@ -852,7 +857,8 @@ namespace OpenPT
 
     void Matrix4x4fStack::Pop()
     {
-        if(accumulated.size()==1){
+        if (accumulated.size() == 1)
+        {
             return;
         }
         accumulated.pop();
@@ -863,5 +869,40 @@ namespace OpenPT
         Vector4f vec4(vec3, 1.0f);
         vec4 = accumulated.top() * vec4;
         vec3 = Vector3f(vec4[0], vec4[1], vec4[2]);
+    }
+
+    const Matrix4x4f AffineTransformation::Translation(const Vector3f &origin)
+    {
+        Matrix4x4f ret(Matrix4x4f::I);
+        for (int i = 0; i < 3; ++i)
+        {
+            ret[i][3] = origin[i];
+        }
+        return ret;
+    }
+
+    const Matrix4x4f AffineTransformation::RotationEulerXYZ(const Vector3f &euler_xyz)
+    {
+        // TODO: Optimize.
+
+        auto x = euler_xyz.x;
+        auto y = euler_xyz.y;
+        auto z = euler_xyz.z;
+        Matrix4x4f Z = {{std::cos(z), -std::sin(z), 0.0f, 0.0f},
+                        {std::sin(z), std::cos(z), 0.0f, 0.0f},
+                        {0.0f, 0.0f, 1.0f, 0.0f},
+                        {0.0f, 0.0f, 0.0f, 1.0f}};
+
+        Matrix4x4f Y = {{std::cos(y), 0.0f, -std::sin(y), 0.0f},
+                        {0.0f, 1.0f, 0.0f, 0.0f},
+                        {std::sin(y), 0.0f, std::cos(y), 0.0f},
+                        {0.0f, 0.0f, 0.0f, 1.0f}};
+
+        Matrix4x4f X = {{1.0f, 0.0f, 0.0f, 0.0f},
+                        {0.0f, std::cos(x), -std::sin(x), 0.0f},
+                        {0.0f, std::sin(x), std::cos(x), 0.0f},
+                        {0.0f, 0.0f, 0.0f, 1.0f}};
+
+        return Z * Y * X;
     }
 }

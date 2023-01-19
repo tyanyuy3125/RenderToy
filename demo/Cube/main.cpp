@@ -9,7 +9,7 @@ using namespace OpenPT;
 int main()
 {
     std::cout << "Begin importing...\n";
-    OBJModelImporter importer("./cube.obj");
+    OBJModelImporter importer("./sphere.obj");
     std::vector<Mesh> meshes = importer.Import();
     std::cout << "Imported " << meshes.size() << " mesh(es).\n";
 
@@ -17,10 +17,12 @@ int main()
     world.meshes.insert(world.meshes.end(), meshes.begin(), meshes.end());
     world.cameras.push_back(AcademyCamera);
 
-    Matrix4x4f camera_mat4 = {{1.0f, 0.0f, 0.0f, 0.0f},
-                              {0.0f, 0.0f, -1.0f, -10.0f},
-                              {0.0f, 1.0f, 0.0f, 0.0f},
-                              {0.0f, 0.0f, 0.0f, 1.0f}};
+    // Matrix4x4f camera_mat4 = {{1.0f, 0.0f, 0.0f, 0.0f},
+    //                           {0.0f, 0.0f, -1.0f, -10.0f},
+    //                           {0.0f, 1.0f, 0.0f, 0.0f},
+    //                           {0.0f, 0.0f, 0.0f, 1.0f}};
+    Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, -10.0f, 10.0f});
+    camera_mat4 = camera_mat4 * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(45), 0.0f, 0.0f});
     world.cameras[0].SetO2W(camera_mat4);
 
     std::cout
@@ -28,14 +30,16 @@ int main()
 
     Vector3f *buffer;
     IntersectTestRenderer renderer(&world);
+    renderer.format_settings.resolution = Size(320, 180);
     renderer.Render(0, buffer);
 
     std::cout << "Exporting...\n";
 
     std::ofstream os;
-    os.open("./cube.bmp");
+    os.open("./sphere.bmp");
 
     BMPExporter exporter;
+    exporter.format_settings.resolution = Size(320, 180);
     exporter.Export(os, buffer);
 
     os.close();

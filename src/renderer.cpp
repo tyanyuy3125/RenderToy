@@ -23,8 +23,8 @@ namespace OpenPT
 
         // CAMERA PREPARATION
 
-        float top = (InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
-        float right = (InchToMM(cam->gate_dimension.x) / 2.0f) / cam->focal_length;
+        float top = (Convert::InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
+        float right = (Convert::InchToMM(cam->gate_dimension.x) / 2.0f) / cam->focal_length;
 
         // TODO: Verify if following comments are telling truth.
         // We implement FILL CONVENTION when aspect ratio conflicts with gate dimension.
@@ -60,11 +60,7 @@ namespace OpenPT
                 Vector2f screen_coord = {2 * right * NDC_coord.x - right, 2 * top * NDC_coord.y - top};
 
                 // Blender convention: Camera directing towards -z.
-                
                 Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
-                // mat_stack.Transform(cast_ray.direction);
-                // mat_stack.Transform(cast_ray.src);
-                // cast_ray.direction -= cast_ray.src; // Temporal solution!
 
                 bool intersected = false;
 
@@ -74,7 +70,7 @@ namespace OpenPT
                     mat_stack.Transform(cast_ray.direction);
                     mat_stack.Transform(cast_ray.src);
                     cast_ray.direction -= cast_ray.src; // Temporal solution!
-                    cast_ray.direction.Normalize();
+                    cast_ray.direction.Normalize(); // Temporal solution!
 
                     if (mesh_obj.Intersect(cast_ray))
                     {

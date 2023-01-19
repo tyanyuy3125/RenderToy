@@ -40,8 +40,8 @@ namespace OpenPT
         void Normalize();
         const Vector2f Normalized() const;
 
-        float &operator[](const int i);
-        const float operator[](const int i) const;
+        float &operator[](const size_t i);
+        const float operator[](const size_t i) const;
 
         const Vector2f operator+(const Vector2f &a) const;
         const Vector2f operator-(const Vector2f &a) const;
@@ -84,8 +84,8 @@ namespace OpenPT
         void Normalize();
         const Vector3f Normalized() const;
 
-        float &operator[](const int i);
-        const float operator[](const int i) const;
+        float &operator[](const size_t i);
+        const float operator[](const size_t i) const;
 
         const Vector3f operator+(const Vector3f &a) const;
         const Vector3f operator-(const Vector3f &a) const;
@@ -128,8 +128,8 @@ namespace OpenPT
         void Normalize();
         const Vector4f Normalized() const;
 
-        float &operator[](const int i);
-        const float operator[](const int i) const;
+        float &operator[](const size_t i);
+        const float operator[](const size_t i) const;
 
         const Vector4f operator+(const Vector4f &a) const;
         const Vector4f operator-(const Vector4f &a) const;
@@ -167,8 +167,8 @@ namespace OpenPT
         Matrix3x3f(Vector3f r0, Vector3f r1, Vector3f r2);
         Matrix3x3f(std::array<Vector3f, 3> triple);
 
-        Vector3f &operator[](const int i);
-        const Vector3f &operator[](const int i) const;
+        Vector3f &operator[](const size_t i);
+        const Vector3f &operator[](const size_t i) const;
 
         const bool operator==(const Matrix3x3f &a) const;
 
@@ -201,8 +201,8 @@ namespace OpenPT
         Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
         Matrix4x4f(std::array<Vector4f, 4> quadruple);
 
-        Vector4f &operator[](const int i);
-        const Vector4f &operator[](const int i) const;
+        Vector4f &operator[](const size_t i);
+        const Vector4f &operator[](const size_t i) const;
 
         const bool operator==(const Matrix4x4f &a) const;
 
@@ -234,8 +234,8 @@ namespace OpenPT
         Matrix2x2f(Vector2f r0, Vector2f r1);
         Matrix2x2f(std::array<Vector2f, 2> tuple);
 
-        Vector2f &operator[](const int i);
-        const Vector2f &operator[](const int i) const;
+        Vector2f &operator[](const size_t i);
+        const Vector2f &operator[](const size_t i) const;
 
         const bool operator==(const Matrix2x2f &a) const;
 
@@ -256,7 +256,14 @@ namespace OpenPT
 #pragma endregion
 
 #pragma region Unit Conversion
-    const float InchToMM(const float inch);
+    struct Convert{
+        Convert() = delete;
+        Convert(const Convert &) = delete;
+        Convert(const Convert &&) = delete;
+
+        static const float InchToMM(const float inch);
+        static const float DegreeToRadians(const float deg);
+    };
 #pragma endregion
 
 #pragma region Drawing Math
@@ -297,6 +304,21 @@ namespace OpenPT
         void Pop();
 
         void Transform(Vector3f &vec3) const;
+    };
+
+    class AffineTransformation
+    {
+    public:
+        AffineTransformation() = delete;
+        AffineTransformation(const AffineTransformation &) = delete;
+        AffineTransformation(const AffineTransformation &&) = delete;
+
+        const static Matrix4x4f Translation(const Vector3f &origin);
+
+        /// @brief Use Blender XYZ-Euler convention, matrix representation of intrinsic transformations: Z*Y*X*v.
+        /// @param euler_xyz XYZ-Euler angles, in radius.
+        /// @return 
+        const static Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
 }
 #endif // MATHFUNC_H
