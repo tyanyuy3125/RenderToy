@@ -19,10 +19,15 @@
 
 namespace OpenPT
 {
-    class Mesh : public GeoObj
+    class Model : public GeoObj
     {
     public:
-        std::string name;
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) = 0;
+    };
+
+    class Mesh : public Model
+    {
+    public:
         std::vector<Vector3f> geo_vert;
         std::vector<Vector3f> vert_norm;
         std::vector<Vector2f> vert_tex;
@@ -31,7 +36,14 @@ namespace OpenPT
         // TODO <tianyu@illumiart.net>: Too ugly! Needs refactor.
         std::vector<std::array<std::array<int, 3>, 3>> face;
 
-        bool Intersect(const Ray &ray);
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) override final;
+    };
+
+    class IdealSphere : public Model
+    {
+    public:
+        float radius;
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) override final;
     };
 };
 

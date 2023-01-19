@@ -12,6 +12,7 @@ namespace OpenPT
         Matrix4x4f world_to_object;
 
     public:
+        std::string name;
         GeoObj();
         
         /// @brief Set object to world matrix.

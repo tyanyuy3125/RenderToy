@@ -4,7 +4,7 @@ namespace OpenPT
 {
     // TODO: return accurate beta & gamma with depth test.
     // TODO: Optimize the following using BVH and other accelerating methods.
-    bool Mesh::Intersect(const Ray &ray)
+    const bool Mesh::Intersect(const Ray &ray)
     {
         auto r_o = ray.src;
         auto r_d = ray.direction;

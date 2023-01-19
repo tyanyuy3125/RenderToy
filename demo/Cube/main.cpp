@@ -9,7 +9,7 @@ using namespace OpenPT;
 int main()
 {
     std::cout << "Begin importing...\n";
-    OBJModelImporter importer("./sphere.obj");
+    OBJModelImporter importer("./cube.obj");
     std::vector<Mesh> meshes = importer.Import();
     std::cout << "Imported " << meshes.size() << " mesh(es).\n";
 
@@ -30,16 +30,16 @@ int main()
 
     Vector3f *buffer;
     IntersectTestRenderer renderer(&world);
-    renderer.format_settings.resolution = Size(320, 180);
+    renderer.format_settings.resolution = Size(640, 360);
     renderer.Render(0, buffer);
 
     std::cout << "Exporting...\n";
 
     std::ofstream os;
-    os.open("./sphere.bmp");
+    os.open("./cube.bmp");
 
     BMPExporter exporter;
-    exporter.format_settings.resolution = Size(320, 180);
+    exporter.format_settings.resolution = Size(640, 360);
     exporter.Export(os, buffer);
 
     os.close();
