@@ -11,9 +11,9 @@
 
 namespace OpenPT
 {
-    Importer::Importer(std::string path_) : path(path_) {}
+    OBJModelImporter::OBJModelImporter(std::string path_) : path(path_) {}
 
-    std::vector<Mesh> Importer::Import()
+    std::vector<Mesh> OBJModelImporter::Import()
     {
         std::vector<Mesh> ret;
 

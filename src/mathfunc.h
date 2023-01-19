@@ -13,6 +13,7 @@
 
 #include <array>
 #include <istream>
+#include <stack>
 
 namespace OpenPT
 {
@@ -283,5 +284,19 @@ namespace OpenPT
     };
 
 #pragma endregion
+
+    class Matrix4x4fStack
+    {
+    private:
+        std::stack<Matrix4x4f> accumulated;
+
+    public:
+        Matrix4x4fStack();
+
+        void Push(const Matrix4x4f &mat4);
+        void Pop();
+
+        void Transform(Vector3f &vec3) const;
+    };
 }
 #endif // MATHFUNC_H

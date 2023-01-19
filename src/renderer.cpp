@@ -21,7 +21,6 @@ namespace OpenPT
         Camera *cam = &(world->cameras[camera_id]);
         buffer = new Vector3f[format_settings.resolution.Area()];
 
-
         // CAMERA PREPARATION
 
         float top = (InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
@@ -49,6 +48,9 @@ namespace OpenPT
         right *= xscale;
         top *= yscale;
 
+        Matrix4x4fStack mat_stack;
+        mat_stack.Push(cam->GetO2W());
+
         for (int y = 0; y < format_settings.resolution.height; ++y)
         {
             for (int x = 0; x < format_settings.resolution.width; ++x)
@@ -58,9 +60,38 @@ namespace OpenPT
                 Vector2f screen_coord = {2 * right * NDC_coord.x - right, 2 * top * NDC_coord.y - top};
 
                 // Blender convention: Camera directing towards -z.
+                
                 Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                // mat_stack.Transform(cast_ray.direction);
+                // mat_stack.Transform(cast_ray.src);
+                // cast_ray.direction -= cast_ray.src; // Temporal solution!
 
-                BUFFER(x, y, format_settings.resolution.width) = Vector3f(float(x) / format_settings.resolution.width, 1.0f, 1.0f);
+                bool intersected = false;
+
+                for (auto mesh_obj : world->meshes)
+                {
+                    mat_stack.Push(mesh_obj.GetW2O());
+                    mat_stack.Transform(cast_ray.direction);
+                    mat_stack.Transform(cast_ray.src);
+                    cast_ray.direction -= cast_ray.src; // Temporal solution!
+                    cast_ray.direction.Normalize();
+
+                    if (mesh_obj.Intersect(cast_ray))
+                    {
+                        intersected = true;
+                        mat_stack.Pop();
+                        break;
+                    }
+                    mat_stack.Pop();
+                }
+                if (intersected)
+                {
+                    BUFFER(x, y, format_settings.resolution.width) = Vector3f(1.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    BUFFER(x, y, format_settings.resolution.width) = Vector3f(0.0f, 0.0f, 0.0f);
+                }
             }
         }
     }

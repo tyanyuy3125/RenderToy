@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Model Importer Module
+ *  OpenPT - Importer Module
  *  File created on 2023/1/11
  *  Last edited on 2023/1/11
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -15,13 +15,13 @@
 
 namespace OpenPT
 {
-    class Importer
+    class OBJModelImporter
     {
     public:
-        Importer() = delete;
-        Importer(const Importer&) = delete;
-        Importer(const Importer&&) = delete;
-        Importer(std::string path_);
+        OBJModelImporter() = delete;
+        OBJModelImporter(const OBJModelImporter&) = delete;
+        OBJModelImporter(const OBJModelImporter&&) = delete;
+        OBJModelImporter(std::string path_);
 
         // https://stackoverflow.com/questions/15704565/efficient-way-to-return-a-stdvector-in-c
         std::vector<Mesh> Import();

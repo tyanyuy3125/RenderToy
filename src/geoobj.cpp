@@ -34,4 +34,18 @@ namespace OpenPT
     {
         return world_to_object;
     }
+    
+    const Vector3f &GeoObj::O2WTransform(const Vector3f &vec) const
+    {
+        Vector4f vec4(vec, 1.0f);
+        vec4 = object_to_world * vec4;
+        return Vector3f(vec4[0], vec4[1], vec4[2]);
+    }
+    
+    const Vector3f &GeoObj::W2OTramsform(const Vector3f &vec) const
+    {
+        Vector4f vec4(vec, 1.0f);
+        vec4 = world_to_object * vec4;
+        return Vector3f(vec4[0], vec4[1], vec4[2]);
+    }
 }

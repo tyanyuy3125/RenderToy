@@ -839,4 +839,29 @@ namespace OpenPT
     {
         return float(width) / float(height);
     }
+
+    void Matrix4x4fStack::Push(const Matrix4x4f &mat4)
+    {
+        accumulated.push(mat4 * accumulated.top());
+    }
+
+    Matrix4x4fStack::Matrix4x4fStack()
+    {
+        accumulated.push(Matrix4x4f::I);
+    }
+
+    void Matrix4x4fStack::Pop()
+    {
+        if(accumulated.size()==1){
+            return;
+        }
+        accumulated.pop();
+    }
+
+    void Matrix4x4fStack::Transform(Vector3f &vec3) const
+    {
+        Vector4f vec4(vec3, 1.0f);
+        vec4 = accumulated.top() * vec4;
+        vec3 = Vector3f(vec4[0], vec4[1], vec4[2]);
+    }
 }
