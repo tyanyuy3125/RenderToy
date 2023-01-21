@@ -26,7 +26,15 @@ namespace OpenPT
         Vector3f tmp_vec3;
         Vector2f tmp_vec2;
         char slash;
-        std::array<std::array<int, 3>, 3> tmp_facedef;
+
+        std::vector<Vector3f> vert;
+        std::vector<Vector3f> norm;
+        std::vector<Vector2f> uv;
+        vert.push_back(Vector3f::O);
+        norm.push_back(Vector3f::O);
+        uv.push_back(Vector2f::O);
+
+        int a, b, c, d, e, f, g, h, i;
         while (!fs.eof())
         {
             fs >> identifier;
@@ -35,6 +43,13 @@ namespace OpenPT
                 if (!current_mesh.name.empty())
                 {
                     ret.push_back(current_mesh);
+
+                    vert.clear();
+                    norm.clear();
+                    uv.clear();
+                    vert.push_back(Vector3f::O);
+                    norm.push_back(Vector3f::O);
+                    uv.push_back(Vector2f::O);
                 }
                 fs >> current_mesh.name;
                 continue;
@@ -43,31 +58,32 @@ namespace OpenPT
             if (identifier == "v")
             {
                 fs >> tmp_vec3;
-                current_mesh.geo_vert.push_back(tmp_vec3);
+                vert.push_back(tmp_vec3);
                 continue;
             }
 
             if (identifier == "vn")
             {
                 fs >> tmp_vec3;
-                current_mesh.vert_norm.push_back(tmp_vec3);
+                norm.push_back(tmp_vec3);
                 continue;
             }
 
             if (identifier == "vt")
             {
                 fs >> tmp_vec2;
-                current_mesh.vert_tex.push_back(tmp_vec2);
+                uv.push_back(tmp_vec2);
                 continue;
             }
 
             if (identifier == "f")
             {
-                for (int i = 0; i < 3; ++i)
-                {
-                    fs >> tmp_facedef[i][0] >> slash >> tmp_facedef[i][1] >> slash >> tmp_facedef[i][2];
-                }
-                current_mesh.face.push_back(tmp_facedef);
+                // f vert/uv/norm
+                fs >> a >> slash >> b >> slash >> c >>
+                    d >> slash >> e >> slash >> f >>
+                    g >> slash >> h >> slash >> i;
+
+                current_mesh.faces.push_back(Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}));
                 continue;
             }
 

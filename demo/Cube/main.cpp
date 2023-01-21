@@ -9,7 +9,7 @@ using namespace OpenPT;
 int main()
 {
     std::cout << "Begin importing...\n";
-    OBJModelImporter importer("./plane.obj");
+    OBJModelImporter importer("./cube.obj");
     std::vector<Mesh> meshes = importer.Import();
     std::cout << "Imported " << meshes.size() << " mesh(es).\n";
 

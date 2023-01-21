@@ -21,7 +21,13 @@ namespace OpenPT
 {
     struct Triangle
     {
-         
+        std::array<Vector3f, 3> vert;
+        std::array<Vector3f, 3> norm;
+        std::array<Vector2f, 3> uv;
+
+        Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_);
+
+        const bool Intersect(const Ray &ray, float &t, float &u, float &v);
     };
 
     class Model : public GeoObj
@@ -33,13 +39,7 @@ namespace OpenPT
     class Mesh : public Model
     {
     public:
-        std::vector<Vector3f> geo_vert;
-        std::vector<Vector3f> vert_norm;
-        std::vector<Vector2f> vert_tex;
-
-        // Currently, we only support triangulated mesh!
-        // TODO <tianyu@illumiart.net>: Too ugly! Needs refactor.
-        std::vector<std::array<std::array<int, 3>, 3>> face;
+        std::vector<Triangle> faces;
 
         virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) override final;
     };
