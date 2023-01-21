@@ -11,13 +11,9 @@
 
 namespace OpenPT
 {
-    OBJModelImporter::OBJModelImporter(std::string path_) : path(path_) {}
-
-    std::vector<Mesh> OBJModelImporter::Import()
+    void OBJModelImporter::Import(World &world, const std::string &path)
     {
-        std::vector<Mesh> ret;
-
-        Mesh current_mesh;
+        Mesh *current_mesh = nullptr;
 
         std::ifstream fs;
         fs.open(path);
@@ -40,10 +36,9 @@ namespace OpenPT
             fs >> identifier;
             if (identifier == "o")
             {
-                if (!current_mesh.name.empty())
+                if (current_mesh!=nullptr)
                 {
-                    current_mesh.BuildBVH();
-                    ret.push_back(current_mesh);
+                    world.meshes.push_back(current_mesh);
 
                     vert.clear();
                     norm.clear();
@@ -52,7 +47,8 @@ namespace OpenPT
                     norm.push_back(Vector3f::O);
                     uv.push_back(Vector2f::O);
                 }
-                fs >> current_mesh.name;
+                current_mesh = new Mesh();
+                fs >> current_mesh->name;
                 continue;
             }
 
@@ -80,19 +76,18 @@ namespace OpenPT
             if (identifier == "f")
             {
                 // f vert/uv/norm
-                fs >> a >> slash >> b >> slash >> c >>
-                    d >> slash >> e >> slash >> f >>
-                    g >> slash >> h >> slash >> i;
+                fs >> a >> slash /*>> b */>> slash >> c >>
+                    d >> slash /*>> e */>> slash >> f >>
+                    g >> slash /*>> h */>> slash >> i;
+                b = e = h = 0;
 
-                current_mesh.faces.push_back(new Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}));
+                world.triangles.push_back(new Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}, current_mesh));
+                current_mesh->faces.push_back(world.triangles.back());
                 continue;
             }
 
             fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        current_mesh.BuildBVH();
-        ret.push_back(current_mesh);
-
-        return ret;
+        world.meshes.push_back(current_mesh);
     }
 };

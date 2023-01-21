@@ -20,40 +20,27 @@
 
 namespace OpenPT
 {
-    class Model : public GeoObj
-    {
-    public:
-        BoundingBox bbox;
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const = 0;
-    };
+    class Mesh;
 
-    class Triangle : public Model
+    class Triangle
     {
     public:
+        const BoundingBox BBox() const;
+
         std::array<Vector3f, 3> vert;
         std::array<Vector3f, 3> norm;
         std::array<Vector2f, 3> uv;
 
-        Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_);
+        Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_, Mesh *const parent_);
+        const bool Intersect(const Ray &ray, float &t, float &u, float &v) const;
 
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
+        Mesh *parent;
     };
 
-    class Mesh : public Model
+    class Mesh : public GeoObj
     {
     public:
-        BVH *bvh{nullptr};
-        std::vector<const Model *> faces;
-
-        void BuildBVH();
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
-    };
-
-    class IdealSphere : public Model
-    {
-    public:
-        float radius;
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
+        std::vector<const Triangle *> faces;
     };
 };
 

@@ -5,6 +5,7 @@
 
 #include "world.h"
 #include "mathfunc.h"
+#include "bvh.h"
 
 namespace OpenPT
 {
@@ -22,6 +23,7 @@ namespace OpenPT
     {
     protected:
         World *world;
+        BVH *bvh;
 
     public:
         FormatSettings format_settings;
@@ -31,6 +33,7 @@ namespace OpenPT
         IRenderer(const IRenderer &&) = delete;
         IRenderer(World *world_);
         virtual void Render(int camera_id, Vector3f *&buffer) = 0;
+        ~IRenderer();
     };
 
     class TestRenderer : public IRenderer

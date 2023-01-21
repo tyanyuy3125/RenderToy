@@ -3,12 +3,19 @@
 #include "renderer.h"
 #include "camera.h"
 #include "ray.h"
+#include "bvh.h"
 
 namespace OpenPT
 {
     IRenderer::IRenderer(World *world_)
         : world(world_)
     {
+        bvh = new BVH(world->triangles);
+    }
+
+    IRenderer::~IRenderer()
+    {
+        delete bvh;
     }
 
     IntersectTestRenderer::IntersectTestRenderer(World *world_)
@@ -21,19 +28,14 @@ namespace OpenPT
         Camera *cam = &(world->cameras[camera_id]);
         buffer = new Vector3f[format_settings.resolution.Area()];
 
-        // CAMERA PREPARATION
-
+        // BEGIN Camera Preparation
         float top = (Convert::InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
         float right = (Convert::InchToMM(cam->gate_dimension.x) / 2.0f) / cam->focal_length;
-
-        // TODO: Verify if following comments are telling truth.
         // We implement FILL CONVENTION when aspect ratio conflicts with gate dimension.
         // Corresponding to AUTO setting of Sensor Fit in Blender.
         float gate_aspr = cam->gate_dimension.x / cam->gate_dimension.y;
         float film_aspr = format_settings.resolution.AspectRatio();
-
         float xscale = 1.0f, yscale = 1.0f;
-
         if (gate_aspr >= film_aspr)
         {
             // Gate is wider than Film.
@@ -44,12 +46,10 @@ namespace OpenPT
             // Film is wider than Gate.
             yscale = gate_aspr / film_aspr;
         }
-
         right *= xscale;
         top *= yscale;
+        // END Camera Preparation
 
-        Matrix4x4fStack mat_stack;
-        mat_stack.Push(cam->GetO2W());
 
         for (int y = 0; y < format_settings.resolution.height; ++y)
         {
@@ -62,28 +62,18 @@ namespace OpenPT
                 // Blender convention: Camera directing towards -z.
                 Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
 
-                bool intersected = false;
-                float t, u, v;
-                for (auto mesh_obj : world->meshes)
-                {
-                    mat_stack.Push(mesh_obj.GetW2O());
-                    mat_stack.Transform(cast_ray.direction);
-                    mat_stack.Transform(cast_ray.src);
-                    cast_ray.direction -= cast_ray.src; // Temporal solution!
-                    cast_ray.direction.Normalize(); // Temporal solution!
+                // TODO: simplify
+                cast_ray.direction = cam->O2WTransform(cast_ray.direction);
+                cast_ray.src = cam->O2WTransform(cast_ray.src);
+                cast_ray.direction -= cast_ray.src; // Temporal solution!
+                cast_ray.direction.Normalize();     // Temporal solution!
 
-                    if (mesh_obj.Intersect(cast_ray, t, u, v))
-                    {
-                        intersected = true;
-                        mat_stack.Pop();
-                        break;
-                    }
-                    mat_stack.Pop();
-                }
-                if (intersected)
+                float t, u, v;
+                auto intersected = bvh->Intersect(cast_ray, t, u, v);
+
+                if (intersected != nullptr)
                 {
-                    BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * Vector3f::X + u * Vector3f::Y + v * Vector3f::Z;
-                    // BUFFER(x, y, format_settings.resolution.width) = Vector3f(1.0f, 0.0f, 0.0f);
+                    BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2];
                 }
                 else
                 {
