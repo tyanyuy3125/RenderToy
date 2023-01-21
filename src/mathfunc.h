@@ -8,7 +8,8 @@
 #ifndef MATHFUNC_H
 #define MATHFUNC_H
 
-#define EPS 1e-5
+#define EPS 1e-7
+#define INF 1e7
 #define PI 3.14159265358979323846L
 
 #include <array>
@@ -71,6 +72,7 @@ namespace OpenPT
         const static Vector3f Y;
         const static Vector3f Z;
         const static Vector3f White;
+        const static Vector3f Inf;
 
         float x, y, z;
 
@@ -78,6 +80,7 @@ namespace OpenPT
         Vector3f(const float x_, const float y_, const float z_);
         Vector3f(const std::array<float, 3> &triple);
         Vector3f(const Vector2f &vec2, float val3);
+        Vector3f(const float val);
 
         float Length() const;
 
@@ -323,5 +326,7 @@ namespace OpenPT
         /// @return 
         const static Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
+
+    
 }
 #endif // MATHFUNC_H

@@ -21,8 +21,8 @@ namespace OpenPT
         const Matrix4x4f &GetO2W() const;
         const Matrix4x4f &GetW2O() const;
 
-        const Vector3f &O2WTransform(const Vector3f &vec) const;
-        const Vector3f &W2OTramsform(const Vector3f &vec) const;
+        const Vector3f O2WTransform(const Vector3f &vec) const;
+        const Vector3f W2OTramsform(const Vector3f &vec) const;
     };
 }
 

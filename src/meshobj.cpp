@@ -1,16 +1,21 @@
 #include "meshobj.h"
 
 #define ENABLE_BOUNDING_VOLUME
+#define ENABLE_MESH_BVH
 
 #include <limits>
 
 namespace OpenPT
 {
-    // TODO: Optimize the following using BVH and other accelerating methods.
-    const bool Mesh::Intersect(const Ray &ray, float &t, float &u, float &v)
+    void Mesh::BuildBVH()
     {
-        auto r_o = ray.src;
-        auto r_d = ray.direction;
+        bvh = new BVH(faces);
+    }
+
+    // TODO: Optimize the following using BVH and other accelerating methods.
+    const bool Mesh::Intersect(const Ray &ray, float &t, float &u, float &v) const
+    {
+#ifndef ENABLE_MESH_BVH
         t = std::numeric_limits<float>::max();
         bool flag = false;
         for (auto f : faces)
@@ -45,9 +50,18 @@ namespace OpenPT
 #endif
         }
         return flag;
+#else
+        float placeholder;
+        auto object = bvh->Intersect(ray, placeholder);
+        if (object == nullptr)
+        {
+            return false;
+        }
+        return object->Intersect(ray, t, u, v);
+#endif
     }
 
-    const bool IdealSphere::Intersect(const Ray &ray, float &t, float &u, float &v)
+    const bool IdealSphere::Intersect(const Ray &ray, float &t, float &u, float &v) const
     {
         return false;
     }
@@ -66,7 +80,7 @@ namespace OpenPT
         bbox = BoundingBox(bmin, bmax);
     }
 
-    const bool Triangle::Intersect(const Ray &ray, float &t, float &u, float &v)
+    const bool Triangle::Intersect(const Ray &ray, float &t, float &u, float &v) const
     {
         Vector3f v0 = vert[0];
         Vector3f v1 = vert[1];
@@ -105,71 +119,6 @@ namespace OpenPT
         }
         u = alpha * inv_det;
         v = beta * inv_det;
-
-        return true;
-    }
-
-    BoundingBox::BoundingBox()
-        : vmin(Vector3f::O), vmax(Vector3f::O)
-    {
-    }
-
-    BoundingBox::BoundingBox(const Vector3f &vmin_, const Vector3f &vmax_)
-        : vmin(vmin_), vmax(vmax_)
-    {
-    }
-
-    const bool BoundingBox::Intersect(const Ray &ray)
-    {
-        float tmin = (vmin.x - ray.src.x) / ray.direction.x;
-        float tmax = (vmax.x - ray.src.x) / ray.direction.x;
-
-        if (tmin > tmax)
-        {
-            std::swap(tmin, tmax);
-        }
-
-        float tymin = (vmin.y - ray.src.y) / ray.direction.y;
-        float tymax = (vmax.y - ray.src.y) / ray.direction.y;
-
-        if (tymin > tymax)
-        {
-            std::swap(tymin, tymax);
-        }
-
-        if ((tmin > tymax) || (tymin > tmax))
-        {
-            return false;
-        }
-
-        if (tymin > tmin)
-            tmin = tymin;
-
-        if (tymax < tmax)
-            tmax = tymax;
-
-        float tzmin = (vmin.z - ray.src.z) / ray.direction.z;
-        float tzmax = (vmax.z - ray.src.z) / ray.direction.z;
-
-        if (tzmin > tzmax)
-        {
-            std::swap(tzmin, tzmax);
-        }
-
-        if ((tmin > tzmax) || (tzmin > tmax))
-        {
-            return false;
-        }
-
-        if (tzmin > tmin)
-        {
-            tmin = tzmin;
-        }
-
-        if (tzmax < tmax)
-        {
-            tmax = tzmax;
-        }
 
         return true;
     }

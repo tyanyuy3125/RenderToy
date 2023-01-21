@@ -42,6 +42,7 @@ namespace OpenPT
             {
                 if (!current_mesh.name.empty())
                 {
+                    current_mesh.BuildBVH();
                     ret.push_back(current_mesh);
 
                     vert.clear();
@@ -83,12 +84,13 @@ namespace OpenPT
                     d >> slash >> e >> slash >> f >>
                     g >> slash >> h >> slash >> i;
 
-                current_mesh.faces.push_back(Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}));
+                current_mesh.faces.push_back(new Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}));
                 continue;
             }
 
             fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
+        current_mesh.BuildBVH();
         ret.push_back(current_mesh);
 
         return ret;

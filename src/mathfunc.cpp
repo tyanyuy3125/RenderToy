@@ -20,11 +20,17 @@ namespace OpenPT
     {
     }
 
+    Vector3f::Vector3f(const float val)
+        : Vector3f(val, val, val)
+    {
+    }
+
     const Vector3f Vector3f::O = Vector3f();
     const Vector3f Vector3f::X = Vector3f(1.0f, 0.0f, 0.0f);
     const Vector3f Vector3f::Y = Vector3f(0.0f, 1.0f, 0.0f);
     const Vector3f Vector3f::Z = Vector3f(0.0f, 0.0f, 1.0f);
     const Vector3f Vector3f::White = Vector3f(1.0f, 1.0f, 1.0f);
+    const Vector3f Vector3f::Inf = Vector3f(INF, INF, INF);
 
     float Vector3f::Length() const
     {

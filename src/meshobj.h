@@ -11,6 +11,7 @@
 #include "mathfunc.h"
 #include "geoobj.h"
 #include "ray.h"
+#include "bvh.h"
 
 #include <vector>
 #include <string>
@@ -19,47 +20,40 @@
 
 namespace OpenPT
 {
-    struct BoundingBox
+    class Model : public GeoObj
     {
-        Vector3f vmin, vmax;
-        BoundingBox();
-        BoundingBox(const Vector3f &vmin_, const Vector3f &vmax_);
-
-        const bool Intersect(const Ray &ray);
+    public:
+        BoundingBox bbox;
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const = 0;
     };
 
-    struct Triangle
+    class Triangle : public Model
     {
-        BoundingBox bbox;
+    public:
         std::array<Vector3f, 3> vert;
         std::array<Vector3f, 3> norm;
         std::array<Vector2f, 3> uv;
 
         Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_);
 
-        const bool Intersect(const Ray &ray, float &t, float &u, float &v);
-    };
-
-    class Model : public GeoObj
-    {
-    public:
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) = 0;
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
     };
 
     class Mesh : public Model
     {
     public:
-        BoundingBox bbox;
-        std::vector<Triangle> faces;
+        BVH *bvh{nullptr};
+        std::vector<const Model *> faces;
 
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) override final;
+        void BuildBVH();
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
     };
 
     class IdealSphere : public Model
     {
     public:
         float radius;
-        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) override final;
+        virtual const bool Intersect(const Ray &ray, float &t, float &u, float &v) const override final;
     };
 };
 
