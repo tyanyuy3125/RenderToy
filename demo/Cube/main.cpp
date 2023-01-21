@@ -22,7 +22,7 @@ int main()
     //                           {0.0f, 1.0f, 0.0f, 0.0f},
     //                           {0.0f, 0.0f, 0.0f, 1.0f}};
     Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 10.0f});
-    camera_mat4 = AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(45), 0.0f, 0.0f}) * camera_mat4;
+    camera_mat4 = AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(45)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(45), 0.0f, 0.0f}) * camera_mat4;
     world.cameras[0].SetO2W(camera_mat4);
 
     std::cout

@@ -63,7 +63,7 @@ namespace OpenPT
                 Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
 
                 bool intersected = false;
-
+                float t, u, v;
                 for (auto mesh_obj : world->meshes)
                 {
                     mat_stack.Push(mesh_obj.GetW2O());
@@ -72,8 +72,7 @@ namespace OpenPT
                     cast_ray.direction -= cast_ray.src; // Temporal solution!
                     cast_ray.direction.Normalize(); // Temporal solution!
 
-                    float placeholder;
-                    if (mesh_obj.Intersect(cast_ray, placeholder, placeholder, placeholder))
+                    if (mesh_obj.Intersect(cast_ray, t, u, v))
                     {
                         intersected = true;
                         mat_stack.Pop();
@@ -83,7 +82,8 @@ namespace OpenPT
                 }
                 if (intersected)
                 {
-                    BUFFER(x, y, format_settings.resolution.width) = Vector3f(1.0f, 0.0f, 0.0f);
+                    BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * Vector3f::X + u * Vector3f::Y + v * Vector3f::Z;
+                    // BUFFER(x, y, format_settings.resolution.width) = Vector3f(1.0f, 0.0f, 0.0f);
                 }
                 else
                 {
