@@ -30,8 +30,11 @@ int main()
 
     Vector3f *buffer;
     IntersectTestRenderer renderer(&world);
-    renderer.format_settings.resolution = Size(640, 360);
+    renderer.format_settings.resolution = Size(1280, 720);
+    clock_t timeStart = clock();
     renderer.Render(0, buffer);
+    clock_t timeEnd = clock();
+    printf("Render time: %04.2f (sec)\n", (float)(timeEnd - timeStart) / CLOCKS_PER_SEC);
 
     std::cout << "Exporting...\n";
 
@@ -39,7 +42,7 @@ int main()
     os.open("./cube.bmp");
 
     BMPExporter exporter;
-    exporter.format_settings.resolution = Size(640, 360);
+    exporter.format_settings.resolution = Size(1280, 720);
     exporter.Export(os, buffer);
 
     os.close();
