@@ -76,10 +76,9 @@ namespace OpenPT
             if (identifier == "f")
             {
                 // f vert/uv/norm
-                fs >> a >> slash /*>> b */>> slash >> c >>
-                    d >> slash /*>> e */>> slash >> f >>
-                    g >> slash /*>> h */>> slash >> i;
-                b = e = h = 0;
+                fs >> a >> slash >> b >> slash >> c >>
+                    d >> slash >> e >> slash >> f >>
+                    g >> slash >> h >> slash >> i;
 
                 world.triangles.push_back(new Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}, current_mesh));
                 current_mesh->faces.push_back(world.triangles.back());

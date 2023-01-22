@@ -11,7 +11,7 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    OBJModelImporter::Import(world, "./rabbit.obj");
+    OBJModelImporter::Import(world, "./cube.obj");
     // OBJModelImporter::Import(world, "./cube.obj");
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and "<<world.meshes.size()<<" mesh(es).\n";
     world.cameras.push_back(AcademyCamera);
@@ -20,8 +20,8 @@ int main()
     //                           {0.0f, 0.0f, -1.0f, -10.0f},
     //                           {0.0f, 1.0f, 0.0f, 0.0f},
     //                           {0.0f, 0.0f, 0.0f, 1.0f}};
-    Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 20.0f});
-    camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 2.0f}) * AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(135)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(60), 0.0f, 0.0f}) * camera_mat4;
+    Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 10.0f});
+    camera_mat4 = AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(45)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(45), 0.0f, 0.0f}) * camera_mat4;
     world.cameras[0].SetO2W(camera_mat4);
 
     // Matrix4x4f cube_mat4 = AffineTransformation::Translation({-1.0f, 0.0f, 0.0f});

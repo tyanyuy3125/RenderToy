@@ -74,6 +74,7 @@ namespace OpenPT
                 if (intersected != nullptr)
                 {
                     BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2];
+                    // BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * Vector3f::X + u * Vector3f::Y + v * Vector3f::Z;
                 }
                 else
                 {
