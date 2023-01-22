@@ -1,4 +1,4 @@
-#define BUFFER(x, y, width) buffer[y * width + x]
+#define BUFFER(x, y, width) render_context->buffer[y * width + x]
 
 #include "renderer.h"
 #include "camera.h"
@@ -7,26 +7,14 @@
 
 namespace OpenPT
 {
-    IRenderer::IRenderer(World *world_)
-        : world(world_)
-    {
-        bvh = new BVH(world->triangles);
-    }
-
-    IRenderer::~IRenderer()
-    {
-        delete bvh;
-    }
-
-    IntersectTestRenderer::IntersectTestRenderer(World *world_)
-        : IRenderer(world_)
+    IntersectTestRenderer::IntersectTestRenderer(RenderContext *render_context_)
+        : IRenderer(render_context_)
     {
     }
 
-    void IntersectTestRenderer::Render(int camera_id, Vector3f *&buffer)
+    void IntersectTestRenderer::Render()
     {
-        Camera *cam = &(world->cameras[camera_id]);
-        buffer = new Vector3f[format_settings.resolution.Area()];
+        Camera *cam = &(render_context->world->cameras[render_context->camera_id]);
 
         // BEGIN Camera Preparation
         float top = (Convert::InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
@@ -34,7 +22,7 @@ namespace OpenPT
         // We implement FILL CONVENTION when aspect ratio conflicts with gate dimension.
         // Corresponding to AUTO setting of Sensor Fit in Blender.
         float gate_aspr = cam->gate_dimension.x / cam->gate_dimension.y;
-        float film_aspr = format_settings.resolution.AspectRatio();
+        float film_aspr = render_context->format_settings.resolution.AspectRatio();
         float xscale = 1.0f, yscale = 1.0f;
         if (gate_aspr >= film_aspr)
         {
@@ -51,12 +39,12 @@ namespace OpenPT
         // END Camera Preparation
 
 
-        for (int y = 0; y < format_settings.resolution.height; ++y)
+        for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
         {
-            for (int x = 0; x < format_settings.resolution.width; ++x)
+            for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
             {
                 // (x, y) is the point in Raster Space.
-                Vector2f NDC_coord = {float(x) / float(format_settings.resolution.width), float(y) / float(format_settings.resolution.height)};
+                Vector2f NDC_coord = {float(x) / float(render_context->format_settings.resolution.width), float(y) / float(render_context->format_settings.resolution.height)};
                 Vector2f screen_coord = {2 * right * NDC_coord.x - right, 2 * top * NDC_coord.y - top};
 
                 // Blender convention: Camera directing towards -z.
@@ -69,16 +57,16 @@ namespace OpenPT
                 cast_ray.direction.Normalize();     // Temporal solution!
 
                 float t, u, v;
-                auto intersected = bvh->Intersect(cast_ray, t, u, v);
+                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v);
 
                 if (intersected != nullptr)
                 {
-                    BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2];
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = (1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2];
                     // BUFFER(x, y, format_settings.resolution.width) = (1 - u - v) * Vector3f::X + u * Vector3f::Y + v * Vector3f::Z;
                 }
                 else
                 {
-                    BUFFER(x, y, format_settings.resolution.width) = Vector3f(0.0f, 0.0f, 0.0f);
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = Vector3f(0.0f, 0.0f, 0.0f);
                 }
             }
         }
@@ -89,15 +77,13 @@ namespace OpenPT
     {
     }
 
-    void TestRenderer::Render(int camera_id, Vector3f *&buffer)
+    void TestRenderer::Render()
     {
-        // TODO: Memory leak!
-        buffer = new Vector3f[format_settings.resolution.Area()];
-        for (int y = 0; y < format_settings.resolution.height; ++y)
+        for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
         {
-            for (int x = 0; x < format_settings.resolution.width; ++x)
+            for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
             {
-                BUFFER(x, y, format_settings.resolution.width) = Vector3f(float(x) / format_settings.resolution.width, 1.0f, 1.0f);
+                BUFFER(x, y, render_context->format_settings.resolution.width) = Vector3f(float(x) / render_context->format_settings.resolution.width, 1.0f, 1.0f);
             }
         }
     }
@@ -106,4 +92,23 @@ namespace OpenPT
         : resolution(resolution_), aspect(aspect_)
     {
     }
+    
+    RenderContext::RenderContext(World *world_, FormatSettings format_settings_)
+        : world(world_), format_settings(format_settings_)
+    {
+        bvh = new BVH(world->triangles);
+        buffer = new Vector3f[format_settings.resolution.Area()];
+    }
+
+    RenderContext::~RenderContext()
+    {
+        delete[] buffer;
+        delete bvh;
+    }
+
+    IRenderer::IRenderer(RenderContext *render_context_)
+        : render_context(render_context_)
+    {
+    }
+    
 }

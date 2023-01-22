@@ -128,7 +128,7 @@ namespace OpenPT
     {
         if (node->is_leaf)
         {
-            if (node->node_bbox_list.size() == 0 || depth == 16)
+            if (node->node_bbox_list.size() == 0 || depth == 2)
             {
                 node->node_bbox_list.push_back(bbox_insert);
             }
