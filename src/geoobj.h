@@ -2,6 +2,7 @@
 #define GEOOBJ_H
 
 #include "mathfunc.h"
+#include "ray.h"
 
 namespace OpenPT
 {
@@ -22,7 +23,10 @@ namespace OpenPT
         const Matrix4x4f &GetW2O() const;
 
         const Vector3f O2WTransform(const Vector3f &vec) const;
-        const Vector3f W2OTramsform(const Vector3f &vec) const;
+        const Vector3f W2OTransform(const Vector3f &vec) const;
+
+        const Ray O2WTransform(const Ray &ray) const;
+        const Ray W2OTransform(const Ray &ray) const;
     };
 }
 

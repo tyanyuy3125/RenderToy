@@ -24,7 +24,7 @@ namespace OpenPT
         }
         world_to_object[3][3] = 1.0f;
     }
-    
+
     const Matrix4x4f &GeoObj::GetO2W() const
     {
         return object_to_world;
@@ -34,18 +34,34 @@ namespace OpenPT
     {
         return world_to_object;
     }
-    
+
     const Vector3f GeoObj::O2WTransform(const Vector3f &vec) const
     {
         Vector4f vec4(vec, 1.0f);
         vec4 = object_to_world * vec4;
         return Vector3f(vec4[0], vec4[1], vec4[2]);
     }
-    
-    const Vector3f GeoObj::W2OTramsform(const Vector3f &vec) const
+
+    const Vector3f GeoObj::W2OTransform(const Vector3f &vec) const
     {
         Vector4f vec4(vec, 1.0f);
         vec4 = world_to_object * vec4;
         return Vector3f(vec4[0], vec4[1], vec4[2]);
+    }
+
+    const Ray GeoObj::O2WTransform(const Ray &ray) const
+    {
+        Ray ret(O2WTransform(ray.src), O2WTransform(ray.direction));
+        ret.direction -= ret.src;
+        ret.direction.Normalize();
+        return ret;
+    }
+
+    const Ray GeoObj::W2OTransform(const Ray &ray) const
+    {
+        Ray ret(W2OTransform(ray.src), W2OTransform(ray.direction));
+        ret.direction -= ret.src;
+        ret.direction.Normalize();
+        return ret;
     }
 }

@@ -23,7 +23,6 @@ namespace OpenPT
         OBJModelImporter(const OBJModelImporter&) = delete;
         OBJModelImporter(const OBJModelImporter&&) = delete;
 
-        // https://stackoverflow.com/questions/15704565/efficient-way-to-return-a-stdvector-in-c
         static void Import(World &world, const std::string &path);
     };
 };

@@ -6,6 +6,7 @@
 #include "world.h"
 #include "mathfunc.h"
 #include "bvh.h"
+#include "camera.h"
 
 namespace OpenPT
 {
@@ -34,6 +35,9 @@ namespace OpenPT
 
     class IRenderer
     {
+    protected:
+        void PrepareScreenSpace(Camera *cam, float &top, float &right);
+
     public:
         RenderContext *render_context;
         IRenderer() = delete;
@@ -64,6 +68,13 @@ namespace OpenPT
 
         DepthBufferRenderer(RenderContext *render_context_);
         DepthBufferRenderer(RenderContext *render_context_, float near_, float far_);
+        virtual void Render() override final;
+    };
+
+    class NormalRenderer : public IRenderer
+    {
+    public:
+        NormalRenderer(RenderContext *render_context_);
         virtual void Render() override final;
     };
 }
