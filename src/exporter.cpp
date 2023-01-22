@@ -1,4 +1,4 @@
-#define BUFFER(x, y, width) buffer[y * width + x]
+#define BUFFER(x, y, width) render_context->buffer[y * width + x]
 
 #include <algorithm>
 
@@ -7,10 +7,10 @@
 
 namespace OpenPT
 {
-    void PPMExporter::Export(std::ostream &os, Vector3f *buffer)
+    void PPMExporter::Export(std::ostream &os)
     {
-        int nx = format_settings.resolution.width;
-        int ny = format_settings.resolution.height;
+        int nx = render_context->format_settings.resolution.width;
+        int ny = render_context->format_settings.resolution.height;
         os << "P3" << std::endl
            << nx << ' ' << ny << std::endl
            << "255" << std::endl;
@@ -30,16 +30,12 @@ namespace OpenPT
         }
     }
 
-    PPMExporter::PPMExporter()
+    PPMExporter::PPMExporter(RenderContext *render_context_)
+        : IExporter(render_context_)
     {
     }
 
-    PPMExporter::PPMExporter(FormatSettings format_settings_)
-        : IExporter(format_settings_)
-    {
-    }
-
-    void BMPExporter::Export(std::ostream &os, Vector3f *buffer)
+    void BMPExporter::Export(std::ostream &os)
     {
 #pragma pack(push, 1)
         struct BmpHeader
@@ -73,21 +69,21 @@ namespace OpenPT
         } pixel;
 #pragma pack(pop)
 
-        int padding_len = 4 - (format_settings.resolution.width % 4);
+        int padding_len = 4 - (render_context->format_settings.resolution.width % 4);
         padding_len %= 4;
 
-        bmpHeader.sizeOfBitmapFile = 54 + format_settings.resolution.Area() * 3;
-        bmpInfoHeader.width = format_settings.resolution.width;
-        bmpInfoHeader.height = format_settings.resolution.height;
+        bmpHeader.sizeOfBitmapFile = 54 + render_context->format_settings.resolution.Area() * 3;
+        bmpInfoHeader.width = render_context->format_settings.resolution.width;
+        bmpInfoHeader.height = render_context->format_settings.resolution.height;
 
         os.write((char *)&bmpHeader, 14);
         os.write((char *)&bmpInfoHeader, 40);
 
-        for (int i = 0; i < format_settings.resolution.height; ++i)
+        for (int i = 0; i < render_context->format_settings.resolution.height; ++i)
         {
-            for (int j = 0; j < format_settings.resolution.width; ++j)
+            for (int j = 0; j < render_context->format_settings.resolution.width; ++j)
             {
-                auto real_color = BUFFER(j, i, format_settings.resolution.width);
+                auto real_color = BUFFER(j, i, render_context->format_settings.resolution.width);
                 float r = std::clamp(real_color.x, 0.0f, 1.0f);
                 float g = std::clamp(real_color.y, 0.0f, 1.0f);
                 float b = std::clamp(real_color.z, 0.0f, 1.0f);
@@ -100,22 +96,13 @@ namespace OpenPT
         }
     }
 
-    BMPExporter::BMPExporter()
+    BMPExporter::BMPExporter(RenderContext *render_context_)
+        : IExporter(render_context_)
     {
     }
 
-    BMPExporter::BMPExporter(FormatSettings format_settings_)
-        : IExporter(format_settings_)
-    {
-    }
-
-    IExporter::IExporter()
-        : format_settings()
-    {
-    }
-
-    IExporter::IExporter(FormatSettings format_settings_)
-        : format_settings(format_settings_)
+    IExporter::IExporter(RenderContext *render_context_)
+        : render_context(render_context_)
     {
     }
 }

@@ -2,7 +2,6 @@
 #define RAY_H
 
 #include "mathfunc.h"
-#include "geoobj.h"
 
 namespace OpenPT
 {

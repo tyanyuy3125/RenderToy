@@ -5,6 +5,8 @@
 
 #include "world.h"
 #include "mathfunc.h"
+#include "bvh.h"
+#include "camera.h"
 
 namespace OpenPT
 {
@@ -18,33 +20,62 @@ namespace OpenPT
         FormatSettings(Size resolution_, Vector2f aspect_);
     };
 
+    struct RenderContext
+    {
+        World *world;
+        BVH *bvh;
+        Vector3f *buffer;
+
+        FormatSettings format_settings;
+        int camera_id = 0;
+
+        RenderContext(World *world_, FormatSettings format_settings_);
+        ~RenderContext();
+    };
+
     class IRenderer
     {
     protected:
-        World *world;
+        void PrepareScreenSpace(Camera *cam, float &top, float &right);
 
     public:
-        FormatSettings format_settings;
-
+        RenderContext *render_context;
         IRenderer() = delete;
         IRenderer(const IRenderer &) = delete;
         IRenderer(const IRenderer &&) = delete;
-        IRenderer(World *world_);
-        virtual void Render(int camera_id, Vector3f *&buffer) = 0;
+        IRenderer(RenderContext *render_context_);
+        virtual void Render() = 0;
     };
 
     class TestRenderer : public IRenderer
     {
     public:
-        TestRenderer();
-        virtual void Render(int camera_id, Vector3f *&buffer) override final;
+        TestRenderer(const Size &resolution_);
+        virtual void Render() override final;
     };
 
     class IntersectTestRenderer : public IRenderer
     {
     public:
-        IntersectTestRenderer(World *world_);
-        virtual void Render(int camera_id, Vector3f *&buffer) override final;
+        IntersectTestRenderer(RenderContext *render_context_);
+        virtual void Render() override final;
+    };
+
+    class DepthBufferRenderer : public IRenderer
+    {
+    public:
+        float near, far;
+
+        DepthBufferRenderer(RenderContext *render_context_);
+        DepthBufferRenderer(RenderContext *render_context_, float near_, float far_);
+        virtual void Render() override final;
+    };
+
+    class NormalRenderer : public IRenderer
+    {
+    public:
+        NormalRenderer(RenderContext *render_context_);
+        virtual void Render() override final;
     };
 }
 

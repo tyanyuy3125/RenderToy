@@ -10,27 +10,24 @@ namespace OpenPT
 {
     struct IExporter
     {
-        FormatSettings format_settings;
-        virtual void Export(std::ostream &os, Vector3f *buffer) = 0;
+        RenderContext *render_context;
+        virtual void Export(std::ostream &os) = 0;
 
-        IExporter();
-        IExporter(FormatSettings format_settings_);
+        IExporter(RenderContext *render_context_);
     };
 
     struct PPMExporter : public IExporter
     {
-        virtual void Export(std::ostream &os, Vector3f *buffer) override final;
+        virtual void Export(std::ostream &os) override final;
 
-        PPMExporter();
-        PPMExporter(FormatSettings format_settings_);
+        PPMExporter(RenderContext *render_context_);
     };
 
     struct BMPExporter : public IExporter
     {
-        virtual void Export(std::ostream &os, Vector3f *buffer) override final;
+        virtual void Export(std::ostream &os) override final;
 
-        BMPExporter();
-        BMPExporter(FormatSettings format_settings_);
+        BMPExporter(RenderContext *render_context_);
     };
 }
 

@@ -9,6 +9,7 @@
 #define IMPORTER_H
 
 #include "meshobj.h"
+#include "world.h"
 
 #include <string>
 #include <vector>
@@ -21,13 +22,8 @@ namespace OpenPT
         OBJModelImporter() = delete;
         OBJModelImporter(const OBJModelImporter&) = delete;
         OBJModelImporter(const OBJModelImporter&&) = delete;
-        OBJModelImporter(std::string path_);
 
-        // https://stackoverflow.com/questions/15704565/efficient-way-to-return-a-stdvector-in-c
-        std::vector<Mesh> Import();
-
-    private:
-        std::string path;
+        static void Import(World &world, const std::string &path);
     };
 };
 

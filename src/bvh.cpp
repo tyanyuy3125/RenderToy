@@ -99,13 +99,8 @@ namespace OpenPT
 
     OctreeNode::~OctreeNode()
     {
-        for (uint8_t i = 0; i < 8; ++i)
-        {
-            if (child[i] != nullptr)
-            {
-                delete child[i];
-            }
-        }
+        // Do nothing.
+        // Memory managed by Octree.
     }
 
     Octree::Octree(const BoundingBox &tree_bbox_)
@@ -225,9 +220,7 @@ namespace OpenPT
 
                     child_bbox.vmin.z = (i&1)?centroid.z : bbox.vmin.z;
                     child_bbox.vmax.z = (i&1)?bbox.vmax.z : centroid.z;
-
                     Build(node->child[i], child_bbox);
-
                     node->bbox.ExtendBy(node->child[i]->bbox);
                 }
             }
@@ -244,13 +237,13 @@ namespace OpenPT
         delete node;
     }
 
-    BVH::BVH(std::vector<const Model *> &models)
+    BVH::BVH(std::vector<const Triangle *> &models)
     {
         BoundingBox tree_bbox;
         bbox_list.reserve(models.size());
         for(int i=0;i<models.size();++i){
-            bbox_list[i] = models[i]->bbox;
-            tree_bbox.ExtendBy(models[i]->bbox);
+            bbox_list[i] = models[i]->BBox();
+            tree_bbox.ExtendBy(bbox_list[i]);
             bbox_list[i].object = models[i];
         }
 
@@ -263,10 +256,10 @@ namespace OpenPT
         octree->Build();
     }
 
-    const Model *BVH::Intersect(const Ray &ray, float &t) const
+    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v) const
     {
         t = INF;
-        const Model *intersected = nullptr;
+        const Triangle *intersected = nullptr;
         float placeholder;
         if(!octree->root->bbox.Intersect(ray, placeholder))
         {
@@ -288,6 +281,8 @@ namespace OpenPT
                     if(e->object->Intersect(ray, it, iu, iv)){
                         if(it < t){
                             t = it;
+                            u = iu;
+                            v = iv;
                             intersected = e->object;
                         }
                     }

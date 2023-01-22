@@ -16,6 +16,7 @@ add_library(OpenPT
             camera.h camera.cpp
             procedural.h procedural.cpp
             ray.h ray.cpp
-            bvh.h bvh.cpp)
+            bvh.h bvh.cpp
+            texture.h texture.cpp)
 
 set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)

@@ -9,7 +9,7 @@
 
 namespace OpenPT
 {
-    class Model;
+    class Triangle;
 
     struct BoundingBox
     {
@@ -23,7 +23,7 @@ namespace OpenPT
         void ExtendBy(const BoundingBox &bbox);
         const Vector3f Centroid() const;
 
-        const Model *object{nullptr};
+        const Triangle *object{nullptr};
     };
 
     struct OctreeNode
@@ -63,12 +63,11 @@ namespace OpenPT
 
     class BVH
     {
+    public:
         Octree *octree;
         std::vector<BoundingBox> bbox_list;
-
-    public:
-        BVH(std::vector<const Model *> &models);
-        const Model *Intersect(const Ray &ray, float &t) const;
+        BVH(std::vector<const Triangle *> &models);
+        const Triangle *Intersect(const Ray &ray, float &t, float &u, float &v) const;
         ~BVH();
     };
 }

@@ -10,7 +10,8 @@ namespace OpenPT
 {
     struct World
     {
-        std::vector<Mesh> meshes;
+        std::vector<Mesh *> meshes;
+        std::vector<const Triangle *> triangles;
         std::vector<Camera> cameras;
     };
 }
