@@ -24,7 +24,7 @@ int main()
         << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
-    IntersectTestRenderer renderer(&rc);
+    DepthBufferRenderer renderer(&rc, 5.0f, 20.0f);
     clock_t timeStart = clock();
     renderer.Render();
     clock_t timeEnd = clock();

@@ -34,10 +34,8 @@ namespace OpenPT
 
     class IRenderer
     {
-    protected:
-        RenderContext *render_context;
-
     public:
+        RenderContext *render_context;
         IRenderer() = delete;
         IRenderer(const IRenderer &) = delete;
         IRenderer(const IRenderer &&) = delete;
@@ -48,7 +46,7 @@ namespace OpenPT
     class TestRenderer : public IRenderer
     {
     public:
-        TestRenderer();
+        TestRenderer(const Size &resolution_);
         virtual void Render() override final;
     };
 
@@ -62,7 +60,10 @@ namespace OpenPT
     class DepthBufferRenderer : public IRenderer
     {
     public:
+        float near, far;
+
         DepthBufferRenderer(RenderContext *render_context_);
+        DepthBufferRenderer(RenderContext *render_context_, float near_, float far_);
         virtual void Render() override final;
     };
 }

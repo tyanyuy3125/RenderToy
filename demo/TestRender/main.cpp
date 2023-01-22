@@ -5,13 +5,13 @@
 
 int main(){
     OpenPT::Vector3f *buffer;
-    OpenPT::TestRenderer tr;
-    tr.Render(0, buffer);
-    OpenPT::BMPExporter exporter;
+    OpenPT::TestRenderer tr(OpenPT::Size(1920, 1080));
+    tr.Render();
+    OpenPT::BMPExporter exporter(tr.render_context);
 
     std::ofstream os;
     os.open("./testimage.bmp");
-    exporter.Export(os, buffer);
+    exporter.Export(os);
     os.close();
 
     std::cout<<"Render completed.\n";
