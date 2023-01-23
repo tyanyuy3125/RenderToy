@@ -115,7 +115,7 @@ namespace OpenPT
         Vector3f v2 = vert[2];
         v1 = parent->O2WTransform(v1);
         v2 = parent->O2WTransform(v2);
-        return Tangent().Cross(v2-v1).Normalized();
+        return Tangent().Cross(v2 - v1).Normalized();
     }
 
     const float Triangle::Area() const

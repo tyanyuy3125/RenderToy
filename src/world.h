@@ -21,6 +21,8 @@ namespace OpenPT
         /// @param position_o 
         /// @param id_o 
         void SampleEmitter(const Random &random, Vector3f &position_o, const Triangle *&id_o) const;
+
+        int CountEmitters() const;
     };
 }
 

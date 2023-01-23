@@ -305,6 +305,14 @@ namespace OpenPT
         return intersected;
     }
 
+    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position) const
+    {
+        float t, u, v;
+        auto ret = Intersect(ray, t, u, v);
+        position = ray.src + t * ray.direction;
+        return ret;
+    }
+
     BVH::~BVH()
     {
         delete octree;

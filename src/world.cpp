@@ -25,3 +25,13 @@ void OpenPT::World::SampleEmitter(const Random &random, Vector3f &position_o, co
         id_o = nullptr;
     }
 }
+
+int OpenPT::World::CountEmitters() const
+{
+    int ret;
+    for(auto m : emissive_meshes)
+    {
+        ret += m->faces.size();
+    }
+    return ret;
+}

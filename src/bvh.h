@@ -68,6 +68,7 @@ namespace OpenPT
         std::vector<BoundingBox> bbox_list;
         BVH(std::vector<const Triangle *> &models);
         const Triangle *Intersect(const Ray &ray, float &t, float &u, float &v) const;
+        const Triangle *Intersect(const Ray &ray, Vector3f &position) const;
         ~BVH();
     };
 }

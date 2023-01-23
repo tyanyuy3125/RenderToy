@@ -73,8 +73,18 @@ namespace OpenPT
     {
         return triangle;
     }
-    
+
+    const Triangle *SurfacePoint::GetHitTriangle() const
+    {
+        return triangle;
+    }
+
     const Vector3f SurfacePoint::GetPosition()
+    {
+        return position;
+    }
+    
+    const Vector3f SurfacePoint::GetPosition() const
     {
         return position;
     }
