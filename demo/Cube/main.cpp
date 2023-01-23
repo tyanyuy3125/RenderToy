@@ -11,7 +11,7 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    OBJModelImporter::Import(world, "./cube.obj");
+    OBJModelImporter::Import(world, "./sphere.obj");
 
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and " << world.meshes.size() << " mesh(es).\n";
     world.cameras.push_back(AcademyCamera);

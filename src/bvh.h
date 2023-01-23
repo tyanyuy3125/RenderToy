@@ -17,7 +17,7 @@ namespace OpenPT
         BoundingBox();
         BoundingBox(const Vector3f &vmin_, const Vector3f &vmax_);
 
-        const bool Intersect(const Ray &ray, float &t_min);
+        const bool Intersect(const Ray &ray, float &t_min, float &t_max);
         /// @brief Extends by another bbox.
         /// @param bbox
         void ExtendBy(const BoundingBox &bbox);

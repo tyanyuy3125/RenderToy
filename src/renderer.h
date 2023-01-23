@@ -7,6 +7,8 @@
 #include "mathfunc.h"
 #include "bvh.h"
 #include "camera.h"
+#include "surfacepoint.h"
+#include "random.h"
 
 namespace OpenPT
 {
