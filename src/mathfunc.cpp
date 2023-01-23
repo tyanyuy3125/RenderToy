@@ -77,6 +77,11 @@ namespace OpenPT
         return Vector3f(x * a, y * a, z * a);
     }
 
+    const Vector3f Vector3f::operator*(const Vector3f &vec) const
+    {
+        return Vector3f(x * vec.x, y * vec.y, z * vec.z);
+    }
+
     const Vector3f Vector3f::operator/(const float a) const
     {
         return Vector3f(x / a, y / a, z / a);

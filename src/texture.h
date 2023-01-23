@@ -5,9 +5,10 @@
 
 namespace OpenPT
 {
-    struct PrincipledBRDF
+    struct Texture
     {
-        Vector3f base_color;
+        Vector3f reflectivity;
+        Vector3f emitivity;
     };
 }
 

@@ -98,4 +98,34 @@ namespace OpenPT
 
         return v0v1 * a + v0v2 * b + v0;
     }
+
+    const Vector3f Triangle::Tangent() const
+    {
+        Vector3f v0 = vert[0];
+        Vector3f v1 = vert[1];
+        v0 = parent->O2WTransform(v0);
+        v1 = parent->O2WTransform(v1);
+        return (v1 - v0).Normalized();
+    }
+
+    const Vector3f Triangle::Normal() const
+    {
+        // TODO: Optimize!
+        Vector3f v1 = vert[1];
+        Vector3f v2 = vert[2];
+        v1 = parent->O2WTransform(v1);
+        v2 = parent->O2WTransform(v2);
+        return Tangent().Cross(v2-v1).Normalized();
+    }
+
+    const float Triangle::Area() const
+    {
+        Vector3f v0 = vert[0];
+        Vector3f v1 = vert[1];
+        Vector3f v2 = vert[2];
+        Vector3f v0v1 = v1 - v0;
+        Vector3f v0v2 = v2 - v0;
+
+        return v0v1.Cross(v0v2).Length() * 0.5f;
+    }
 }

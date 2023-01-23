@@ -94,6 +94,7 @@ namespace OpenPT
         const Vector3f operator-(const Vector3f &a) const;
         const Vector3f operator-(void) const;
         const Vector3f operator*(const float a) const;
+        const Vector3f operator*(const Vector3f &vec) const;
         const Vector3f operator/(const float a) const;
 
         const Vector3f &operator+=(const Vector3f &a);
