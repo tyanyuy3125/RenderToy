@@ -12,6 +12,7 @@
 #include "geoobj.h"
 #include "ray.h"
 #include "bvh.h"
+#include "random.h"
 
 #include <vector>
 #include <string>
@@ -32,7 +33,17 @@ namespace OpenPT
         std::array<Vector2f, 3> uv;
 
         Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_, Mesh *const parent_);
+        /// @brief Do ray-triangle intersection test in WORLD SPACE.
+        /// @param ray 
+        /// @param t 
+        /// @param u 
+        /// @param v 
+        /// @return 
         const bool Intersect(const Ray &ray, float &t, float &u, float &v) const;
+        /// @brief Get sample point in WORLD SPACE.
+        /// @param random 
+        /// @return 
+        const Vector3f GetSamplePoint(const Random &random) const;
 
         Mesh *parent;
     };

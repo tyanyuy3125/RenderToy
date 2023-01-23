@@ -13,6 +13,14 @@ namespace OpenPT
         std::vector<Mesh *> meshes;
         std::vector<const Triangle *> triangles;
         std::vector<Camera> cameras;
+
+        std::vector<Mesh *> emissive_meshes;
+        
+        /// @brief Randomly chooses a emissive triangle in the scene. Used by source sampling.
+        /// @param random 
+        /// @param position_o 
+        /// @param id_o 
+        void SampleEmitter(const Random &random, Vector3f &position_o, const Triangle *&id_o) const;
     };
 }
 

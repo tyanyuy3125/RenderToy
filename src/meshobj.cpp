@@ -1,9 +1,7 @@
 #include "meshobj.h"
 
-#define ENABLE_BOUNDING_VOLUME
-#define ENABLE_MESH_BVH
-
 #include <limits>
+#include <cmath>
 
 namespace OpenPT
 {
@@ -48,6 +46,7 @@ namespace OpenPT
         float det = v0v1.Dot(pvec);
 
         // Culling enabled.
+        // TODO: We should disable culling!
         if (det < EPS)
         {
             return false;
@@ -77,5 +76,26 @@ namespace OpenPT
         v = beta * inv_det;
 
         return true;
+    }
+
+    const Vector3f Triangle::GetSamplePoint(const Random &random) const
+    {
+        Vector3f v0 = vert[0];
+        Vector3f v1 = vert[1];
+        Vector3f v2 = vert[2];
+        v0 = parent->O2WTransform(v0);
+        v1 = parent->O2WTransform(v1);
+        v2 = parent->O2WTransform(v2);
+
+        Vector3f v0v1 = v1 - v0;
+        Vector3f v0v2 = v2 - v0;
+
+        float sqr1 = std::sqrt(random.Float());
+        float r2 = random.Float();
+
+        float a = 1.0f - sqr1;
+        float b = (1.0f - r2) * sqr1;
+
+        return v0v1 * a + v0v2 * b + v0;
     }
 }
