@@ -21,7 +21,7 @@ namespace OpenPT
                 float far_clipping_plane_);
     };
 
-    static const Camera AcademyCamera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825f, 0.446f), 0.1f, 1000.0f);
+    static const Camera academy_camera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825f, 0.446f), 0.1f, 1000.0f);
 }
 
 #endif // CAMERA_H

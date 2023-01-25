@@ -20,10 +20,18 @@ namespace OpenPT
     {
     public:
         OBJModelImporter() = delete;
-        OBJModelImporter(const OBJModelImporter&) = delete;
-        OBJModelImporter(const OBJModelImporter&&) = delete;
+        OBJModelImporter(const OBJModelImporter &) = delete;
+        OBJModelImporter(const OBJModelImporter &&) = delete;
 
         static void Import(World &world, const std::string &path);
+    };
+
+    class TARGAImporter
+    {
+    public:
+        TARGAImporter() = delete;
+        TARGAImporter(const TARGAImporter &) = delete;
+        TARGAImporter(const TARGAImporter &&) = delete;
     };
 };
 

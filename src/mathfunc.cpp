@@ -10,6 +10,20 @@
 
 #include "mathfunc.h"
 
+/// @brief Multiply 4 floats by another 4 floats.
+/// @tparam offset Offset from the first float.
+/// @param p1 Memory address of first float in the first 4 floats.
+/// @param p2 Memory address of first float in the second 4 floats.
+/// @return
+template <int offset>
+inline __m128 mul4(const float *p1, const float *p2)
+{
+    constexpr int lanes = offset * 8;
+    const __m128 a = _mm_loadu_ps(p1 + lanes);
+    const __m128 b = _mm_loadu_ps(p2 + lanes);
+    return _mm_mul_ps(a, b);
+}
+
 namespace OpenPT
 {
     Vector3f::Vector3f(const float x_, const float y_, const float z_) : x(x_), y(y_), z(z_) {}
@@ -439,7 +453,15 @@ namespace OpenPT
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
     {
+        // It is NOT recommended to enable SIMD instructions in vector computations.
+#ifndef ENABLE_VECTOR_SIMD
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+#else
+        const __m128 mul_arr = mul4<0>(&a.x, &b.x);
+        const __m128 r2 = _mm_add_ps(mul_arr, _mm_movehl_ps(mul_arr, mul_arr));
+        const __m128 r1 = _mm_add_ps(r2, _mm_movehdup_ps(r2));
+        return _mm_cvtss_f32(r1);
+#endif
     }
 
     const Vector4f Vector4f::Cross(const Vector4f &a, const Vector4f &b)
@@ -515,10 +537,7 @@ namespace OpenPT
         Vector4f ret;
         for (int i = 0; i < 4; ++i)
         {
-            for (int j = 0; j < 4; ++j)
-            {
-                ret[i] += row[i][j] * a[j];
-            }
+            ret[i] = Vector4f::Dot(row[i], a);
         }
         return ret;
     }

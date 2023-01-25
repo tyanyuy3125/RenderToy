@@ -108,7 +108,6 @@ namespace OpenPT
 
     const Vector3f Triangle::Normal() const
     {
-        // TODO: Optimize!
         Vector3f v1 = vert[1];
         Vector3f v2 = vert[2];
         v1 = parent->O2WTransform(v1);

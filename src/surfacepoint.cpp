@@ -25,10 +25,7 @@ namespace OpenPT
         const float in_dot = in_dir.Dot(triangle->Normal());
         const float out_dot = out_dir.Dot(triangle->Normal());
 
-        // directions must be on same side of surface (no transmission)
         return Vector3f((in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O :
-                                                           // ideal diffuse BRDF:
-                                                           // radiance scaled by reflectivity, cosine, and 1/pi
                             (in_rad * triangle->parent->tex.reflectivity) * (std::abs(in_dot) / M_PIf32));
     }
 
@@ -39,30 +36,22 @@ namespace OpenPT
         const float reflectivity_mean =
             triangle->parent->tex.reflectivity.Dot(Vector3f::White) / 3.0f;
 
-        // russian-roulette for reflectance magnitude
         if (Random::Float() < reflectivity_mean)
         {
-            // cosine-weighted importance sample hemisphere
-
             const float _2pr1 = M_PIf32 * 2.0f * Random::Float();
             const float sr2 = ::sqrt(Random::Float());
 
-            // make coord frame coefficients (z in normal direction)
             const float x = std::cos(_2pr1) * sr2;
             const float y = std::sin(_2pr1) * sr2;
             const float z = std::sqrt(1.0f - (sr2 * sr2));
 
-            // make coord frame
             Vector3f normal(triangle->Normal());
             Vector3f tangent(triangle->Tangent());
-            // put normal on inward ray side of surface (preventing transmission)
             normal = normal.Dot(in_dir) >= 0.0f ? normal : -normal;
 
-            // make vector from frame scaled by coefficients
             out_dir = (tangent * x) + (normal.Cross(tangent) * y) +
                       (normal * z);
 
-            // make color by dividing-out mean from reflectivity
             color_o = triangle->parent->tex.reflectivity / reflectivity_mean;
         }
 
