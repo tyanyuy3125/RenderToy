@@ -7,6 +7,7 @@
 #include "surfacepoint.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace OpenPT
 {
@@ -255,13 +256,13 @@ namespace OpenPT
             radiance = radiance + SampleEmitters(ray_dir, surface_point);
 
             Vector3f nextDirection;
-            Vector3f color;
+            float rr;
+            // Vector3f color;
             // check surface reflects ray
-            if (surface_point.GetNextDirection(-ray_dir, nextDirection, color))
+            if (surface_point.GetNextDirection(-ray_dir, nextDirection, rr))
             {
-                // recurse
-                radiance = radiance + (color * Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) * Radiance(surface_point.GetPosition(),
-                                                        nextDirection, surface_point.GetHitTriangle()));
+                auto current_tri = surface_point.GetHitTriangle()->parent;
+                radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) * (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) / (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
             }
         }
         else
@@ -274,44 +275,35 @@ namespace OpenPT
         return radiance;
     }
 
-    const Vector3f PathTracingRenderer::SampleEmitters(const Vector3f &ray_dir, const SurfacePoint &surface_point) const
+    const Vector3f PathTracingRenderer::SampleEmitters(const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
     {
-        Vector3f radiance;
+        Vector3f ret;
 
-        // single emitter sample, ideal diffuse BRDF:
-        //    reflected = (emitivity * solidangle) * (emitterscount) *
-        //       (cos(emitdirection) / pi * reflectivity)
-        // -- SurfacePoint does the first and last parts (in separate methods)
+        Vector3f emit_pos;
+        const Triangle *emit_triangle = nullptr;
+        render_context->world->SampleEmitter(emit_pos, emit_triangle);
 
-        // get position on an emitter
-        Vector3f emitterPosition;
-        const Triangle *emitterId = nullptr;
-        render_context->world->SampleEmitter(emitterPosition, emitterId);
-
-        // check an emitter was found
-        if (emitterId != nullptr)
+        if (emit_triangle != nullptr)
         {
-            // make direction to emit point
-            const Vector3f emitDirection((emitterPosition - surface_point.GetPosition()).Normalized());
+            const Vector3f dir_to_emitter((emit_pos - surface_point.GetPosition()).Normalized());
 
-            // send shadow ray
-            const Triangle *pHitObject = nullptr;
-            Vector3f hitPosition;
-            pHitObject = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), emitDirection), hitPosition, surface_point.GetHitTriangle());
+            // Send test intersection ray.
+            const Triangle *test_triangle = nullptr;
+            Vector3f test_triangle_hit;
+            test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, surface_point.GetHitTriangle());
 
-            // if unshadowed, get inward emission value
-            Vector3f emissionIn;
-            if ((pHitObject == nullptr) | (emitterId == pHitObject))
+            Vector3f emission_in;
+            if ((test_triangle == nullptr) | (emit_triangle == test_triangle))
             {
-                emissionIn = SurfacePoint(emitterId, emitterPosition).GetEmission(surface_point.GetPosition(), -emitDirection, true);
+                auto tri = surface_point.GetHitTriangle();
+                emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
+                const float in_dot = dir_to_emitter.Dot(surface_point.GetHitTriangle()->NormalC());
+                const float out_dot = -original_ray_dir.Dot(surface_point.GetHitTriangle()->NormalC());
+                ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));
             }
-
-            // get amount reflected by surface
-            // [kd] * [(out_dir dot trianglenorm)] * [emitivity] * [(out_dir dot lightnorm)] * [area] / [distance^2] [/ Pi]
-            radiance = surface_point.GetReflection(emitDirection, emissionIn * static_cast<float>(render_context->world->CountEmitters()), -ray_dir);
         }
 
-        return radiance;
+        return ret;
     }
 
     AlbedoRenderer::AlbedoRenderer(RenderContext *render_context_)

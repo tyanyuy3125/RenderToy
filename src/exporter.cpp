@@ -19,6 +19,8 @@ namespace OpenPT
             for (int j = 0; j < nx; ++j)
             {
                 auto real_color = BUFFER(j, i, nx);
+                real_color = Convert::Tonemap(real_color, 1.5f);
+                real_color = Vector3f::Pow(real_color, 0.4545f);
                 float r = std::clamp(real_color.x, 0.0f, 1.0f);
                 float g = std::clamp(real_color.y, 0.0f, 1.0f);
                 float b = std::clamp(real_color.z, 0.0f, 1.0f);
@@ -84,6 +86,9 @@ namespace OpenPT
             for (int j = 0; j < render_context->format_settings.resolution.width; ++j)
             {
                 auto real_color = BUFFER(j, i, render_context->format_settings.resolution.width);
+                // TODO: 把下面的几个函数封装到Posteffects类中。
+                real_color = Convert::Tonemap(real_color, 1.5f);
+                real_color = Vector3f::Pow(real_color, 0.4545f);
                 float r = std::clamp(real_color.x, 0.0f, 1.0f);
                 float g = std::clamp(real_color.y, 0.0f, 1.0f);
                 float b = std::clamp(real_color.z, 0.0f, 1.0f);

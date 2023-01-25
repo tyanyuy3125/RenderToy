@@ -106,6 +106,11 @@ namespace OpenPT
 
         const static float Dot(const Vector3f &a, const Vector3f &b);
         const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
+        /// @brief GLSL-like respective pow.
+        /// @param a 
+        /// @param b 
+        /// @return 
+        const static Vector3f Pow(const Vector3f &a, const Vector3f &b);
 
         const float Dot(const Vector3f &a) const;
         const Vector3f Cross(const Vector3f &a) const;
@@ -272,6 +277,9 @@ namespace OpenPT
         static const float DegreeToRadians(const float deg);
         static const Vector3f BlackBody(const float t);
         static const Vector3f XYZToSRGB(const Vector3f &x);
+
+        static const float RGBToLuminance(const Vector3f &vec);
+        static const Vector3f Tonemap(const Vector3f &vec, const float limit);
     };
 #pragma endregion
 

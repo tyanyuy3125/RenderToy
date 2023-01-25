@@ -161,6 +161,11 @@ namespace OpenPT
                         a.x * b.y - a.y * b.x);
     }
 
+    const Vector3f Vector3f::Pow(const Vector3f &a, const Vector3f &b)
+    {
+        return Vector3f(std::pow(a.x,b.x),std::pow(a.y,b.y),std::pow(a.z,b.z));
+    }
+
     const float Vector3f::Dot(const Vector3f &a) const
     {
         return x * a.x + y * a.y + z * a.z;
@@ -449,6 +454,16 @@ namespace OpenPT
             {-0.9692660, 1.8760108, 0.0415560},
             {0.0556434, -0.2040259, 1.0572252}};
         return matrix * x;
+    }
+
+    const float Convert::RGBToLuminance(const Vector3f &vec)
+    {
+        return 0.212671 * vec.x + 0.715160 * vec.y + 0.072169 * vec.z;
+    }
+
+    const Vector3f Convert::Tonemap(const Vector3f &vec, const float limit)
+    {
+        return vec * 1.0f / (1.0f + RGBToLuminance(vec) / limit);
     }
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)

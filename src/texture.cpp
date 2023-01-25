@@ -36,13 +36,50 @@ void Fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr)
 namespace OpenPT
 {
 
-    OpenPT::Texture::Texture()
-        : kd(Vector3f::O), emitivity(Vector3f::O)
+    OpenPT::Material::Material()
+        : type(MaterialType::DIFFUSE), kd(Vector3f::O), emitivity(Vector3f::O)
     {
     }
 
-    Texture::Texture(const Vector3f &reflectivity_, const Vector3f &emitivity_)
-        : kd(reflectivity_), emitivity(emitivity_)
+    Material::Material(MaterialType type_, const Vector3f &reflectivity_, const Vector3f &emitivity_)
+        : type(type_), kd(reflectivity_), emitivity(emitivity_)
     {
+    }
+
+    const float Material::PDF(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const
+    {
+        switch (type)
+        {
+        case MaterialType::DIFFUSE:
+        case MaterialType::MICROFACET_DIFFUSE:
+        case MaterialType::MICROFACET_GLOSSY:
+            // uniform sample probability 1 / (2 * PI)
+            if (Vector3f::Dot(wo, N) > 0.0f)
+                return 1.0f / M_PI;
+            else
+                return 0.0f;
+            break;
+        }
+    }
+
+    const Vector3f Material::Eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const
+    {
+        switch (type)
+        {
+        case MaterialType::DIFFUSE: // case MICROFACET_DIFFUSE: case MICROFACET_GLOSSY:
+            float cosalpha = Vector3f::Dot(N, wo);
+            if (cosalpha > 0.0f)
+            {
+                return kd * EvalDiffuse(wi, wo, N);
+            }
+            else
+                return Vector3f(0.0f);
+            break;
+        }
+    }
+
+    const Vector3f Material::EvalDiffuse(const Vector3f &wi, const Vector3f &wo, const Vector3f &N)
+    {
+        return 1.0f / M_PI;
     }
 }
