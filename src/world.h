@@ -12,7 +12,7 @@ namespace OpenPT
     struct World
     {
         std::vector<Mesh *> meshes;
-        std::vector<const Triangle *> triangles;
+        std::vector<Triangle *> triangles;
         std::vector<Camera> cameras;
 
         /// @brief Randomly chooses a emissive triangle in the scene. Used by source sampling.

@@ -345,7 +345,7 @@ namespace OpenPT
 
                 if (intersected != nullptr)
                 {
-                    BUFFER(x, y, render_context->format_settings.resolution.width) = intersected->parent->tex.reflectivity;
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = intersected->parent->tex.kd;
                 }
                 else
                 {
