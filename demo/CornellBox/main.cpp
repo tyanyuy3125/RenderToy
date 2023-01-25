@@ -33,7 +33,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 8);
+    PathTracingRenderer renderer(&rc, 1024);
     renderer.Render();
 
     std::cout << "Exporting...\n";

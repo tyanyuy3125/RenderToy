@@ -15,7 +15,7 @@ namespace OpenPT
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->Normal()) * triangle->Area();
 
-        const float solidAngle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : EPS) : 1.0f;
+        const float solidAngle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : 0.0f) : 1.0f;
 
         return Vector3f(cos_area > 0.0f ? triangle->parent->tex.emitivity * solidAngle : Vector3f::O);
     }

@@ -67,6 +67,7 @@ namespace OpenPT
         Octree *octree;
         std::vector<BoundingBox> bbox_list;
         BVH(std::vector<const Triangle *> &models);
+        std::vector<const Triangle *> *models;
         const Triangle *Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const;
         const Triangle *Intersect(const Ray &ray, Vector3f &position, const Triangle * const exclude) const;
         ~BVH();

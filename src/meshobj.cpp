@@ -14,6 +14,9 @@ namespace OpenPT
         v1 = parent->O2WTransform(v1);
         v2 = parent->O2WTransform(v2);
 
+        // Vector3f vertexs[3] = {v0, v1, v2};
+        // float bound[6];
+
         Vector3f bmax = {
             std::max(v0.x, std::max(v1.x, v2.x)),
             std::max(v0.y, std::max(v1.y, v2.y)),
@@ -24,6 +27,23 @@ namespace OpenPT
             std::min(v0.z, std::min(v1.z, v2.z))};
 
         return BoundingBox(bmin, bmax);
+        // // initialize
+        // for (int i = 6; i-- > 0; bound[i] = vertexs[2][i % 3])
+        // {
+        // }
+
+        // // expand
+        // for (int i = 0; i < 3; ++i)
+        // {
+        //     for (int j = 0, d = 0, m = 0; j < 6; ++j, d = j / 3, m = j % 3)
+        //     {
+        //         // include some tolerance
+        //         const float v = vertexs[i][m] + ((d ? 1.0 : -1.0) * 1.0f / 1024.0f);
+        //         bound[j] = (bound[j] > v) ^ d ? v : bound[j];
+        //     }
+        // }
+
+        // return BoundingBox({bound[0], bound[1], bound[2]},{bound[3], bound[4], bound[5]});
     }
 
     Triangle::Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_, Mesh *const parent_)

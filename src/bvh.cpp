@@ -240,6 +240,7 @@ namespace OpenPT
     }
 
     BVH::BVH(std::vector<const Triangle *> &models)
+        : models(&models)
     {
         BoundingBox tree_bbox;
         bbox_list.reserve(models.size());
@@ -262,22 +263,38 @@ namespace OpenPT
 
     const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const
     {
+        // const Triangle *intersected = nullptr;
+        // t = INF;
+        // for(auto tri : (*models))
+        // {
+        //     float it, iu, iv;
+        //     if(tri != exclude && tri->Intersect(ray, it, iu, iv))
+        //     {
+        //         if(it < t)
+        //         {
+        //             t = it;
+        //             u = iu;
+        //             v = iv;
+        //             intersected = tri;
+        //         }
+        //     }
+        // }
+        // return intersected;
         t = INF;
         const Triangle *intersected = nullptr;
-        float t_min, t_max = INF;
+        float t_min, t_max;
         bool intersected_test = octree->root->bbox.Intersect(ray, t_min, t_max);
         if (!intersected_test || t_max < 0.0f)
         {
             return nullptr;
         }
-        t = t_max;
 
-        std::priority_queue<Octree::QueueElement> queue;
+        std::queue<Octree::QueueElement> queue;
         queue.push(Octree::QueueElement(octree->root, 0));
 
-        while (!queue.empty() && queue.top().t < t)
+        while (!queue.empty())
         {
-            auto node = queue.top().node;
+            auto node = queue.front().node;
             queue.pop();
             if (node->is_leaf)
             {
