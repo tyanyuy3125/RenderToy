@@ -1,5 +1,5 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
 #include "mathfunc.h"
 
@@ -22,10 +22,29 @@ namespace OpenPT
 
         const float PDF(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const;
         const Vector3f Eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const;
+        const Vector3f Sample(const Vector3f &wi, const Vector3f &N) const;
+
     private:
         static const Vector3f EvalDiffuse(const Vector3f &wi, const Vector3f &wo, const Vector3f &N);
+    };
 
+    struct ITexture
+    {
+        virtual void Sample(const float u, const float v) const = 0;
     };
 }
 
-#endif // TEXTURE_H
+namespace OpenPT::ProceduralTexture
+{
+    struct PerlinNoiseTexture : public ITexture
+    {
+        virtual void Sample(const float u, const float v) const override final;
+    };
+
+    struct CheckboardTexture : public ITexture
+    {
+        virtual void Sample(const float u, const float v) const override final;
+    };
+}
+
+#endif // MATERIAL_H

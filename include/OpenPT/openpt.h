@@ -7,4 +7,4 @@
 #include "../../src/renderer.h"
 #include "../../src/exporter.h"
 #include "../../src/world.h"
-#include "../../src/texture.h"
+#include "../../src/material.h"

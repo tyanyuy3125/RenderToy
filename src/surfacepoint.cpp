@@ -39,19 +39,9 @@ namespace OpenPT
 
         if (Random::Float() < rr)
         {
-            const float _2pr1 = M_PIf32 * 2.0f * Random::Float();
-            const float sr2 = ::sqrt(Random::Float());
-
-            const float x = std::cos(_2pr1) * sr2;
-            const float y = std::sin(_2pr1) * sr2;
-            const float z = std::sqrt(1.0f - (sr2 * sr2));
-
             Vector3f normal(triangle->NormalC());
-            Vector3f tangent(triangle->TangentC());
             normal = normal.Dot(in_dir) >= 0.0f ? normal : -normal;
-
-            out_dir = (tangent * x) + (normal.Cross(tangent) * y) +
-                      (normal * z);
+            out_dir = triangle->parent->tex.Sample(in_dir, triangle->NormalC());
         }
 
         return !(out_dir == Vector3f::O);

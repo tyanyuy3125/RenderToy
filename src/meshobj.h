@@ -13,7 +13,7 @@
 #include "ray.h"
 #include "bvh.h"
 #include "random.h"
-#include "texture.h"
+#include "material.h"
 
 #include <vector>
 #include <string>

@@ -17,7 +17,7 @@ add_library(OpenPT
             procedural.h procedural.cpp
             ray.h ray.cpp
             bvh.h bvh.cpp
-            texture.h texture.cpp
+            material.h material.cpp
             random.h random.cpp
             surfacepoint.h surfacepoint.cpp)
 
