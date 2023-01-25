@@ -9,6 +9,8 @@ namespace OpenPT
     {
         Vector3f reflectivity;
         Vector3f emitivity;
+        Texture();
+        Texture(const Vector3f &reflectivity_, const Vector3f &emitivity_);
     };
 }
 

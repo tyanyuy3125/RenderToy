@@ -128,7 +128,7 @@ namespace OpenPT
     {
         if (node->is_leaf)
         {
-            if (node->node_bbox_list.size() == 0 || depth == 2)
+            if (node->node_bbox_list.size() == 0 || depth == 8)
             {
                 node->node_bbox_list.push_back(bbox_insert);
             }
@@ -260,7 +260,7 @@ namespace OpenPT
         octree->Build();
     }
 
-    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v) const
+    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const
     {
         t = INF;
         const Triangle *intersected = nullptr;
@@ -284,7 +284,7 @@ namespace OpenPT
                 for (const auto &e : node->node_bbox_list)
                 {
                     float it, iu, iv;
-                    if (e->object->Intersect(ray, it, iu, iv))
+                    if (e->object != exclude && e->object->Intersect(ray, it, iu, iv))
                     {
                         if (it < t)
                         {
@@ -316,10 +316,10 @@ namespace OpenPT
         return intersected;
     }
 
-    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position) const
+    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position, const Triangle * const exclude) const
     {
         float t, u, v;
-        auto ret = Intersect(ray, t, u, v);
+        auto ret = Intersect(ray, t, u, v, exclude);
         position = ray.src + t * ray.direction;
         return ret;
     }

@@ -10,7 +10,6 @@
 
 #define EPS 1e-7
 #define INF 1e7
-#define PI 3.14159265358979323846L
 
 #include <array>
 #include <istream>
@@ -103,6 +102,7 @@ namespace OpenPT
         const Vector3f &operator/=(const float a);
 
         const bool operator==(const Vector3f &a) const;
+        const bool operator!=(const Vector3f &a) const;
 
         const static float Dot(const Vector3f &a, const Vector3f &b);
         const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
@@ -270,6 +270,8 @@ namespace OpenPT
 
         static const float InchToMM(const float inch);
         static const float DegreeToRadians(const float deg);
+        static const Vector3f BlackBody(const float t);
+        static const Vector3f XYZToSRGB(const Vector3f &x);
     };
 #pragma endregion
 

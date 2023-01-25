@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <immintrin.h>
 
 #include "mathfunc.h"
 
@@ -122,6 +123,11 @@ namespace OpenPT
     const bool Vector3f::operator==(const Vector3f &a) const
     {
         return ((std::abs(x - a.x) < EPS) && (std::abs(y - a.y) < EPS) && (std::abs(z - a.z) < EPS));
+    }
+
+    const bool Vector3f::operator!=(const Vector3f &a) const
+    {
+        return !((*this) == a);
     }
 
     const Vector3f operator*(const float lambda, const Vector3f &a)
@@ -394,7 +400,41 @@ namespace OpenPT
 
     const float Convert::DegreeToRadians(const float deg)
     {
-        return deg * (PI / 180);
+        return deg * (M_PIf32 / 180.0f);
+    }
+
+    const Vector3f Convert::BlackBody(const float t)
+    {
+        // MIT License
+        // Copyright (c) 2020 Christopher J. Howard
+        // https://www.shadertoy.com/view/tsKczy
+
+        // Approximate the Planckian locus in CIE 1960 UCS color space (Krystek's algorithm)
+        float tt = t * t;
+        float u = (0.860117757 + 1.54118254e-4 * t + 1.28641212e-7 * tt) / (1.0 + 8.42420235e-4 * t + 7.08145163e-7 * tt);
+        float v = (0.317398726 + 4.22806245e-5 * t + 4.20481691e-8 * tt) / (1.0 - 2.89741816e-5 * t + 1.61456053e-7 * tt);
+
+        // CIE 1960 UCS -> CIE xyY, Y = 1
+        Vector2f xyy = Vector2f(3.0 * u, 2.0 * v) / (2.0 * u - 8.0 * v + 4.0);
+
+        // CIE xyY -> CIE XYZ
+        Vector3f xyz = Vector3f(xyy.x / xyy.y, 1.0, (1.0 - xyy.x - xyy.y) / xyy.y);
+
+        // CIE XYZ -> linear sRGB
+        Vector3f srgb = XYZToSRGB(xyz);
+
+        // Normalize RGB to preserve chromaticity
+        return srgb / std::max(srgb.x, std::max(srgb.y, srgb.z));
+    }
+
+    const Vector3f Convert::XYZToSRGB(const Vector3f &x)
+    {
+        // Source: http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+        const Matrix3x3f matrix = {
+            {3.2404542, -1.5371385, -0.4985314},
+            {-0.9692660, 1.8760108, 0.0415560},
+            {0.0556434, -0.2040259, 1.0572252}};
+        return matrix * x;
     }
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)

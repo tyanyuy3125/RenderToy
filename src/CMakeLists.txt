@@ -22,3 +22,8 @@ add_library(OpenPT
             surfacepoint.h surfacepoint.cpp)
 
 set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(OpenPT PUBLIC OpenMP::OpenMP_CXX)
+endif()

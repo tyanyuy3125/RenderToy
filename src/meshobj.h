@@ -44,7 +44,7 @@ namespace OpenPT
         /// @brief Get sample point in WORLD SPACE.
         /// @param random 
         /// @return 
-        const Vector3f GetSamplePoint(const Random &random) const;
+        const Vector3f GetSamplePoint() const;
         const Vector3f Tangent() const;
         const Vector3f Normal() const;
         const float Area() const;

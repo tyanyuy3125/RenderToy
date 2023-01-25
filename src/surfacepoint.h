@@ -13,7 +13,7 @@ namespace OpenPT
 
         const Vector3f GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const;
         const Vector3f GetReflection(const Vector3f &in_dir, const Vector3f &in_rad, const Vector3f &out_dir) const;
-        bool GetNextDirection(const Random &random, const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o);
+        bool GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o);
 
         const Triangle *GetHitTriangle();
         const Triangle *GetHitTriangle() const;

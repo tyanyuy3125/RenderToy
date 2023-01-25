@@ -2,22 +2,12 @@
 
 #include <cmath>
 
-void OpenPT::World::SampleEmitter(const Random &random, Vector3f &position_o, const Triangle *&id_o) const
+void OpenPT::World::SampleEmitter(Vector3f &position_o, const Triangle *&id_o) const
 {
-    if (!emissive_meshes.empty())
+    if (!emissive_triangles.empty())
     {
-        int index = static_cast<int>(std::floor(random.Float() *
-                                                static_cast<float>(emissive_meshes.size())));
-        index = index < emissive_meshes.size() ? index : int(emissive_meshes.size() - 1);
-
-        auto selected_mesh = emissive_meshes[index];
-
-        index = static_cast<int>(std::floor(random.Float() *
-                                            static_cast<float>(selected_mesh->faces.size())));
-        index = index < selected_mesh->faces.size() ? index : int(selected_mesh->faces.size() - 1);
-
-        position_o = selected_mesh->faces[index]->GetSamplePoint(random);
-        id_o = selected_mesh->faces[index];
+        id_o = emissive_triangles[Random::Int(0, emissive_triangles.size()-1)];
+        position_o = id_o->GetSamplePoint();
     }
     else
     {
@@ -28,10 +18,25 @@ void OpenPT::World::SampleEmitter(const Random &random, Vector3f &position_o, co
 
 int OpenPT::World::CountEmitters() const
 {
-    int ret;
-    for(auto m : emissive_meshes)
+    return emissive_triangles.size();
+}
+
+void OpenPT::World::PrepareDirectLightSampling()
+{
+    emissive_triangles.clear();
+    for(auto m : meshes)
     {
-        ret += m->faces.size();
+        if(m->tex.emitivity!=Vector3f::O)
+        {
+            for(auto t : m->faces)
+            {
+                emissive_triangles.push_back(t);
+            }
+        }
     }
-    return ret;
+}
+
+const OpenPT::Vector3f OpenPT::World::GetDefaultEmission(const OpenPT::Vector3f &back_dir) const
+{
+    return (back_dir[2] < 0.0f) ? sky_emission : ground_reflection;
 }

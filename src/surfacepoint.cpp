@@ -29,10 +29,10 @@ namespace OpenPT
         return Vector3f((in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O :
                                                            // ideal diffuse BRDF:
                                                            // radiance scaled by reflectivity, cosine, and 1/pi
-                            (in_rad * triangle->parent->tex.reflectivity) * (std::abs(in_dot) / PI));
+                            (in_rad * triangle->parent->tex.reflectivity) * (std::abs(in_dot) / M_PIf32));
     }
 
-    bool SurfacePoint::GetNextDirection(const Random &random, const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o)
+    bool SurfacePoint::GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o)
     {
         out_dir = Vector3f::O;
 
@@ -40,12 +40,12 @@ namespace OpenPT
             triangle->parent->tex.reflectivity.Dot(Vector3f::White) / 3.0f;
 
         // russian-roulette for reflectance magnitude
-        if (random.Float() < reflectivity_mean)
+        if (Random::Float() < reflectivity_mean)
         {
             // cosine-weighted importance sample hemisphere
 
-            const float _2pr1 = PI * 2.0f * random.Float();
-            const float sr2 = ::sqrt(random.Float());
+            const float _2pr1 = M_PIf32 * 2.0f * Random::Float();
+            const float sr2 = ::sqrt(Random::Float());
 
             // make coord frame coefficients (z in normal direction)
             const float x = std::cos(_2pr1) * sr2;

@@ -3,6 +3,7 @@
 
 #include "meshobj.h"
 #include "camera.h"
+#include "mathfunc.h"
 
 #include <vector>
 
@@ -14,15 +15,21 @@ namespace OpenPT
         std::vector<const Triangle *> triangles;
         std::vector<Camera> cameras;
 
-        std::vector<Mesh *> emissive_meshes;
-        
         /// @brief Randomly chooses a emissive triangle in the scene. Used by source sampling.
-        /// @param random 
-        /// @param position_o 
-        /// @param id_o 
-        void SampleEmitter(const Random &random, Vector3f &position_o, const Triangle *&id_o) const;
-
+        /// @param random
+        /// @param position_o
+        /// @param id_o
+        void SampleEmitter(Vector3f &position_o, const Triangle *&id_o) const;
         int CountEmitters() const;
+        void PrepareDirectLightSampling();
+
+        Vector3f sky_emission;
+        Vector3f ground_reflection;
+
+        const Vector3f GetDefaultEmission(const Vector3f &back_dir) const;
+
+    private:
+        std::vector<const Triangle *> emissive_triangles;
     };
 }
 
