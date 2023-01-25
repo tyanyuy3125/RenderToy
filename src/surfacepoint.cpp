@@ -12,6 +12,7 @@ namespace OpenPT
 
     const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const
     {
+        // emitivity * (out_dir dot lightnorm) * area / distance^2
         const Vector3f ray(to_pos - position);
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
@@ -27,7 +28,7 @@ namespace OpenPT
         const float out_dot = out_dir.Dot(triangle->NormalC());
 
         return (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O :
-                            in_rad * std::abs(in_dot) * triangle->parent->tex.Eval(in_dir, out_dir, triangle->NormalC());
+                            (in_rad * triangle->parent->tex.kd) * (std::abs(in_dot) / M_PIf32);
     }
 
     bool SurfacePoint::GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o)

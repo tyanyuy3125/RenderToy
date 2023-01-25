@@ -34,7 +34,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 16);
+    PathTracingRenderer renderer(&rc, 512);
     auto t1 = std::chrono::system_clock::now();
     renderer.Render();
     auto t2 = std::chrono::system_clock::now();

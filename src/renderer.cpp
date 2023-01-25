@@ -260,7 +260,7 @@ namespace OpenPT
             if (surface_point.GetNextDirection(-ray_dir, nextDirection, color))
             {
                 // recurse
-                radiance = radiance + (color * Radiance(surface_point.GetPosition(),
+                radiance = radiance + (color * Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) * Radiance(surface_point.GetPosition(),
                                                         nextDirection, surface_point.GetHitTriangle()));
             }
         }
@@ -307,6 +307,7 @@ namespace OpenPT
             }
 
             // get amount reflected by surface
+            // [kd] * [(out_dir dot trianglenorm)] * [emitivity] * [(out_dir dot lightnorm)] * [area] / [distance^2] [/ Pi]
             radiance = surface_point.GetReflection(emitDirection, emissionIn * static_cast<float>(render_context->world->CountEmitters()), -ray_dir);
         }
 
