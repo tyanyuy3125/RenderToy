@@ -312,4 +312,46 @@ namespace OpenPT
 
         return radiance;
     }
+
+    AlbedoRenderer::AlbedoRenderer(RenderContext *render_context_)
+        : IRenderer(render_context_)
+    {
+    }
+
+    void AlbedoRenderer::Render()
+    {
+        Camera *cam = &(render_context->world->cameras[render_context->camera_id]);
+        float top, right;
+        PrepareScreenSpace(cam, top, right);
+
+        float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
+        float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
+
+#pragma omp parallel for
+        for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
+        {
+            for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
+            {
+                // (x, y) is the point in Raster Space.
+                Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
+                Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+
+                // Blender convention: Camera directing towards -z.
+                Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                cast_ray = cam->O2WTransform(cast_ray);
+
+                float t, u, v;
+                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
+
+                if (intersected != nullptr)
+                {
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = intersected->parent->tex.reflectivity;
+                }
+                else
+                {
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = Vector3f::O;
+                }
+            }
+        }
+    }
 }

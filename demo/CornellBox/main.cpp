@@ -8,10 +8,6 @@ using namespace OpenPT;
 
 int main()
 {
-    #ifdef __clang__
-    std::cout<<"Clang"<<std::endl;
-    #endif
-
     std::cout << "Begin importing...\n";
 
     World world;
@@ -37,11 +33,8 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 16);
-    clock_t timeStart = clock();
+    PathTracingRenderer renderer(&rc, 8);
     renderer.Render();
-    clock_t timeEnd = clock();
-    printf("Render time: %04.2f (sec)\n", (float)(timeEnd - timeStart) / CLOCKS_PER_SEC);
 
     std::cout << "Exporting...\n";
 

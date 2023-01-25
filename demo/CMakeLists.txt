@@ -5,5 +5,5 @@
 #
 
 add_subdirectory(CornellBox)
-add_subdirectory(Maze)
+add_subdirectory(Interactive)
 add_subdirectory(TestRender)
