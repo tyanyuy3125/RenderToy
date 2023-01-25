@@ -17,6 +17,14 @@ add_library(OpenPT
             procedural.h procedural.cpp
             ray.h ray.cpp
             bvh.h bvh.cpp
-            texture.h texture.cpp)
+            texture.h texture.cpp
+            random.h random.cpp
+            surfacepoint.h surfacepoint.cpp)
 
 set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(OpenPT PUBLIC OpenMP::OpenMP_CXX)
+endif()
+target_compile_options(OpenPT PUBLIC "-march=native")

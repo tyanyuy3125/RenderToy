@@ -6,13 +6,10 @@ namespace OpenPT
     class Random
     {
     public:
-        Random();
+        Random() = delete;
 
-        int Int() const;
-        float Float() const;
-
-    private:
-        mutable int z_m[4];
+        static const int Int(int min, int max);
+        static const float Float();
     };
 }
 

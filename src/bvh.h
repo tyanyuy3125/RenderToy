@@ -17,7 +17,7 @@ namespace OpenPT
         BoundingBox();
         BoundingBox(const Vector3f &vmin_, const Vector3f &vmax_);
 
-        const bool Intersect(const Ray &ray, float &t_min);
+        const bool Intersect(const Ray &ray, float &t_min, float &t_max);
         /// @brief Extends by another bbox.
         /// @param bbox
         void ExtendBy(const BoundingBox &bbox);
@@ -67,7 +67,8 @@ namespace OpenPT
         Octree *octree;
         std::vector<BoundingBox> bbox_list;
         BVH(std::vector<const Triangle *> &models);
-        const Triangle *Intersect(const Ray &ray, float &t, float &u, float &v) const;
+        const Triangle *Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const;
+        const Triangle *Intersect(const Ray &ray, Vector3f &position, const Triangle * const exclude) const;
         ~BVH();
     };
 }

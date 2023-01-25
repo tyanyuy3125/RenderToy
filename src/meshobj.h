@@ -13,6 +13,7 @@
 #include "ray.h"
 #include "bvh.h"
 #include "random.h"
+#include "texture.h"
 
 #include <vector>
 #include <string>
@@ -43,7 +44,10 @@ namespace OpenPT
         /// @brief Get sample point in WORLD SPACE.
         /// @param random 
         /// @return 
-        const Vector3f GetSamplePoint(const Random &random) const;
+        const Vector3f GetSamplePoint() const;
+        const Vector3f Tangent() const;
+        const Vector3f Normal() const;
+        const float Area() const;
 
         Mesh *parent;
     };
@@ -52,6 +56,8 @@ namespace OpenPT
     {
     public:
         std::vector<const Triangle *> faces;
+
+        Texture tex;
     };
 };
 

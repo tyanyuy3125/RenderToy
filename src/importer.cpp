@@ -39,13 +39,12 @@ namespace OpenPT
                 if (current_mesh!=nullptr)
                 {
                     world.meshes.push_back(current_mesh);
-
-                    vert.clear();
-                    norm.clear();
-                    uv.clear();
-                    vert.push_back(Vector3f::O);
-                    norm.push_back(Vector3f::O);
-                    uv.push_back(Vector2f::O);
+                    // vert.clear();
+                    // norm.clear();
+                    // uv.clear();
+                    // vert.push_back(Vector3f::O);
+                    // norm.push_back(Vector3f::O);
+                    // uv.push_back(Vector2f::O);
                 }
                 current_mesh = new Mesh();
                 fs >> current_mesh->name;

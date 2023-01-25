@@ -6,8 +6,23 @@
  */
 
 #include <cmath>
+#include <immintrin.h>
 
 #include "mathfunc.h"
+
+/// @brief Multiply 4 floats by another 4 floats.
+/// @tparam offset Offset from the first float.
+/// @param p1 Memory address of first float in the first 4 floats.
+/// @param p2 Memory address of first float in the second 4 floats.
+/// @return
+template <int offset>
+inline __m128 mul4(const float *p1, const float *p2)
+{
+    constexpr int lanes = offset * 8;
+    const __m128 a = _mm_loadu_ps(p1 + lanes);
+    const __m128 b = _mm_loadu_ps(p2 + lanes);
+    return _mm_mul_ps(a, b);
+}
 
 namespace OpenPT
 {
@@ -77,6 +92,11 @@ namespace OpenPT
         return Vector3f(x * a, y * a, z * a);
     }
 
+    const Vector3f Vector3f::operator*(const Vector3f &vec) const
+    {
+        return Vector3f(x * vec.x, y * vec.y, z * vec.z);
+    }
+
     const Vector3f Vector3f::operator/(const float a) const
     {
         return Vector3f(x / a, y / a, z / a);
@@ -117,6 +137,11 @@ namespace OpenPT
     const bool Vector3f::operator==(const Vector3f &a) const
     {
         return ((std::abs(x - a.x) < EPS) && (std::abs(y - a.y) < EPS) && (std::abs(z - a.z) < EPS));
+    }
+
+    const bool Vector3f::operator!=(const Vector3f &a) const
+    {
+        return !((*this) == a);
     }
 
     const Vector3f operator*(const float lambda, const Vector3f &a)
@@ -389,12 +414,54 @@ namespace OpenPT
 
     const float Convert::DegreeToRadians(const float deg)
     {
-        return deg * (PI / 180);
+        return deg * (M_PIf32 / 180.0f);
+    }
+
+    const Vector3f Convert::BlackBody(const float t)
+    {
+        // MIT License
+        // Copyright (c) 2020 Christopher J. Howard
+        // https://www.shadertoy.com/view/tsKczy
+
+        // Approximate the Planckian locus in CIE 1960 UCS color space (Krystek's algorithm)
+        float tt = t * t;
+        float u = (0.860117757 + 1.54118254e-4 * t + 1.28641212e-7 * tt) / (1.0 + 8.42420235e-4 * t + 7.08145163e-7 * tt);
+        float v = (0.317398726 + 4.22806245e-5 * t + 4.20481691e-8 * tt) / (1.0 - 2.89741816e-5 * t + 1.61456053e-7 * tt);
+
+        // CIE 1960 UCS -> CIE xyY, Y = 1
+        Vector2f xyy = Vector2f(3.0 * u, 2.0 * v) / (2.0 * u - 8.0 * v + 4.0);
+
+        // CIE xyY -> CIE XYZ
+        Vector3f xyz = Vector3f(xyy.x / xyy.y, 1.0, (1.0 - xyy.x - xyy.y) / xyy.y);
+
+        // CIE XYZ -> linear sRGB
+        Vector3f srgb = XYZToSRGB(xyz);
+
+        // Normalize RGB to preserve chromaticity
+        return srgb / std::max(srgb.x, std::max(srgb.y, srgb.z));
+    }
+
+    const Vector3f Convert::XYZToSRGB(const Vector3f &x)
+    {
+        // Source: http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+        const Matrix3x3f matrix = {
+            {3.2404542, -1.5371385, -0.4985314},
+            {-0.9692660, 1.8760108, 0.0415560},
+            {0.0556434, -0.2040259, 1.0572252}};
+        return matrix * x;
     }
 
     const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
     {
+        // It is NOT recommended to enable SIMD instructions in vector computations.
+#ifndef ENABLE_VECTOR_SIMD
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+#else
+        const __m128 mul_arr = mul4<0>(&a.x, &b.x);
+        const __m128 r2 = _mm_add_ps(mul_arr, _mm_movehl_ps(mul_arr, mul_arr));
+        const __m128 r1 = _mm_add_ps(r2, _mm_movehdup_ps(r2));
+        return _mm_cvtss_f32(r1);
+#endif
     }
 
     const Vector4f Vector4f::Cross(const Vector4f &a, const Vector4f &b)
@@ -470,10 +537,7 @@ namespace OpenPT
         Vector4f ret;
         for (int i = 0; i < 4; ++i)
         {
-            for (int j = 0; j < 4; ++j)
-            {
-                ret[i] += row[i][j] * a[j];
-            }
+            ret[i] = Vector4f::Dot(row[i], a);
         }
         return ret;
     }

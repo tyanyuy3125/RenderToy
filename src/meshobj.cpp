@@ -45,8 +45,6 @@ namespace OpenPT
         Vector3f pvec = ray.direction.Cross(v0v2);
         float det = v0v1.Dot(pvec);
 
-        // Culling enabled.
-        // TODO: We should disable culling!
         if (det < EPS)
         {
             return false;
@@ -54,21 +52,21 @@ namespace OpenPT
 
         Vector3f tvec = ray.src - v0;
         auto alpha = pvec.Dot(tvec);
-        if (alpha < 0.0f || alpha > det)
+        if (alpha < EPS || alpha > det)
         {
             return false;
         }
 
         Vector3f qvec = tvec.Cross(v0v1);
         auto beta = qvec.Dot(ray.direction);
-        if (beta < 0.0f || alpha + beta > det)
+        if (beta < EPS || alpha + beta > det)
         {
             return false;
         }
 
         float inv_det = 1.0f / det;
         t = v0v2.Dot(qvec) * inv_det;
-        if (t < 0.0f)
+        if (t < EPS)
         {
             return false;
         }
@@ -78,7 +76,7 @@ namespace OpenPT
         return true;
     }
 
-    const Vector3f Triangle::GetSamplePoint(const Random &random) const
+    const Vector3f Triangle::GetSamplePoint() const
     {
         Vector3f v0 = vert[0];
         Vector3f v1 = vert[1];
@@ -90,12 +88,41 @@ namespace OpenPT
         Vector3f v0v1 = v1 - v0;
         Vector3f v0v2 = v2 - v0;
 
-        float sqr1 = std::sqrt(random.Float());
-        float r2 = random.Float();
+        float sqr1 = std::sqrt(Random::Float());
+        float r2 = Random::Float();
 
         float a = 1.0f - sqr1;
         float b = (1.0f - r2) * sqr1;
 
         return v0v1 * a + v0v2 * b + v0;
+    }
+
+    const Vector3f Triangle::Tangent() const
+    {
+        Vector3f v0 = vert[0];
+        Vector3f v1 = vert[1];
+        v0 = parent->O2WTransform(v0);
+        v1 = parent->O2WTransform(v1);
+        return (v1 - v0).Normalized();
+    }
+
+    const Vector3f Triangle::Normal() const
+    {
+        Vector3f v1 = vert[1];
+        Vector3f v2 = vert[2];
+        v1 = parent->O2WTransform(v1);
+        v2 = parent->O2WTransform(v2);
+        return Tangent().Cross(v2 - v1).Normalized();
+    }
+
+    const float Triangle::Area() const
+    {
+        Vector3f v0 = vert[0];
+        Vector3f v1 = vert[1];
+        Vector3f v2 = vert[2];
+        Vector3f v0v1 = v1 - v0;
+        Vector3f v0v2 = v2 - v0;
+
+        return v0v1.Cross(v0v2).Length() * 0.5f;
     }
 }

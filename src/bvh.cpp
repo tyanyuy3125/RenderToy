@@ -16,7 +16,7 @@ namespace OpenPT
     {
     }
 
-    const bool BoundingBox::Intersect(const Ray &ray, float &t_min)
+    const bool BoundingBox::Intersect(const Ray &ray, float &t_min, float &t_max)
     {
         float tmin = (vmin.x - ray.src.x) / ray.direction.x;
         float tmax = (vmax.x - ray.src.x) / ray.direction.x;
@@ -67,7 +67,7 @@ namespace OpenPT
         {
             tmax = tzmax;
         }
-        
+
         t_min = tmin;
 
         return true;
@@ -128,7 +128,7 @@ namespace OpenPT
     {
         if (node->is_leaf)
         {
-            if (node->node_bbox_list.size() == 0 || depth == 2)
+            if (node->node_bbox_list.size() == 0 || depth == 8)
             {
                 node->node_bbox_list.push_back(bbox_insert);
             }
@@ -207,19 +207,19 @@ namespace OpenPT
         {
             for (uint8_t i = 0; i < 8; ++i)
             {
-                if(node->child[i])
+                if (node->child[i])
                 {
                     BoundingBox child_bbox;
                     Vector3f centroid = bbox.Centroid();
 
-                    child_bbox.vmin.x = (i&4)?centroid.x : bbox.vmin.x;
-                    child_bbox.vmax.x = (i&4)?bbox.vmax.x : centroid.x;
+                    child_bbox.vmin.x = (i & 4) ? centroid.x : bbox.vmin.x;
+                    child_bbox.vmax.x = (i & 4) ? bbox.vmax.x : centroid.x;
 
-                    child_bbox.vmin.y = (i&2)?centroid.y : bbox.vmin.y;
-                    child_bbox.vmax.y = (i&2)?bbox.vmax.y : centroid.y;
+                    child_bbox.vmin.y = (i & 2) ? centroid.y : bbox.vmin.y;
+                    child_bbox.vmax.y = (i & 2) ? bbox.vmax.y : centroid.y;
 
-                    child_bbox.vmin.z = (i&1)?centroid.z : bbox.vmin.z;
-                    child_bbox.vmax.z = (i&1)?bbox.vmax.z : centroid.z;
+                    child_bbox.vmin.z = (i & 1) ? centroid.z : bbox.vmin.z;
+                    child_bbox.vmax.z = (i & 1) ? bbox.vmax.z : centroid.z;
                     Build(node->child[i], child_bbox);
                     node->bbox.ExtendBy(node->child[i]->bbox);
                 }
@@ -229,8 +229,10 @@ namespace OpenPT
 
     void Octree::RecursiveDelete(OctreeNode *&node)
     {
-        for(uint8_t i =0;i<8;++i){
-            if(node->child[i] != nullptr){
+        for (uint8_t i = 0; i < 8; ++i)
+        {
+            if (node->child[i] != nullptr)
+            {
                 RecursiveDelete(node->child[i]);
             }
         }
@@ -241,45 +243,51 @@ namespace OpenPT
     {
         BoundingBox tree_bbox;
         bbox_list.reserve(models.size());
-        for(int i=0;i<models.size();++i){
+        for (int i = 0; i < models.size(); ++i)
+        {
             bbox_list[i] = models[i]->BBox();
             tree_bbox.ExtendBy(bbox_list[i]);
             bbox_list[i].object = models[i];
         }
 
         octree = new Octree(tree_bbox);
-        
-        for(int i=0;i<models.size();++i){
+
+        for (int i = 0; i < models.size(); ++i)
+        {
             octree->Insert(&bbox_list[i]);
         }
 
         octree->Build();
     }
 
-    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v) const
+    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const
     {
         t = INF;
         const Triangle *intersected = nullptr;
-        float placeholder;
-        if(!octree->root->bbox.Intersect(ray, placeholder))
+        float t_min, t_max = INF;
+        bool intersected_test = octree->root->bbox.Intersect(ray, t_min, t_max);
+        if (!intersected_test || t_max < 0.0f)
         {
             return nullptr;
         }
+        t = t_max;
 
         std::priority_queue<Octree::QueueElement> queue;
         queue.push(Octree::QueueElement(octree->root, 0));
 
-        while(!queue.empty() && queue.top().t < t)
+        while (!queue.empty() && queue.top().t < t)
         {
             auto node = queue.top().node;
             queue.pop();
-            if(node->is_leaf)
+            if (node->is_leaf)
             {
-                for(const auto &e : node->node_bbox_list)
+                for (const auto &e : node->node_bbox_list)
                 {
-                    float it,iu,iv;
-                    if(e->object->Intersect(ray, it, iu, iv)){
-                        if(it < t){
+                    float it, iu, iv;
+                    if (e->object != exclude && e->object->Intersect(ray, it, iu, iv))
+                    {
+                        if (it < t)
+                        {
                             t = it;
                             u = iu;
                             v = iv;
@@ -290,12 +298,15 @@ namespace OpenPT
             }
             else
             {
-                for(uint8_t i=0;i<8;++i){
-                    if(node->child[i]!=nullptr){
-                        float t_bbox;
-                        if(node->child[i]->bbox.Intersect(ray, t_bbox))
+                for (uint8_t i = 0; i < 8; ++i)
+                {
+                    if (node->child[i] != nullptr)
+                    {
+                        float t_min_child = 0.0f, t_max_child = t_max;
+                        if (node->child[i]->bbox.Intersect(ray, t_min_child, t_max_child))
                         {
-                            queue.push(Octree::QueueElement(node->child[i], t_bbox));
+                            float t = (t_min_child < 0.0f && t_max_child >= 0.0f) ? t_max_child : t_min_child;
+                            queue.push(Octree::QueueElement(node->child[i], t));
                         }
                     }
                 }
@@ -303,6 +314,14 @@ namespace OpenPT
         }
 
         return intersected;
+    }
+
+    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position, const Triangle * const exclude) const
+    {
+        float t, u, v;
+        auto ret = Intersect(ray, t, u, v, exclude);
+        position = ray.src + t * ray.direction;
+        return ret;
     }
 
     BVH::~BVH()
