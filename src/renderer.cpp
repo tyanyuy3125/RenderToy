@@ -260,7 +260,7 @@ namespace OpenPT
             if (surface_point.GetNextDirection(-ray_dir, nextDirection, color))
             {
                 // recurse
-                radiance = radiance + (color * Radiance(surface_point.GetPosition(),
+                radiance = radiance + (color * Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->Normal()) *Radiance(surface_point.GetPosition(),
                                                         nextDirection, surface_point.GetHitTriangle()));
             }
         }
