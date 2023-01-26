@@ -26,9 +26,9 @@ namespace OpenPT
           at_distance(at_distance_),
           extinction(extinction_)
     {
-        if (metallic < 0.001f)
+        if (roughness < 0.001f)
         {
-            metallic = 0.001f;
+            roughness = 0.001f;
         }
     }
 
