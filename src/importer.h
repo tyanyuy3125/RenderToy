@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Importer Module
+ *  RenderToy - Importer Module
  *  File created on 2023/1/11
  *  Last edited on 2023/1/11
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace OpenPT
+namespace RenderToy
 {
     class OBJModelImporter
     {

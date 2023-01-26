@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Math Function Unit Test
+ *  RenderToy - Math Function Unit Test
  *  File created on 2023/1/10
  *  Last edited on 2023/1/10
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -12,7 +12,7 @@
 #include <array>
 #include <cmath>
 
-using namespace OpenPT;
+using namespace RenderToy;
 
 std::array<float, 3> initializer = {0.5f, 0.6f, 0.7f};
 

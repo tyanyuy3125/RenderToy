@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Mesh Object Module
+ *  RenderToy - Mesh Object Module
  *  File created on 2023/1/11
  *  Last edited on 2023/1/21
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -20,7 +20,7 @@
 #include <tuple>
 #include <array>
 
-namespace OpenPT
+namespace RenderToy
 {
     class Mesh;
 

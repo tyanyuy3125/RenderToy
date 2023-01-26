@@ -5,7 +5,7 @@
 #include "mathfunc.h"
 #include "exporter.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     void PPMExporter::Export(std::ostream &os)
     {

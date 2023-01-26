@@ -4,7 +4,7 @@
 #include "meshobj.h"
 #include "mathfunc.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     class SurfacePoint
     {

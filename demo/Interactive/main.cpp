@@ -4,7 +4,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 
-#include "../../include/OpenPT/openpt.h"
+#include "../../include/RenderToy/rendertoy.h"
 
 Display *dis;
 int screen;
@@ -16,7 +16,7 @@ void init_x();
 void close_x();
 void redraw();
 
-using namespace OpenPT;
+using namespace RenderToy;
 
 int main()
 {

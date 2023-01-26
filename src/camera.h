@@ -4,7 +4,7 @@
 #include "mathfunc.h"
 #include "geoobj.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     class Camera : public GeoObj
     {

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-namespace OpenPT
+namespace RenderToy
 {
     const BoundingBox Triangle::BBox() const
     {
@@ -64,6 +64,7 @@ namespace OpenPT
         v = beta * inv_det;
 
         return true;
+
         // Vector3f pvec = ray.direction.Cross(v0v2_w);
         // float det = v0v1_w.Dot(pvec);
 

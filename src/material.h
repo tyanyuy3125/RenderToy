@@ -3,7 +3,7 @@
 
 #include "mathfunc.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     struct PrincipledBSDF
     {
@@ -79,7 +79,7 @@ namespace OpenPT
     };
 }
 
-namespace OpenPT::ProceduralTexture
+namespace RenderToy::ProceduralTexture
 {
     struct PerlinNoiseTexture : public ITexture
     {

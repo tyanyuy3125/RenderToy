@@ -5,4 +5,4 @@
 #
 
 add_executable(TestRender main.cpp)
-target_link_libraries(TestRender PRIVATE OpenPT)
+target_link_libraries(TestRender PRIVATE RenderToy)

@@ -7,7 +7,7 @@
 #include "mathfunc.h"
 #include "ray.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     class Triangle;
 

@@ -5,7 +5,7 @@
 # Tianyu Huang <tianyu@illumiart.net>
 #
 
-add_library(OpenPT 
+add_library(RenderToy 
             mathfunc.cpp mathfunc.h 
             meshobj.cpp meshobj.h
             importer.cpp importer.h 
@@ -21,11 +21,11 @@ add_library(OpenPT
             random.h random.cpp
             surfacepoint.h surfacepoint.cpp)
 
-set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)
+set_property(TARGET RenderToy PROPERTY CXX_STANDARD 17)
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(OpenPT PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(RenderToy PUBLIC OpenMP::OpenMP_CXX)
 endif()
-target_compile_options(OpenPT PUBLIC "-march=native")
+target_compile_options(RenderToy PUBLIC "-march=native")
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG")

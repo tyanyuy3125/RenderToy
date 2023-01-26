@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace OpenPT
+namespace RenderToy
 {
     IntersectTestRenderer::IntersectTestRenderer(RenderContext *render_context_)
         : IRenderer(render_context_)

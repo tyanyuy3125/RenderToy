@@ -4,7 +4,7 @@
 #include <cstring>
 #include <queue>
 
-namespace OpenPT
+namespace RenderToy
 {
     BoundingBox::BoundingBox()
         : vmin(Vector3f::O), vmax(Vector3f::O)

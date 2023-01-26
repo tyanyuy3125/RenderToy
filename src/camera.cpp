@@ -1,6 +1,6 @@
 #include "camera.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     Camera::Camera(Matrix4x4f object_to_world_, float focal_length_, Vector2f gate_dimension_, float near_clipping_plane_, float far_clipping_plane_)
         : focal_length(focal_length_),
