@@ -16,7 +16,7 @@
 find_package(Catch2 REQUIRED)
 
 add_executable(Tests mathfunctests.cpp importertests.cpp exportertests.cpp geoobjtests.cpp)
-target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain OpenPT)
+target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain RenderToy)
 
 add_test(NAME Tests COMMAND Tests)
 

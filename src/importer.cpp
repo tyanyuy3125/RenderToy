@@ -9,7 +9,7 @@
 #include <tuple>
 #include <limits>
 
-namespace OpenPT
+namespace RenderToy
 {
     void OBJModelImporter::Import(World &world, const std::string &path)
     {

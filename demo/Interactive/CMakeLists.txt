@@ -7,6 +7,6 @@
 find_package(X11 REQUIRED)
 
 add_executable(Interactive main.cpp)
-target_link_libraries(Interactive PRIVATE OpenPT)
+target_link_libraries(Interactive PRIVATE RenderToy)
 target_link_libraries(Interactive PRIVATE X11)
 configure_file(cornellbox.obj ${EXECUTABLE_OUTPUT_PATH} cornellbox.obj COPYONLY)

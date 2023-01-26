@@ -10,7 +10,7 @@
 #include "surfacepoint.h"
 #include "random.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     // Use Blender conventions.
     struct FormatSettings

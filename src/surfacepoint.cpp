@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-namespace OpenPT
+namespace RenderToy
 {
     SurfacePoint::SurfacePoint(const Triangle *triangle_, const Vector3f &position_)
         : triangle(triangle_), position(position_)

@@ -4,7 +4,7 @@
 
 static std::mt19937 random_device;
 
-namespace OpenPT
+namespace RenderToy
 {
 
     const int Random::Int(int min, int max)

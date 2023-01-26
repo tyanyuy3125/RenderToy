@@ -1,13 +1,13 @@
-#include "../../include/OpenPT/openpt.h"
+#include "../../include/RenderToy/rendertoy.h"
 
 #include <fstream>
 #include <iostream>
 
 int main(){
-    OpenPT::Vector3f *buffer;
-    OpenPT::TestRenderer tr(OpenPT::Size(1920, 1080));
+    RenderToy::Vector3f *buffer;
+    RenderToy::TestRenderer tr(RenderToy::Size(1920, 1080));
     tr.Render();
-    OpenPT::BMPExporter exporter(tr.render_context);
+    RenderToy::BMPExporter exporter(tr.render_context);
 
     std::ofstream os;
     os.open("./testimage.bmp");

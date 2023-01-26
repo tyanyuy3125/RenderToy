@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Math Function Module
+ *  RenderToy - Math Function Module
  *  File created on 2023/1/10
  *  Last edited on 2023/1/17
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -24,7 +24,7 @@ inline __m128 mul4(const float *p1, const float *p2)
     return _mm_mul_ps(a, b);
 }
 
-namespace OpenPT
+namespace RenderToy
 {
     Vector3f::Vector3f(const float x_, const float y_, const float z_) : x(x_), y(y_), z(z_) {}
     Vector3f::Vector3f() : Vector3f(0.0f, 0.0f, 0.0f) {}

@@ -3,7 +3,7 @@
 
 #include "mathfunc.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     struct Ray
     {

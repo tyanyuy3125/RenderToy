@@ -7,7 +7,7 @@
 
 #include <vector>
 
-namespace OpenPT
+namespace RenderToy
 {
     struct World
     {

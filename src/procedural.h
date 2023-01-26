@@ -1,7 +1,7 @@
 #ifndef PROCEDURAL_H
 #define PROCEDURAL_H
 
-namespace OpenPT::Procedural
+namespace RenderToy::Procedural
 {
     
 }

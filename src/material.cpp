@@ -5,9 +5,9 @@
 #include <cmath>
 #include <algorithm>
 
-using namespace OpenPT;
+using namespace RenderToy;
 
-namespace OpenPT
+namespace RenderToy
 {
     PrincipledBSDF::PrincipledBSDF(const Vector3f &base_color_, const Vector3f &emission_, const float roughness_, const float metallic_, const float anisotropic_, const float subsurface_, const float specular_tint_, const float sheen_, const float sheen_tint_, const float clearcoat_, const float clearcoat_roughness_, const float spec_trans_, const float ior_, const float at_distance_, const Vector3f &extinction_)
         : base_color(base_color_),

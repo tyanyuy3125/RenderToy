@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Math Function Module
+ *  RenderToy - Math Function Module
  *  File created on 2023/1/10
  *  Last edited on 2023/1/16
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -19,7 +19,7 @@
 
 #include "random.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     struct Size;
     struct Point;

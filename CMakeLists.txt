@@ -1,5 +1,5 @@
 #
-# CMakeLists.txt for the whole OpenPT project
+# CMakeLists.txt for the whole RenderToy project
 # File created on 2023/1/10
 # Last edited on 2023/1/16
 # Tianyu Huang <tianyu@illumiart.net>
@@ -29,7 +29,7 @@ set(CMAKE_C_COMPILER "/usr/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 cmake_minimum_required(VERSION 3.10)
-project(OpenPT LANGUAGES CXX VERSION 0.1)
+project(RenderToy LANGUAGES CXX VERSION 0.1)
 
 set(cmake_cxx_standard 17)
 set(cmake_cxx_standard_required True)

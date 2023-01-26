@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-void OpenPT::World::SampleEmitter(Vector3f &position_o, const Triangle *&id_o) const
+void RenderToy::World::SampleEmitter(Vector3f &position_o, const Triangle *&id_o) const
 {
     if (!emissive_triangles.empty())
     {
@@ -16,12 +16,12 @@ void OpenPT::World::SampleEmitter(Vector3f &position_o, const Triangle *&id_o) c
     }
 }
 
-int OpenPT::World::CountEmitters() const
+int RenderToy::World::CountEmitters() const
 {
     return emissive_triangles.size();
 }
 
-void OpenPT::World::PrepareDirectLightSampling()
+void RenderToy::World::PrepareDirectLightSampling()
 {
     emissive_triangles.clear();
     for(auto m : meshes)
@@ -36,7 +36,7 @@ void OpenPT::World::PrepareDirectLightSampling()
     }
 }
 
-const OpenPT::Vector3f OpenPT::World::GetDefaultEmission(const OpenPT::Vector3f &back_dir) const
+const RenderToy::Vector3f RenderToy::World::GetDefaultEmission(const RenderToy::Vector3f &back_dir) const
 {
     return (back_dir[2] < 0.0f) ? sky_emission : ground_reflection;
 }

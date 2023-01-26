@@ -1,6 +1,6 @@
 #include "geoobj.h"
 
-namespace OpenPT
+namespace RenderToy
 {
     GeoObj::GeoObj()
         : object_to_world(Matrix4x4f::I), world_to_object(Matrix4x4f::I)

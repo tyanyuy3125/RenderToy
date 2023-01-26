@@ -1,5 +1,5 @@
 /*
- *  OpenPT - Importer Unit Test
+ *  RenderToy - Importer Unit Test
  *  File created on 2023/1/11
  *  Last edited on 2023/1/11
  *  Tianyu Huang <tianyu@illumiart.net>
@@ -15,7 +15,7 @@
 #include <string>
 #include <cmath>
 
-using namespace OpenPT;
+using namespace RenderToy;
 
 TEST_CASE("SStream Functionality Test")
 {
