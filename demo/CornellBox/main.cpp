@@ -27,13 +27,14 @@ int main()
     world.cameras.push_back(academy_camera);
 
     Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 10.0f});
-    camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 1.0f})*AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(-90)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(90), 0.0f, 0.0f}) * camera_mat4;
+    camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 1.0f})*AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(-70)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(90), 0.0f, 0.0f}) * camera_mat4;
     world.cameras[0].SetO2W(camera_mat4);
 
     std::cout << "Begin rendering...\n";
 
-    RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 64);
+    RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
+    PathTracingRenderer renderer(&rc, 8);
+    // AlbedoRenderer renderer(&rc);
     renderer.Render();
 
     std::cout << "Exporting...\n";
