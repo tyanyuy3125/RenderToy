@@ -35,61 +35,35 @@ namespace OpenPT
         Vector3f pvec = ray.direction.Cross(v0v2_w);
         float det = v0v1_w.Dot(pvec);
 
-        if (det > EPS)
+        if (det < EPS)
         {
-            Vector3f tvec = ray.src - v0;
-            auto alpha = pvec.Dot(tvec);
-            if (alpha < EPS || alpha > det)
-            {
-                return false;
-            }
-
-            Vector3f qvec = tvec.Cross(v0v1);
-            auto beta = qvec.Dot(ray.direction);
-            if (beta < EPS || alpha + beta > det)
-            {
-                return false;
-            }
-
-            float inv_det = 1.0f / det;
-            t = v0v2.Dot(qvec) * inv_det;
-            if (t < EPS)
-            {
-                return false;
-            }
-            u = alpha * inv_det;
-            v = beta * inv_det;
-
-            return true;
+            return false;
         }
-        else if (det < EPS)
+
+        Vector3f tvec = ray.src - vert_w[0];
+        auto alpha = pvec.Dot(tvec);
+        if (alpha < EPS || alpha > det)
         {
-            Vector3f tvec = ray.src - v0;
-            auto alpha = pvec.Dot(tvec);
-            if (alpha > EPS || alpha < det)
-            {
-                return false;
-            }
-
-            Vector3f qvec = tvec.Cross(v0v1);
-            auto beta = qvec.Dot(ray.direction);
-            if (beta > EPS || alpha + beta < det)
-            {
-                return false;
-            }
-
-            float inv_det = 1.0f / det;
-            t = v0v2.Dot(qvec) * inv_det;
-            if (t < EPS)
-            {
-                return false;
-            }
-            u = alpha * inv_det;
-            v = beta * inv_det;
-
-            return true;
+            return false;
         }
-        return false;
+
+        Vector3f qvec = tvec.Cross(v0v1_w);
+        auto beta = qvec.Dot(ray.direction);
+        if (beta < EPS || alpha + beta > det)
+        {
+            return false;
+        }
+
+        float inv_det = 1.0f / det;
+        t = v0v2_w.Dot(qvec) * inv_det;
+        if (t < EPS)
+        {
+            return false;
+        }
+        u = alpha * inv_det;
+        v = beta * inv_det;
+
+        return true;
     }
 
     const Vector3f Triangle::GetSamplePoint() const
