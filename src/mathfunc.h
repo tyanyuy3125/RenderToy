@@ -14,6 +14,10 @@
 #include <array>
 #include <istream>
 #include <stack>
+#include <cmath>
+#include <algorithm>
+
+#include "random.h"
 
 namespace OpenPT
 {
@@ -106,6 +110,12 @@ namespace OpenPT
 
         const static float Dot(const Vector3f &a, const Vector3f &b);
         const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
+        /// @brief GLSL-like respective pow.
+        /// @param a
+        /// @param b
+        /// @return
+        const static Vector3f Pow(const Vector3f &a, const Vector3f &b);
+        const static Vector3f Mix(const Vector3f &x, const Vector3f &y, const Vector3f &a);
 
         const float Dot(const Vector3f &a) const;
         const Vector3f Cross(const Vector3f &a) const;
@@ -128,7 +138,7 @@ namespace OpenPT
         Vector4f();
         Vector4f(const float x_, const float y_, const float z_, const float w_);
         Vector4f(const std::array<float, 4> &quadruple);
-        Vector4f(const Vector3f &vec3, float val4);
+        Vector4f(const Vector3f &Vector3f, float val4);
 
         float Length() const;
 
@@ -263,7 +273,8 @@ namespace OpenPT
 #pragma endregion
 
 #pragma region Unit Conversion
-    struct Convert{
+    struct Convert
+    {
         Convert() = delete;
         Convert(const Convert &) = delete;
         Convert(const Convert &&) = delete;
@@ -272,6 +283,9 @@ namespace OpenPT
         static const float DegreeToRadians(const float deg);
         static const Vector3f BlackBody(const float t);
         static const Vector3f XYZToSRGB(const Vector3f &x);
+
+        static const float RGBToLuminance(const Vector3f &vec);
+        static const Vector3f Tonemap(const Vector3f &vec, const float limit);
     };
 #pragma endregion
 
@@ -312,7 +326,7 @@ namespace OpenPT
         void Push(const Matrix4x4f &mat4);
         void Pop();
 
-        void Transform(Vector3f &vec3) const;
+        void Transform(Vector3f &Vector3f) const;
     };
 
     class AffineTransformation
@@ -326,10 +340,69 @@ namespace OpenPT
 
         /// @brief Use Blender XYZ-Euler convention, matrix representation of intrinsic transformations: Z*Y*X*v.
         /// @param euler_xyz XYZ-Euler angles, in radius.
-        /// @return 
+        /// @return
         const static Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
 
-    
+    const float SSE_InvSqrt(const float number);
+
+    float GTR1(float NDotH, float a);
+
+    Vector3f SampleGTR1(float rgh, float r1, float r2);
+
+    float GTR2(float NDotH, float a);
+
+    Vector3f SampleGTR2(float rgh, float r1, float r2);
+
+    Vector3f SampleGGXVNDF(Vector3f V, float rgh, float r1, float r2);
+
+    float GTR2Aniso(float NDotH, float HDotX, float HDotY, float ax, float ay);
+
+    Vector3f SampleGTR2Aniso(float ax, float ay, float r1, float r2);
+
+    float SmithG(float NDotV, float alphaG);
+
+    float SmithGAniso(float NDotV, float VDotX, float VDotY, float ax, float ay);
+
+    float SchlickFresnel(float u);
+
+    float DielectricFresnel(float cosThetaI, float eta);
+
+    Vector3f CosineSampleHemisphere(float r1, float r2);
+
+    Vector3f UniformSampleHemisphere(float r1, float r2);
+
+    Vector3f UniformSampleSphere(float r1, float r2);
+
+    float PowerHeuristic(float a, float b);
+
+    void Onb(const Vector3f N, Vector3f &T, Vector3f &B);
+
+    Vector3f ToWorld(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
+
+    Vector3f ToLocal(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
+
+    // template <typename T>
+    // const T Mix(const T x, const T y, const T a);
+
+    template <typename T>
+    const T Mix(const T x, const T y, const T a)
+    {
+        return x * (T(1) - a) + y * a;
+    }
+
+    float Luminance(Vector3f c);
+
+    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
+
+    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
+
+    struct RayState
+    {
+        bool isRefracted;
+        bool hasBeenRefracted;
+        float lastIOR;
+        RayState();
+    };
 }
 #endif // MATHFUNC_H

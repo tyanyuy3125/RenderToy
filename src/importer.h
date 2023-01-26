@@ -32,6 +32,8 @@ namespace OpenPT
         TARGAImporter() = delete;
         TARGAImporter(const TARGAImporter &) = delete;
         TARGAImporter(const TARGAImporter &&) = delete;
+
+        // static void Import(ImageTexture &image, const std::string &path);
     };
 };
 

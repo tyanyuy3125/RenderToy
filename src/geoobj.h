@@ -18,7 +18,7 @@ namespace OpenPT
         
         /// @brief Set object to world matrix.
         /// @param object_to_world O2W Matrix, should be an AFFINE matrix.
-        void SetO2W(const Matrix4x4f &object_to_world_);
+        virtual void SetO2W(const Matrix4x4f &object_to_world_);
         const Matrix4x4f &GetO2W() const;
         const Matrix4x4f &GetW2O() const;
 

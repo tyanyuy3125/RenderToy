@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 using namespace OpenPT;
 
@@ -11,16 +12,29 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    OBJModelImporter::Import(world, "./cornellbox.obj");
+    OBJModelImporter::Import(world, "./cornellbox_rot.obj");
 
-    world.meshes[0]->tex = Texture(Vector3f::White, Vector3f::O);
-    world.meshes[1]->tex = Texture(Vector3f::X, Vector3f::O);
-    world.meshes[2]->tex = Texture(Vector3f::Y, Vector3f::O);
-    world.meshes[3]->tex = Texture(Vector3f::White, Vector3f::O);
-    world.meshes[4]->tex = Texture(Vector3f::White, Vector3f::O);
-    world.meshes[5]->tex = Texture(Vector3f::White, Convert::BlackBody(6000) * 5.0f);
+    // world.meshes[0]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Vector3f::O);
+    // world.meshes[3]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Vector3f::O);
+    // world.meshes[5]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Vector3f::O);
+    // world.meshes[1]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Vector3f::O);
+    // world.meshes[2]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Vector3f::O);
+    // world.meshes[4]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Convert::BlackBody(6000) * 5.0f);
     // world.sky_emission = Convert::BlackBody(4000) * 0.3f;
     // world.ground_reflection = {0.1,0.09,0.07};
+
+    Material mat;
+    mat.baseColor = Vector3f(0.93, 0.89, 0.85);
+    mat.roughness = 1.0f;
+    mat.subsurface = 1.0f;
+
+    world.meshes[0]->tex = mat;
+    world.meshes[3]->tex = mat;
+    world.meshes[5]->tex = mat;
+    world.meshes[1]->tex = mat;
+    world.meshes[2]->tex = mat;
+    world.meshes[4]->tex = Material(MaterialType::DIFFUSE,Vector3f::White, Convert::BlackBody(6000) * 5.0f);
+
     world.PrepareDirectLightSampling();
 
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and " << world.meshes.size() << " mesh(es).\n";
@@ -33,9 +47,14 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
+
     PathTracingRenderer renderer(&rc, 8);
     // AlbedoRenderer renderer(&rc);
+
+    auto t1 = std::chrono::system_clock::now();
     renderer.Render();
+    auto t2 = std::chrono::system_clock::now();
+    std::cout<<std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()<<std::endl;
 
     std::cout << "Exporting...\n";
 

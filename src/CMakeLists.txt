@@ -17,7 +17,7 @@ add_library(OpenPT
             procedural.h procedural.cpp
             ray.h ray.cpp
             bvh.h bvh.cpp
-            texture.h texture.cpp
+            material.h material.cpp
             random.h random.cpp
             surfacepoint.h surfacepoint.cpp)
 
@@ -28,3 +28,4 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(OpenPT PUBLIC OpenMP::OpenMP_CXX)
 endif()
 target_compile_options(OpenPT PUBLIC "-march=native")
+set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG")

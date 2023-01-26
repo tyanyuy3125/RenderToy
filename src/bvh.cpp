@@ -239,8 +239,7 @@ namespace OpenPT
         delete node;
     }
 
-    BVH::BVH(std::vector<const Triangle *> &models)
-        : models(&models)
+    BVH::BVH(std::vector<Triangle *> &models)
     {
         BoundingBox tree_bbox;
         bbox_list.reserve(models.size());
@@ -282,19 +281,20 @@ namespace OpenPT
         // return intersected;
         t = INF;
         const Triangle *intersected = nullptr;
-        float t_min, t_max;
+        float t_min, t_max = INF;
         bool intersected_test = octree->root->bbox.Intersect(ray, t_min, t_max);
         if (!intersected_test || t_max < 0.0f)
         {
             return nullptr;
         }
+        t = t_max;
 
-        std::queue<Octree::QueueElement> queue;
+        std::priority_queue<Octree::QueueElement> queue;
         queue.push(Octree::QueueElement(octree->root, 0));
 
-        while (!queue.empty())
+        while (!queue.empty() && queue.top().t < t)
         {
-            auto node = queue.front().node;
+            auto node = queue.top().node;
             queue.pop();
             if (node->is_leaf)
             {
@@ -319,11 +319,11 @@ namespace OpenPT
                 {
                     if (node->child[i] != nullptr)
                     {
-                        float t_min_child = 0.0f, t_max_child = t_max;
+                        float t_min_child, t_max_child;
                         if (node->child[i]->bbox.Intersect(ray, t_min_child, t_max_child))
                         {
-                            float t = (t_min_child < 0.0f && t_max_child >= 0.0f) ? t_max_child : t_min_child;
-                            queue.push(Octree::QueueElement(node->child[i], t));
+                            // float t = (t_min_child < 0.0f && t_max_child >= 0.0f) ? t_max_child : t_min_child;
+                            queue.push(Octree::QueueElement(node->child[i], t_min_child));
                         }
                     }
                 }
