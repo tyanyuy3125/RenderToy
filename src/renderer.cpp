@@ -323,7 +323,7 @@ namespace OpenPT
                 else
                 {
                     float bsdfpdf;
-                    auto f = surface_point.GetMaterial().DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
+                    auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
 
                     // float weight = 1.0;
                     // if(light.area > 0.0) // No MIS for distant light
@@ -373,7 +373,7 @@ namespace OpenPT
 
                 if (intersected != nullptr)
                 {
-                    BUFFER(x, y, render_context->format_settings.resolution.width) = intersected->parent->tex.kd;
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = intersected->parent->tex->base_color;
                 }
                 else
                 {
