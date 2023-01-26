@@ -74,7 +74,7 @@ namespace OpenPT
     public:
         std::vector<Triangle *> faces;
 
-        Material tex;
+        PrincipledBSDF *tex;
 
         /// @brief Set object to world matrix.
         /// @param object_to_world O2W Matrix, should be an AFFINE matrix.

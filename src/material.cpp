@@ -9,80 +9,37 @@ using namespace OpenPT;
 
 namespace OpenPT
 {
-
-    OpenPT::Material::Material()
-        : type(MaterialType::DIFFUSE), kd(Vector3f::O), emitivity(Vector3f::O)
+    PrincipledBSDF::PrincipledBSDF(const Vector3f &base_color_, const Vector3f &emission_, const float roughness_, const float metallic_, const float anisotropic_, const float subsurface_, const float specular_tint_, const float sheen_, const float sheen_tint_, const float clearcoat_, const float clearcoat_roughness_, const float spec_trans_, const float ior_, const float at_distance_, const Vector3f &extinction_)
+        : base_color(base_color_),
+          emission(emission_),
+          roughness(roughness_),
+          metallic(metallic_),
+          anisotropic(anisotropic_),
+          subsurface(subsurface_),
+          specular_tint(specular_tint_),
+          sheen(sheen_),
+          sheen_tint(sheen_tint_),
+          clearcoat(clearcoat_),
+          clearcoat_roughness(clearcoat_roughness_),
+          spec_trans(spec_trans_),
+          ior(ior_),
+          at_distance(at_distance_),
+          extinction(extinction_)
     {
-    }
-
-    Material::Material(MaterialType type_, const Vector3f &reflectivity_, const Vector3f &emitivity_)
-        : type(type_), kd(reflectivity_), emitivity(emitivity_)
-    {
-    }
-
-    const float Material::PDF(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const
-    {
-        switch (type)
+        if (roughness < 0.001f)
         {
-        case MaterialType::DIFFUSE:
-        case MaterialType::MICROFACET_DIFFUSE:
-        case MaterialType::MICROFACET_GLOSSY:
-            // uniform sample probability 1 / (2 * PI)
-            if (Vector3f::Dot(wo, N) > 0.0f)
-                return 1.0f / M_PI;
-            else
-                return 0.0f;
-            break;
+            roughness = 0.001f;
         }
     }
 
-    const Vector3f Material::Eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &N) const
-    {
-        // switch (type)
-        // {
-        // case MaterialType::DIFFUSE:
-        //     float cosalpha = Vector3f::Dot(N, wo);
-        //     if (cosalpha > 0.0f)
-        //     {
-        //         return kd * EvalDiffuse(wi, wo, N);
-        //     }
-        //     else
-        //         return Vector3f(0.0f);
-        //     break;
-        // }
-    }
-
-    const Vector3f Material::Sample(const Vector3f &wi, const Vector3f &N) const
-    {
-        // switch (type)
-        // {
-        // case MaterialType::DIFFUSE:
-        // case MaterialType::MICROFACET_DIFFUSE:
-        // case MaterialType::MICROFACET_GLOSSY:
-        //     // uniform sample on the hemisphere
-        //     float x_1 = Random::Float(), x_2 = Random::Float();
-        //     float z = std::fabs(1.0f - 2.0f * x_1);
-        //     float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
-        //     Vector3f local_ray(r * std::cos(phi), r * std::sin(phi), z);
-        //     return LocalRayToWorld(local_ray, N);
-        //     break;
-        // }
-        return Vector3f::O;
-    }
-
-    // const Vector3f Material::EvalDiffuse(const Vector3f &wi, const Vector3f &wo, const Vector3f &N)
-    // {
-    //     return 1.0f / M_PI;
-    // }
-
-    float Material::FresnelMix(float eta, float VDotH) const
+    float PrincipledBSDF::FresnelMix(float eta, float VDotH) const
     {
         float metallicFresnel = SchlickFresnel(VDotH);
         float dielectricFresnel = DielectricFresnel(VDotH, eta);
         return Mix(dielectricFresnel, metallicFresnel, metallic);
     }
 
-    Vector3f Material::EvalDiffuse(Vector3f Csheen, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    Vector3f PrincipledBSDF::EvalDiffuse(Vector3f Csheen, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
         pdf = 0.0;
         if (L.z <= 0.0)
@@ -104,10 +61,10 @@ namespace OpenPT
         Vector3f Fsheen = FH * sheen * Csheen;
 
         pdf = L.z * (1.0f / M_PIf32);
-        return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * baseColor + Fsheen) * (1.0 - metallic) * (1.0 - specTrans);
+        return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0 - metallic) * (1.0 - spec_trans);
     }
 
-    Vector3f Material::EvalSpecReflection(float eta, Vector3f specCol, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    Vector3f PrincipledBSDF::EvalSpecReflection(float eta, Vector3f specCol, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
         pdf = 0.0;
         if (L.z <= 0.0)
@@ -124,7 +81,7 @@ namespace OpenPT
         return F * D * G2 / (4.0f * L.z * V.z);
     }
 
-    Vector3f Material::EvalSpecRefraction(float eta, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    Vector3f PrincipledBSDF::EvalSpecRefraction(float eta, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
         pdf = 0.0;
         if (L.z >= 0.0)
@@ -140,11 +97,11 @@ namespace OpenPT
 
         pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z;
 
-        Vector3f specColor = Vector3f::Pow(baseColor, Vector3f(0.5));
-        return specColor * (1.0 - metallic) * specTrans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z) * std::abs(V.z));
+        Vector3f specColor = Vector3f::Pow(base_color, Vector3f(0.5));
+        return specColor * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z) * std::abs(V.z));
     }
 
-    Vector3f Material::EvalClearcoat(Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    Vector3f PrincipledBSDF::EvalClearcoat(Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
         pdf = 0.0;
         if (L.z <= 0.0)
@@ -152,7 +109,7 @@ namespace OpenPT
 
         float FH = DielectricFresnel(Vector3f::Dot(V, H), 1.0 / 1.5);
         float F = Mix(0.04f, 1.0f, FH);
-        float D = GTR1(H.z, clearcoatRoughness);
+        float D = GTR1(H.z, clearcoat_roughness);
         float G = SmithG(L.z, 0.25) * SmithG(V.z, 0.25);
         float jacobian = 1.0 / (4.0 * Vector3f::Dot(V, H));
 
@@ -160,20 +117,20 @@ namespace OpenPT
         return Vector3f(0.25) * clearcoat * F * D * G / (4.0 * L.z * V.z);
     }
 
-    void Material::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
+    void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
     {
-        float lum = Luminance(baseColor);
-        Vector3f ctint = lum > 0.0 ? baseColor / lum : Vector3f(1.0f);
+        float lum = Luminance(base_color);
+        Vector3f ctint = lum > 0.0 ? base_color / lum : Vector3f(1.0f);
         float F0 = (1.0 - eta) / (1.0 + eta);
-        specCol = Mix(F0 * F0 * Mix(Vector3f(1.0), ctint, Vector3f(specularTint)), Vector3f(baseColor), Vector3f(metallic));
-        sheenCol = Mix(Vector3f(1.0), Vector3f(ctint), Vector3f(sheenTint));
+        specCol = Mix(F0 * F0 * Mix(Vector3f(1.0), ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
+        sheenCol = Mix(Vector3f(1.0), Vector3f(ctint), Vector3f(sheen_tint));
     }
 
-    void Material::GetLobeProbabilities(float eta, Vector3f specCol, float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
+    void PrincipledBSDF::GetLobeProbabilities(float eta, Vector3f specCol, float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
     {
-        diffuseWt = Luminance(baseColor) * (1.0 - metallic) * (1.0 - specTrans);
+        diffuseWt = Luminance(base_color) * (1.0 - metallic) * (1.0 - spec_trans);
         specReflectWt = Luminance(Mix(specCol, Vector3f(1.0), Vector3f(approxFresnel)));
-        specRefractWt = (1.0 - approxFresnel) * (1.0 - metallic) * specTrans * Luminance(baseColor);
+        specRefractWt = (1.0 - approxFresnel) * (1.0 - metallic) * spec_trans * Luminance(base_color);
         clearcoatWt = clearcoat * (1.0 - metallic);
         float totalWt = diffuseWt + specReflectWt + specRefractWt + clearcoatWt;
 
@@ -183,7 +140,7 @@ namespace OpenPT
         clearcoatWt /= totalWt;
     }
 
-    Vector3f Material::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdfPdf) const
+    Vector3f PrincipledBSDF::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdfPdf) const
     {
         float eta = state.lastIOR / ior;
 

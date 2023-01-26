@@ -26,7 +26,7 @@ void OpenPT::World::PrepareDirectLightSampling()
     emissive_triangles.clear();
     for(auto m : meshes)
     {
-        if(m->tex.emitivity!=Vector3f::O)
+        if(m->tex->emission!=Vector3f::O)
         {
             for(auto t : m->faces)
             {

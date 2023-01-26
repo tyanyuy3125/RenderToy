@@ -64,7 +64,6 @@ namespace OpenPT
         v = beta * inv_det;
 
         return true;
-
         // Vector3f pvec = ray.direction.Cross(v0v2_w);
         // float det = v0v1_w.Dot(pvec);
 

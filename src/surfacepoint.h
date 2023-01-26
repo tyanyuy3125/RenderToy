@@ -24,7 +24,7 @@ namespace OpenPT
         const Vector3f GetPosition();
         const Vector3f GetPosition() const;
         const Mesh *GetHitMesh() const;
-        const Material &GetMaterial() const;
+        const PrincipledBSDF *GetMaterial() const;
         const Vector3f GetNormal() const;
 
     private:
