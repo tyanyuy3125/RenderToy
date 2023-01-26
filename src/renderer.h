@@ -89,8 +89,8 @@ namespace OpenPT
         virtual void Render() override final;
 
     private:
-        const Vector3f Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit) const;
-        const Vector3f SampleLight(const Vector3f &ray_dir, const SurfacePoint &surface_point) const;
+        const Vector3f Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state) const;
+        const Vector3f DirectLight(const RayState state, const Vector3f &ray_dir, const SurfacePoint &surface_point) const;
     };
 
     class AlbedoRenderer : public IRenderer

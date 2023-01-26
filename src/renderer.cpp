@@ -217,7 +217,9 @@ namespace OpenPT
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
+#ifndef _DEBUG
 #pragma omp parallel for
+#endif
         for (int i = 0; i < iteration_count; ++i)
         {
             for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
@@ -232,13 +234,14 @@ namespace OpenPT
                     Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
                     cast_ray = cam->O2WTransform(cast_ray);
 
-                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray.src, cast_ray.direction, nullptr) / static_cast<float>(iteration_count);
+                    RayState state;
+                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray.src, cast_ray.direction, nullptr, state) / static_cast<float>(iteration_count);
                 }
             }
         }
     }
 
-    const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit) const
+    const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state) const
     {
         // intersect ray with scene
         const Triangle *hit_obj = nullptr;
@@ -253,23 +256,32 @@ namespace OpenPT
 
             radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false));
 
-            radiance = radiance + SampleLight(ray_dir, surface_point);
+            // if(radiance != Vector3f::O)
+            // {
+            //     int a = 2;
+            //     a /= 2;
+            // }
+
+
+            radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
             Vector3f nextDirection;
             // float rr;
             Vector3f color;
             float pdf;
-            RayState rs;
+            // RayState rs;
             // check surface reflects ray
-            if (surface_point.GetNextDirection(-ray_dir, nextDirection, color, pdf, rs))
+            if (surface_point.GetNextDirection(-ray_dir, nextDirection, color, pdf, state))
             {
-                auto current_tri = surface_point.GetHitTriangle()->parent;
-                radiance += color / pdf * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle());
+                // auto current_tri = surface_point.GetHitTriangle()->parent;
+                radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state);
                 // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
                 //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
                 //                            Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) /
                 //                            (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
             }
+
+
         }
         else
         {
@@ -281,7 +293,7 @@ namespace OpenPT
         return radiance;
     }
 
-    const Vector3f PathTracingRenderer::SampleLight(const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
+    const Vector3f PathTracingRenderer::DirectLight(const RayState state, const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
     {
         Vector3f ret;
 
@@ -304,7 +316,25 @@ namespace OpenPT
                 Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
                 const float in_dot = dir_to_emitter.Dot(surface_point.GetHitTriangle()->NormalC());
                 const float out_dot = -original_ray_dir.Dot(surface_point.GetHitTriangle()->NormalC());
-                ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));
+                if ((in_dot < 0.0f) ^ (out_dot < 0.0f))
+                {
+                    ret = Vector3f::O;
+                }
+                else
+                {
+                    float bsdfpdf;
+                    auto f = surface_point.GetMaterial().DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
+
+                    // float weight = 1.0;
+                    // if(light.area > 0.0) // No MIS for distant light
+                    //     weight = PowerHeuristic(lightSampleRec.pdf, bsdfSampleRec.pdf);
+
+                    if (bsdfpdf > 0.0f)
+                    {
+                        ret += /* weight * */f * emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot);
+                    }
+                }
+                // ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));
             }
         }
 

@@ -346,53 +346,63 @@ namespace OpenPT
 
     const float SSE_InvSqrt(const float number);
 
-    const float Luma(const Vector3f &color);
+    float GTR1(float NDotH, float a);
 
-    void basis(const Vector3f n, Vector3f &b1, Vector3f &b2);
+    Vector3f SampleGTR1(float rgh, float r1, float r2);
 
-    Vector3f toLocal(Vector3f x, Vector3f y, Vector3f z, Vector3f v);
+    float GTR2(float NDotH, float a);
 
-    Vector3f toWorld(Vector3f x, Vector3f y, Vector3f z, Vector3f v);
+    Vector3f SampleGTR2(float rgh, float r1, float r2);
 
-    const Vector3f LocalRayToWorld(const Vector3f &a, const Vector3f &N);
+    Vector3f SampleGGXVNDF(Vector3f V, float rgh, float r1, float r2);
+
+    float GTR2Aniso(float NDotH, float HDotX, float HDotY, float ax, float ay);
+
+    Vector3f SampleGTR2Aniso(float ax, float ay, float r1, float r2);
+
+    float SmithG(float NDotV, float alphaG);
+
+    float SmithGAniso(float NDotV, float VDotX, float VDotY, float ax, float ay);
+
+    float SchlickFresnel(float u);
+
+    float DielectricFresnel(float cosThetaI, float eta);
+
+    Vector3f CosineSampleHemisphere(float r1, float r2);
+
+    Vector3f UniformSampleHemisphere(float r1, float r2);
+
+    Vector3f UniformSampleSphere(float r1, float r2);
+
+    float PowerHeuristic(float a, float b);
+
+    void Onb(const Vector3f N, Vector3f &T, Vector3f &B);
+
+    Vector3f ToWorld(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
+
+    Vector3f ToLocal(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
+
+    // template <typename T>
+    // const T Mix(const T x, const T y, const T a);
 
     template <typename T>
-    const T Mix(const T x, const T y, const T a);
+    const T Mix(const T x, const T y, const T a)
+    {
+        return x * (T(1) - a) + y * a;
+    }
 
-    float Fresnel(float n1, float n2, float VoH, float f0, float f90);
+    float Luminance(Vector3f c);
 
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
 
     const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
-
-    const Vector3f cosineSampleHemisphere(const Vector3f &n);
-
-    const Vector3f F_Schlick(const Vector3f f0, const float theta);
-
-    const float F_Schlick(const float f0, const float f90, const float theta);
-
-    float D_GTR(float roughness, float NoH, float k);
-
-    float SmithG(float NoV, float roughness2);
-
-    float GeometryTerm(float NoL, float NoV, float roughness);
-
-    Vector3f SampleGGXVNDF(Vector3f V, float ax, float ay, float r1, float r2);
-
-    float GGXVNDFPdf(float NoH, float NoV, float roughness);
 
     struct RayState
     {
         bool isRefracted;
         bool hasBeenRefracted;
         float lastIOR;
-
-        RayState()
-        {
-            hasBeenRefracted = false;
-            isRefracted = false;
-            lastIOR = 1.;
-        }
+        RayState();
     };
 }
 #endif // MATHFUNC_H

@@ -1022,73 +1022,186 @@ namespace OpenPT
         return Z * Y * X;
     }
 
-    void basis(const Vector3f n, Vector3f &b1, Vector3f &b2)
+    float GTR1(float NDotH, float a)
     {
-        if (n.z < 0.)
-        {
-            float a = 1.0 / (1.0 - n.z);
-            float b = n.x * n.y * a;
-            b1 = Vector3f(1.0 - n.x * n.x * a, -b, n.x);
-            b2 = Vector3f(b, n.y * n.y * a - 1.0, -n.y);
-        }
-        else
-        {
-            float a = 1.0 / (1.0 + n.z);
-            float b = -n.x * n.y * a;
-            b1 = Vector3f(1.0 - n.x * n.x * a, b, -n.x);
-            b2 = Vector3f(b, 1.0 - n.y * n.y * a, -n.y);
-        }
+        if (a >= 1.0f)
+            return (1.0f / M_PIf32);
+        float a2 = a * a;
+        float t = 1.0f + (a2 - 1.0f) * NDotH * NDotH;
+        return (a2 - 1.0f) / (M_PIf32 * std::log(a2) * t);
     }
 
-        Vector3f toLocal(Vector3f x, Vector3f y, Vector3f z, Vector3f v)
+    Vector3f SampleGTR1(float rgh, float r1, float r2)
     {
-        return Vector3f(Vector3f::Dot(v, x), Vector3f::Dot(v, y), Vector3f::Dot(v, z));
+        float a = std::max(0.001f, rgh);
+        float a2 = a * a;
+
+        float phi = r1 * 2.0f * M_PIf32;
+
+        float cosTheta = std::sqrt((1.0f - std::pow(a2, 1.0f - r1)) / (1.0f - a2));
+        float sinTheta = std::clamp(std::sqrt(1.0f - (cosTheta * cosTheta)), 0.0f, 1.0f);
+        float sinPhi = std::sin(phi);
+        float cosPhi = std::cos(phi);
+
+        return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
     }
 
-    Vector3f toWorld(Vector3f x, Vector3f y, Vector3f z, Vector3f v)
+    float GTR2(float NDotH, float a)
     {
-        return v.x * x + v.y * y + v.z * z;
+        float a2 = a * a;
+        float t = 1.0 + (a2 - 1.0) * NDotH * NDotH;
+        return a2 / (M_PIf32 * t * t);
     }
 
-    const Vector3f LocalRayToWorld(const Vector3f &a, const Vector3f &N)
+    Vector3f SampleGTR2(float rgh, float r1, float r2)
     {
-        Vector3f B, C;
-        if (std::abs(N.x) > std::abs(N.y))
-        {
-            float invLen = 1.0f / std::sqrt(N.x * N.x + N.z * N.z);
-            C = Vector3f(N.z * invLen, 0.0f, -N.x * invLen);
-        }
-        else
-        {
-            float invLen = 1.0f / std::sqrt(N.y * N.y + N.z * N.z);
-            C = Vector3f(0.0f, N.z * invLen, -N.y * invLen);
-        }
-        B = Vector3f::Cross(C, N);
-        return a.x * B + a.y * C + a.z * N;
+        float a = std::max(0.001f, rgh);
+
+        float phi = r1 * 2.0f * M_PIf32;
+
+        float cosTheta = std::sqrt((1.0f - r2) / (1.0f + (a * a - 1.0f) * r2));
+        float sinTheta = std::clamp(std::sqrt(1.0f - (cosTheta * cosTheta)), 0.0f, 1.0f);
+        float sinPhi = std::sin(phi);
+        float cosPhi = std::cos(phi);
+
+        return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
     }
 
-    template <typename T>
-    const T Mix(const T x, const T y, const T a)
+    Vector3f SampleGGXVNDF(Vector3f V, float rgh, float r1, float r2)
     {
-        return x * (T(1) - a) + y * a;
+        Vector3f Vh = Vector3f(rgh * V.x, rgh * V.y, V.z).Normalized();
+
+        float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+        Vector3f T1 = lensq > 0.0f ? Vector3f(-Vh.y, Vh.x, 0.0f) * (1.0f / std::sqrt(lensq)) : Vector3f(1, 0, 0);
+        Vector3f T2 = Vector3f::Cross(Vh, T1);
+
+        float r = sqrt(r1);
+        float phi = 2.0f * M_PIf32 * r2;
+        float t1 = r * std::cos(phi);
+        float t2 = r * std::sin(phi);
+        float s = 0.5f * (1.0f + Vh.z);
+        t2 = (1.0f - s) * std::sqrt(1.0f - t1 * t1) + s * t2;
+
+        Vector3f Nh = t1 * T1 + t2 * T2 + std::sqrt(std::max(0.0f, 1.0f - t1 * t1 - t2 * t2)) * Vh;
+
+        return Vector3f(rgh * Nh.x, rgh * Nh.y, std::max(0.0f, Nh.z)).Normalized();
     }
 
-    float Fresnel(float n1, float n2, float VoH, float f0, float f90)
+    float GTR2Aniso(float NDotH, float HDotX, float HDotY, float ax, float ay)
     {
-        float r0 = (n1 - n2) / (n1 + n2);
-        r0 *= r0;
-        if (n1 > n2)
-        {
-            float n = n1 / n2;
-            float sinT2 = n * n * (1.0 - VoH * VoH);
-            if (sinT2 > 1.0)
-                return f90;
-            VoH = sqrt(1.0 - sinT2);
-        }
-        float x = 1.0 - VoH;
-        float ret = r0 + (1.0 - r0) * pow(x, 5.);
+        float a = HDotX / ax;
+        float b = HDotY / ay;
+        float c = a * a + b * b + NDotH * NDotH;
+        return 1.0f / (M_PIf32 * ax * ay * c * c);
+    }
 
-        return Mix(f0, f90, ret);
+    Vector3f SampleGTR2Aniso(float ax, float ay, float r1, float r2)
+    {
+        float phi = r1 * 2.0f * M_PIf32;
+
+        float sinPhi = ay * std::sin(phi);
+        float cosPhi = ax * std::cos(phi);
+        float tanTheta = std::sqrt(r2 / (1.0f - r2));
+
+        return Vector3f(tanTheta * cosPhi, tanTheta * sinPhi, 1.0f);
+    }
+
+    float SmithG(float NDotV, float alphaG)
+    {
+        float a = alphaG * alphaG;
+        float b = NDotV * NDotV;
+        return (2.0f * NDotV) / (NDotV + std::sqrt(a + b - a * b));
+    }
+
+    float SmithGAniso(float NDotV, float VDotX, float VDotY, float ax, float ay)
+    {
+        float a = VDotX * ax;
+        float b = VDotY * ay;
+        float c = NDotV;
+        return 1.0f / (NDotV + std::sqrt(a * a + b * b + c * c));
+    }
+
+    float SchlickFresnel(float u)
+    {
+        float m = std::clamp(1.0f - u, 0.0f, 1.0f);
+        float m2 = m * m;
+        return m2 * m2 * m;
+    }
+
+    float DielectricFresnel(float cosThetaI, float eta)
+    {
+        float sinThetaTSq = eta * eta * (1.0f - cosThetaI * cosThetaI);
+
+        // Total internal reflection
+        if (sinThetaTSq > 1.0f)
+            return 1.0f;
+
+        float cosThetaT = std::sqrt(std::max(1.0f - sinThetaTSq, 0.0f));
+
+        float rs = (eta * cosThetaT - cosThetaI) / (eta * cosThetaT + cosThetaI);
+        float rp = (eta * cosThetaI - cosThetaT) / (eta * cosThetaI + cosThetaT);
+
+        return 0.5f * (rs * rs + rp * rp);
+    }
+
+    Vector3f CosineSampleHemisphere(float r1, float r2)
+    {
+        Vector3f dir;
+        float r = std::sqrt(r1);
+        float phi = 2.0f * M_PIf32 * r2;
+        dir.x = r * std::cos(phi);
+        dir.y = r * std::sin(phi);
+        dir.z = std::sqrt(std::max(0.0, 1.0 - dir.x * dir.x - dir.y * dir.y));
+        return dir;
+    }
+
+    Vector3f UniformSampleHemisphere(float r1, float r2)
+    {
+        float r = std::sqrt(std::max(0.0f, 1.0f - r1 * r1));
+        float phi = 2.0f * M_PIf32 * r2;
+        return Vector3f(r * std::cos(phi), r * std::sin(phi), r1);
+    }
+
+    Vector3f UniformSampleSphere(float r1, float r2)
+    {
+        float z = 1.0f - 2.0f * r1;
+        float r = std::sqrt(std::max(0.0f, 1.0f - z * z));
+        float phi = 2.0f * M_PIf32 * r2;
+        return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
+    }
+
+    float PowerHeuristic(float a, float b)
+    {
+        float t = a * a;
+        return t / (b * b + t);
+    }
+
+    void Onb(const Vector3f N, Vector3f &T, Vector3f &B)
+    {
+        Vector3f up = std::abs(N.z) < 0.999f ? Vector3f(0, 0, 1) : Vector3f(1, 0, 0);
+        T = Vector3f::Cross(up, N).Normalized();
+        B = Vector3f::Cross(N, T);
+    }
+
+    Vector3f ToWorld(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V)
+    {
+        return V.x * X + V.y * Y + V.z * Z;
+    }
+
+    Vector3f ToLocal(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V)
+    {
+        return Vector3f(Vector3f::Dot(V, X), Vector3f::Dot(V, Y), Vector3f::Dot(V, Z));
+    }
+
+    // template <typename T>
+    // const T Mix(const T x, const T y, const T a)
+    // {
+    //     return x * (T(1) - a) + y * a;
+    // }
+
+    float Luminance(Vector3f c)
+    {
+        return 0.212671 * c.x + 0.715160 * c.y + 0.072169 * c.z;
     }
 
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal)
@@ -1106,73 +1219,10 @@ namespace OpenPT
             return eta * incidentVec - (eta * N_dot_I + sqrtf(k)) * normal;
     }
 
-    const Vector3f cosineSampleHemisphere(const Vector3f &n)
+    RayState::RayState()
     {
-        Vector2f rnd = {Random::Float(), Random::Float()};
-
-        float a = M_PIf32 * 2.0f * rnd.x;
-        float b = 2.0f * rnd.y - 1.0f;
-
-        Vector3f dir = Vector3f(sqrt(1.0 - b * b) * Vector2f(cos(a), sin(a)), b);
-        return (n + dir).Normalized();
+        hasBeenRefracted = false;
+        isRefracted = false;
+        lastIOR = 1.0f;
     }
-
-    const Vector3f F_Schlick(const Vector3f f0, const float theta)
-    {
-        return f0 + (Vector3f(1.0f) - f0) * std::pow(1.0f - theta, 5.0f);
-    }
-
-    const float F_Schlick(const float f0, const float f90, const float theta)
-    {
-        return f0 + (f90 - f0) * std::pow(1.0f - theta, 5.0f);
-    }
-
-    float D_GTR(float roughness, float NoH, float k)
-    {
-        float a2 = std::pow(roughness, 2.0f);
-        return a2 / (M_PIf32 * std::pow((NoH * NoH) * (a2 * a2 - 1.0f) + 1.0f, k));
-    }
-
-    float SmithG(float NoV, float roughness2)
-    {
-        float a = std::pow(roughness2, 2.0f);
-        float b = std::pow(NoV, 2.0f);
-        return (2.0f * NoV) / (NoV + std::sqrt(a + b - a * b));
-    }
-
-    float GeometryTerm(float NoL, float NoV, float roughness)
-    {
-        float a2 = roughness * roughness;
-        float G1 = SmithG(NoV, a2);
-        float G2 = SmithG(NoL, a2);
-        return G1 * G2;
-    }
-
-    Vector3f SampleGGXVNDF(Vector3f V, float ax, float ay, float r1, float r2)
-    {
-        Vector3f Vh = Vector3f(ax * V.x, ay * V.y, V.z).Normalized();
-
-        float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
-        Vector3f T1 = lensq > 0. ? Vector3f(-Vh.y, Vh.x, 0) * (1.0f / std::sqrt(lensq)) : Vector3f(1, 0, 0);
-        Vector3f T2 = Vector3f::Cross(Vh, T1);
-
-        float r = sqrt(r1);
-        float phi = 2.0 * M_PIf32 * r2;
-        float t1 = r * cos(phi);
-        float t2 = r * sin(phi);
-        float s = 0.5 * (1.0 + Vh.z);
-        t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
-
-        Vector3f Nh = t1 * T1 + t2 * T2 + std::sqrt(std::max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
-
-        return Vector3f(ax * Nh.x, ay * Nh.y, std::max(0.0f, Nh.z)).Normalized();
-    }
-
-    float GGXVNDFPdf(float NoH, float NoV, float roughness)
-    {
-        float D = D_GTR(roughness, NoH, 2.);
-        float G1 = SmithG(NoV, roughness * roughness);
-        return (D * G1) / std::max(0.00001f, 4.0f * NoV);
-    }
-
 }

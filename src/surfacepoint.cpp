@@ -48,121 +48,101 @@ namespace OpenPT
         //           (GetMaterial().PDF(out_dir, in_dir, GetNormal()) * rr);
 
         // return !(out_dir == Vector3f::O);
+        state.hasBeenRefracted = state.isRefracted;
 
-        auto n = GetNormal();
+        pdf = 0.0f;
+        Vector3f f = Vector3f(0.0f);
+        auto N = GetNormal();
+        auto V = in_dir;
         auto mat = GetMaterial();
 
-        float roughness = pow(mat.roughness, 2.);
+        float r1 = Random::Float();
+        float r2 = Random::Float();
 
-        // sample microfacet normal
-        Vector3f t, b;
-        basis(n, t, b);
-        Vector3f V = toLocal(t, b, n, in_dir);
-        Vector3f h = SampleGGXVNDF(V, roughness, roughness, Random::Float(), Random::Float());
-        if (h.z < 0.0)
-            h = -h;
-        h = toWorld(t, b, n, h);
+        Vector3f T, B;
+        Onb(N, T, B);
+        V = ToLocal(T, B, N, V); // NDotL = L.z; NDotV = V.z; NDotH = H.z
 
-        // fresnel
-        float VoH = Vector3f::Dot(in_dir, h);
-        Vector3f f0 = Vector3f::Mix(Vector3f(0.04), mat.albedo, mat.metallic);
-        Vector3f F = F_Schlick(f0, VoH);
-        float dielF = Fresnel(state.lastIOR, mat.ior, std::abs(VoH), 0.0f, 1.0f);
+        // Specular and sheen color
+        Vector3f specCol, sheenCol;
 
-        // lobe weight probability
-        float diffW = (1. - mat.metallic) * (1. - mat.spec_trans);
-        float reflectW = Luma(F);
-        float refractW = (1. - mat.metallic) * (mat.spec_trans) * (1. - dielF);
-        float invW = 1. / (diffW + reflectW + refractW);
-        diffW *= invW;
-        reflectW *= invW;
-        refractW *= invW;
+        float eta = state.lastIOR / mat.ior;
+        mat.GetSpecColor(eta, specCol, sheenCol);
 
-        // cdf
-        float cdf[3];
-        cdf[0] = diffW;
-        cdf[1] = cdf[0] + reflectW;
-        // cdf[2] = cdf[1] + refractW;
+        // Lobe weights
+        float diffuseWt, specReflectWt, specRefractWt, clearcoatWt;
+        // TODO: Recheck fresnel. Not sure if correct. VDotN produces fireflies with rough dielectric.
+        // VDotH matches Mitsuba and gets rid of all fireflies but H isn't available at this stage
+        float approxFresnel = mat.FresnelMix(eta, V.z);
+        mat.GetLobeProbabilities(eta, specCol, approxFresnel, diffuseWt, specReflectWt, specRefractWt, clearcoatWt);
 
-        Vector4f bsdf = Vector4f::O;
-        float rnd = Random::Float();
-        if (rnd < cdf[0]) // diffuse
+        // CDF for picking a lobe
+        float cdf[4];
+        cdf[0] = diffuseWt;
+        cdf[1] = cdf[0] + specReflectWt;
+        cdf[2] = cdf[1] + specRefractWt;
+        cdf[3] = cdf[2] + clearcoatWt;
+
+        if (r1 < cdf[0]) // Diffuse Reflection Lobe
         {
-            out_dir = cosineSampleHemisphere(n);
-            h = (out_dir + in_dir).Normalized();
+            r1 /= cdf[0];
+            out_dir = CosineSampleHemisphere(r1, r2);
 
-            float NoL = Vector3f::Dot(n, out_dir);
-            float NoV = Vector3f::Dot(n, in_dir);
-            if (NoL <= 0.0f || NoV <= 0.0f)
-            {
-                bsdf = Vector4f::O;
-            }
-            float LoH = Vector3f::Dot(out_dir, h);
-            float pdf = NoL / M_PIf32;
+            Vector3f H = (out_dir + V).Normalized();
 
-            Vector3f diff = GetMaterial().EvalDisneyDiffuse(NoL, NoV, LoH, roughness) * (Vector3f(1.0f) - F);
-            
-            bsdf.x = diff.x;
-            bsdf.y = diff.y;
-            bsdf.z = diff.z;
-
-            bsdf.w = diffW * pdf;
+            f = mat.EvalDiffuse(sheenCol, V, out_dir, H, pdf);
+            pdf *= diffuseWt;
         }
-        else if (rnd < cdf[1]) // reflection
+        else if (r1 < cdf[1]) // Specular Reflection Lobe
         {
-            out_dir = Reflect(-in_dir, h);
+            r1 = (r1 - cdf[0]) / (cdf[1] - cdf[0]);
+            Vector3f H = SampleGGXVNDF(V, mat.roughness, r1, r2);
 
-            float NoL = Vector3f::Dot(n, out_dir);
-            float NoV = Vector3f::Dot(n, in_dir);
-            if (NoL <= 0.0f || NoV <= 0.0f)
-            {
-                bsdf = Vector4f::O;
-            }
-            float NoH = std::min(0.99f, Vector3f::Dot(n, h));
-            float pdf = GGXVNDFPdf(NoH, NoV, roughness);
+            if (H.z < 0.0)
+                H = -H;
 
-            Vector3f spec = GetMaterial().EvalDisneySpecularReflection(F, NoH, NoV, NoL);
-            
-            bsdf.x = spec.x;
-            bsdf.y = spec.y;
-            bsdf.z = spec.z;
+            out_dir = (Reflect(-V, H)).Normalized();
 
-            bsdf.w = reflectW * pdf;
-        }
-        else // refraction
-        {
-            state.isRefracted = !state.isRefracted;
             float eta = state.lastIOR / mat.ior;
-            out_dir = Refract(-in_dir, h, eta);
+
+            f = mat.EvalSpecReflection(eta, specCol, V, out_dir, H, pdf);
+            pdf *= specReflectWt;
+        }
+        else if (r1 < cdf[2]) // Specular Refraction Lobe
+        {
+            r1 = (r1 - cdf[1]) / (cdf[2] - cdf[1]);
+            Vector3f H = SampleGGXVNDF(V, mat.roughness, r1, r2);
+
+            if (H.z < 0.0)
+                H = -H;
+
+            float eta = state.lastIOR / mat.ior;
             state.lastIOR = mat.ior;
+            state.isRefracted = !state.isRefracted;
 
-            float NoL = Vector3f::Dot(n, out_dir);
-            if (NoL <= 0.)
-            {
-                bsdf = Vector4f::O;
-            }
-            float NoV = Vector3f::Dot(n, in_dir);
-            float NoH = std::min(0.99f, Vector3f::Dot(n, h));
-            float LoH = Vector3f::Dot(out_dir, h);
+            out_dir = Refract(-V, H, eta).Normalized();
 
-            float pdf;
-            Vector3f spec = GetMaterial().EvalDisneySpecularRefraction(dielF, NoH, NoV, NoL, VoH, LoH, eta, pdf);
+            f = mat.EvalSpecRefraction(eta, V, out_dir, H, pdf);
+            pdf *= specRefractWt;
+        }
+        else // Clearcoat Lobe
+        {
+            r1 = (r1 - cdf[2]) / (1.0 - cdf[2]);
+            Vector3f H = SampleGTR1(mat.clearcoatRoughness, r1, r2);
 
-            bsdf.x = spec.x;
-            bsdf.y = spec.y;
-            bsdf.z = spec.z;
+            if (H.z < 0.0)
+                H = -H;
 
-            bsdf.w = reflectW * pdf;
+            out_dir = Reflect(-V, H).Normalized();
+
+            f = mat.EvalClearcoat(V, out_dir, H, pdf);
+            pdf *= clearcoatWt;
         }
 
-        bsdf.x *= std::abs(Vector3f::Dot(n, out_dir));
-        bsdf.y *= std::abs(Vector3f::Dot(n, out_dir));
-        bsdf.z *= std::abs(Vector3f::Dot(n, out_dir));
+        out_dir = ToWorld(T, B, N, out_dir);
+        color_o = f * std::abs(Vector3f::Dot(N, out_dir));
 
-        color_o = {bsdf.x, bsdf.y, bsdf.z};
-        pdf = bsdf.w;
-
-        return !(color_o == Vector3f::O);
+        return !(out_dir == Vector3f::O);
     }
 
     const Triangle *SurfacePoint::GetHitTriangle()
