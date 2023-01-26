@@ -253,16 +253,22 @@ namespace OpenPT
 
             radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false));
 
-            radiance = radiance + SampleEmitters(ray_dir, surface_point);
+            radiance = radiance + SampleLight(ray_dir, surface_point);
 
             Vector3f nextDirection;
-            float rr;
-            // Vector3f color;
+            // float rr;
+            Vector3f color;
+            float pdf;
+            RayState rs;
             // check surface reflects ray
-            if (surface_point.GetNextDirection(-ray_dir, nextDirection, rr))
+            if (surface_point.GetNextDirection(-ray_dir, nextDirection, color, pdf, rs))
             {
                 auto current_tri = surface_point.GetHitTriangle()->parent;
-                radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) * (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) / (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
+                radiance += color / pdf * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle());
+                // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
+                //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
+                //                            Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) /
+                //                            (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
             }
         }
         else
@@ -275,7 +281,7 @@ namespace OpenPT
         return radiance;
     }
 
-    const Vector3f PathTracingRenderer::SampleEmitters(const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
+    const Vector3f PathTracingRenderer::SampleLight(const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
     {
         Vector3f ret;
 
@@ -292,11 +298,10 @@ namespace OpenPT
             Vector3f test_triangle_hit;
             test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, surface_point.GetHitTriangle());
 
-            Vector3f emission_in;
             if ((test_triangle == nullptr) | (emit_triangle == test_triangle))
             {
                 auto tri = surface_point.GetHitTriangle();
-                emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
+                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
                 const float in_dot = dir_to_emitter.Dot(surface_point.GetHitTriangle()->NormalC());
                 const float out_dot = -original_ray_dir.Dot(surface_point.GetHitTriangle()->NormalC());
                 ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));

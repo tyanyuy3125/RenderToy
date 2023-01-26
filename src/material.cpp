@@ -7,50 +7,6 @@
 
 using namespace OpenPT;
 
-const Vector3f LocalRayToWorld(const Vector3f &a, const Vector3f &N)
-{
-    Vector3f B, C;
-    if (std::fabs(N.x) > std::fabs(N.y))
-    {
-        float invLen = 1.0f / std::sqrt(N.x * N.x + N.z * N.z);
-        C = Vector3f(N.z * invLen, 0.0f, -N.x * invLen);
-    }
-    else
-    {
-        float invLen = 1.0f / std::sqrt(N.y * N.y + N.z * N.z);
-        C = Vector3f(0.0f, N.z * invLen, -N.y * invLen);
-    }
-    B = Vector3f::Cross(C, N);
-    return a.x * B + a.y * C + a.z * N;
-}
-
-void Fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr)
-{
-    float cosi = std::clamp(Vector3f::Dot(I, N), -1.0f, 1.0f);
-    float etai = 1, etat = ior;
-    if (cosi > 0)
-    {
-        std::swap(etai, etat);
-    }
-    // Compute sini using Snell's law
-    float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
-    // Total internal reflection
-    if (sint >= 1)
-    {
-        kr = 1;
-    }
-    else
-    {
-        float cost = sqrtf(std::max(0.f, 1 - sint * sint));
-        cosi = fabsf(cosi);
-        float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-        float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-        kr = (Rs * Rs + Rp * Rp) / 2;
-    }
-    // As a consequence of the conservation of energy, transmittance is given by:
-    // kt = 1 - kr;
-}
-
 namespace OpenPT
 {
 
@@ -61,6 +17,11 @@ namespace OpenPT
 
     Material::Material(MaterialType type_, const Vector3f &reflectivity_, const Vector3f &emitivity_)
         : type(type_), kd(reflectivity_), emitivity(emitivity_)
+    {
+    }
+
+    Material::Material(const Vector3f &albedo_, const float metalic_, const float roughness_, const Vector3f &emissive_, const float spec_trans_, const float ior_, const float absorption_)
+        : albedo(albedo_), metallic(metalic_), roughness(roughness_), emissive(emissive_), spec_trans(spec_trans_), ior(ior_), absorption(absorption_)
     {
     }
 
@@ -116,5 +77,39 @@ namespace OpenPT
     const Vector3f Material::EvalDiffuse(const Vector3f &wi, const Vector3f &wo, const Vector3f &N)
     {
         return 1.0f / M_PI;
+    }
+
+    const Vector3f Material::EvalDisneyDiffuse(float NoL, float NoV, float LoH, float roughness_) const
+    {
+        float FD90 = 0.5 + 2. * roughness_ * pow(LoH, 2.);
+        float a = F_Schlick(1., FD90, NoL);
+        float b = F_Schlick(1., FD90, NoV);
+
+        return albedo * (a * b / M_PIf32);
+    }
+
+    const Vector3f Material::EvalDisneySpecularReflection(Vector3f F, float NoH, float NoV, float NoL) const
+    {
+        float roughness_ = pow(roughness, 2.);
+        float D = D_GTR(roughness_, NoH, 2.);
+        float G = GeometryTerm(NoL, NoV, pow(0.5 + roughness * .5, 2.));
+
+        Vector3f spec = D * F * G / (4. * NoL * NoV);
+
+        return spec;
+    }
+
+    const Vector3f Material::EvalDisneySpecularRefraction(float F, float NoH, float NoV, float NoL, float VoH, float LoH, float eta, float &pdf) const
+    {
+        float roughness = std::pow(roughness, 2.0f);
+        float D = D_GTR(roughness, NoH, 2.0f);
+        float G = GeometryTerm(NoL, NoV, std::pow(0.5f + roughness * 0.5f, 2.0f));
+        float denom = std::pow(LoH + VoH * eta, 2.0f);
+
+        float jacobian = std::abs(LoH) / denom;
+        pdf = SmithG(std::abs(NoL), roughness * roughness) * std::max(0.0f, VoH) * D * jacobian / NoV;
+
+        Vector3f spec = Vector3f::Pow(Vector3f(1.0f) - albedo, Vector3f(0.5f)) * D * (1.0f - F) * G * std::abs(VoH) * jacobian * std::pow(eta, 2.0f) / std::abs(NoL * NoV);
+        return spec;
     }
 }

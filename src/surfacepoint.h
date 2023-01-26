@@ -17,12 +17,15 @@ namespace OpenPT
         /// @param is_solid_angle If set TRUE, we consider the triangle as a face rather than a point (when setting to FALSE).
         /// @return 
         const Vector3f GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const;
-        bool GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, float &rr);
+        bool GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state);
 
         const Triangle *GetHitTriangle();
         const Triangle *GetHitTriangle() const;
         const Vector3f GetPosition();
         const Vector3f GetPosition() const;
+        const Mesh *GetHitMesh() const;
+        const Material &GetMaterial() const;
+        const Vector3f GetNormal() const;
 
     private:
         const Triangle *triangle;

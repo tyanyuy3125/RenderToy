@@ -163,7 +163,12 @@ namespace OpenPT
 
     const Vector3f Vector3f::Pow(const Vector3f &a, const Vector3f &b)
     {
-        return Vector3f(std::pow(a.x,b.x),std::pow(a.y,b.y),std::pow(a.z,b.z));
+        return Vector3f(std::pow(a.x, b.x), std::pow(a.y, b.y), std::pow(a.z, b.z));
+    }
+
+    const Vector3f Vector3f::Mix(const Vector3f &x, const Vector3f &y, const Vector3f &a)
+    {
+        return x * (Vector3f(1.0f) - a) + y * a;
     }
 
     const float Vector3f::Dot(const Vector3f &a) const
@@ -410,6 +415,20 @@ namespace OpenPT
     const Vector4f operator*(const float lambda, const Vector4f &a)
     {
         return a * lambda;
+    }
+
+    const float SSE_InvSqrt(const float number)
+    {
+        __m128 _srcReisger = _mm_set1_ps(number);
+        __m128 _dstRegister = _mm_rsqrt_ps(_srcReisger);
+        float array[4]; // 128-bit xmm register (4x32-bit float)
+        _mm_storeu_ps(array, _dstRegister);
+        return array[0]; // The result at all the elements are the same
+    }
+
+    const float Luma(const Vector3f &color)
+    {
+        return Vector3f::Dot(color, Vector3f(0.299, 0.587, 0.114));
     }
 
     const float Convert::InchToMM(const float inch)
@@ -1002,4 +1021,158 @@ namespace OpenPT
 
         return Z * Y * X;
     }
+
+    void basis(const Vector3f n, Vector3f &b1, Vector3f &b2)
+    {
+        if (n.z < 0.)
+        {
+            float a = 1.0 / (1.0 - n.z);
+            float b = n.x * n.y * a;
+            b1 = Vector3f(1.0 - n.x * n.x * a, -b, n.x);
+            b2 = Vector3f(b, n.y * n.y * a - 1.0, -n.y);
+        }
+        else
+        {
+            float a = 1.0 / (1.0 + n.z);
+            float b = -n.x * n.y * a;
+            b1 = Vector3f(1.0 - n.x * n.x * a, b, -n.x);
+            b2 = Vector3f(b, 1.0 - n.y * n.y * a, -n.y);
+        }
+    }
+
+        Vector3f toLocal(Vector3f x, Vector3f y, Vector3f z, Vector3f v)
+    {
+        return Vector3f(Vector3f::Dot(v, x), Vector3f::Dot(v, y), Vector3f::Dot(v, z));
+    }
+
+    Vector3f toWorld(Vector3f x, Vector3f y, Vector3f z, Vector3f v)
+    {
+        return v.x * x + v.y * y + v.z * z;
+    }
+
+    const Vector3f LocalRayToWorld(const Vector3f &a, const Vector3f &N)
+    {
+        Vector3f B, C;
+        if (std::abs(N.x) > std::abs(N.y))
+        {
+            float invLen = 1.0f / std::sqrt(N.x * N.x + N.z * N.z);
+            C = Vector3f(N.z * invLen, 0.0f, -N.x * invLen);
+        }
+        else
+        {
+            float invLen = 1.0f / std::sqrt(N.y * N.y + N.z * N.z);
+            C = Vector3f(0.0f, N.z * invLen, -N.y * invLen);
+        }
+        B = Vector3f::Cross(C, N);
+        return a.x * B + a.y * C + a.z * N;
+    }
+
+    template <typename T>
+    const T Mix(const T x, const T y, const T a)
+    {
+        return x * (T(1) - a) + y * a;
+    }
+
+    float Fresnel(float n1, float n2, float VoH, float f0, float f90)
+    {
+        float r0 = (n1 - n2) / (n1 + n2);
+        r0 *= r0;
+        if (n1 > n2)
+        {
+            float n = n1 / n2;
+            float sinT2 = n * n * (1.0 - VoH * VoH);
+            if (sinT2 > 1.0)
+                return f90;
+            VoH = sqrt(1.0 - sinT2);
+        }
+        float x = 1.0 - VoH;
+        float ret = r0 + (1.0 - r0) * pow(x, 5.);
+
+        return Mix(f0, f90, ret);
+    }
+
+    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal)
+    {
+        return incidentVec - 2.0f * Vector3f::Dot(incidentVec, normal) * normal;
+    }
+
+    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta)
+    {
+        float N_dot_I = Vector3f::Dot(normal, incidentVec);
+        float k = 1.f - eta * eta * (1.f - N_dot_I * N_dot_I);
+        if (k < 0.f)
+            return Vector3f(0.f, 0.f, 0.f);
+        else
+            return eta * incidentVec - (eta * N_dot_I + sqrtf(k)) * normal;
+    }
+
+    const Vector3f cosineSampleHemisphere(const Vector3f &n)
+    {
+        Vector2f rnd = {Random::Float(), Random::Float()};
+
+        float a = M_PIf32 * 2.0f * rnd.x;
+        float b = 2.0f * rnd.y - 1.0f;
+
+        Vector3f dir = Vector3f(sqrt(1.0 - b * b) * Vector2f(cos(a), sin(a)), b);
+        return (n + dir).Normalized();
+    }
+
+    const Vector3f F_Schlick(const Vector3f f0, const float theta)
+    {
+        return f0 + (Vector3f(1.0f) - f0) * std::pow(1.0f - theta, 5.0f);
+    }
+
+    const float F_Schlick(const float f0, const float f90, const float theta)
+    {
+        return f0 + (f90 - f0) * std::pow(1.0f - theta, 5.0f);
+    }
+
+    float D_GTR(float roughness, float NoH, float k)
+    {
+        float a2 = std::pow(roughness, 2.0f);
+        return a2 / (M_PIf32 * std::pow((NoH * NoH) * (a2 * a2 - 1.0f) + 1.0f, k));
+    }
+
+    float SmithG(float NoV, float roughness2)
+    {
+        float a = std::pow(roughness2, 2.0f);
+        float b = std::pow(NoV, 2.0f);
+        return (2.0f * NoV) / (NoV + std::sqrt(a + b - a * b));
+    }
+
+    float GeometryTerm(float NoL, float NoV, float roughness)
+    {
+        float a2 = roughness * roughness;
+        float G1 = SmithG(NoV, a2);
+        float G2 = SmithG(NoL, a2);
+        return G1 * G2;
+    }
+
+    Vector3f SampleGGXVNDF(Vector3f V, float ax, float ay, float r1, float r2)
+    {
+        Vector3f Vh = Vector3f(ax * V.x, ay * V.y, V.z).Normalized();
+
+        float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+        Vector3f T1 = lensq > 0. ? Vector3f(-Vh.y, Vh.x, 0) * (1.0f / std::sqrt(lensq)) : Vector3f(1, 0, 0);
+        Vector3f T2 = Vector3f::Cross(Vh, T1);
+
+        float r = sqrt(r1);
+        float phi = 2.0 * M_PIf32 * r2;
+        float t1 = r * cos(phi);
+        float t2 = r * sin(phi);
+        float s = 0.5 * (1.0 + Vh.z);
+        t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
+
+        Vector3f Nh = t1 * T1 + t2 * T2 + std::sqrt(std::max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+
+        return Vector3f(ax * Nh.x, ay * Nh.y, std::max(0.0f, Nh.z)).Normalized();
+    }
+
+    float GGXVNDFPdf(float NoH, float NoV, float roughness)
+    {
+        float D = D_GTR(roughness, NoH, 2.);
+        float G1 = SmithG(NoV, roughness * roughness);
+        return (D * G1) / std::max(0.00001f, 4.0f * NoV);
+    }
+
 }

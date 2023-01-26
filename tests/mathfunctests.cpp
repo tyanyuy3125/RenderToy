@@ -161,3 +161,9 @@ TEST_CASE("Complement Minor")
                         {0.0f, 0.0f, 0.0f}};
     REQUIRE(b.ComplementMinor(0,0) == minor);
 }
+
+TEST_CASE("SSE InvSqrt")
+{
+    REQUIRE(std::abs(SSE_InvSqrt(2.0f)-(1.0f / sqrt(2.0f)))<1e-4); // SSE InvSqrt has low accuracy.
+    // Fails at 1e-5.
+}

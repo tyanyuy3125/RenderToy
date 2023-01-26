@@ -14,6 +14,10 @@
 #include <array>
 #include <istream>
 #include <stack>
+#include <cmath>
+#include <algorithm>
+
+#include "random.h"
 
 namespace OpenPT
 {
@@ -107,10 +111,11 @@ namespace OpenPT
         const static float Dot(const Vector3f &a, const Vector3f &b);
         const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
         /// @brief GLSL-like respective pow.
-        /// @param a 
-        /// @param b 
-        /// @return 
+        /// @param a
+        /// @param b
+        /// @return
         const static Vector3f Pow(const Vector3f &a, const Vector3f &b);
+        const static Vector3f Mix(const Vector3f &x, const Vector3f &y, const Vector3f &a);
 
         const float Dot(const Vector3f &a) const;
         const Vector3f Cross(const Vector3f &a) const;
@@ -133,7 +138,7 @@ namespace OpenPT
         Vector4f();
         Vector4f(const float x_, const float y_, const float z_, const float w_);
         Vector4f(const std::array<float, 4> &quadruple);
-        Vector4f(const Vector3f &vec3, float val4);
+        Vector4f(const Vector3f &Vector3f, float val4);
 
         float Length() const;
 
@@ -268,7 +273,8 @@ namespace OpenPT
 #pragma endregion
 
 #pragma region Unit Conversion
-    struct Convert{
+    struct Convert
+    {
         Convert() = delete;
         Convert(const Convert &) = delete;
         Convert(const Convert &&) = delete;
@@ -320,7 +326,7 @@ namespace OpenPT
         void Push(const Matrix4x4f &mat4);
         void Pop();
 
-        void Transform(Vector3f &vec3) const;
+        void Transform(Vector3f &Vector3f) const;
     };
 
     class AffineTransformation
@@ -334,10 +340,59 @@ namespace OpenPT
 
         /// @brief Use Blender XYZ-Euler convention, matrix representation of intrinsic transformations: Z*Y*X*v.
         /// @param euler_xyz XYZ-Euler angles, in radius.
-        /// @return 
+        /// @return
         const static Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
 
-    
+    const float SSE_InvSqrt(const float number);
+
+    const float Luma(const Vector3f &color);
+
+    void basis(const Vector3f n, Vector3f &b1, Vector3f &b2);
+
+    Vector3f toLocal(Vector3f x, Vector3f y, Vector3f z, Vector3f v);
+
+    Vector3f toWorld(Vector3f x, Vector3f y, Vector3f z, Vector3f v);
+
+    const Vector3f LocalRayToWorld(const Vector3f &a, const Vector3f &N);
+
+    template <typename T>
+    const T Mix(const T x, const T y, const T a);
+
+    float Fresnel(float n1, float n2, float VoH, float f0, float f90);
+
+    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
+
+    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
+
+    const Vector3f cosineSampleHemisphere(const Vector3f &n);
+
+    const Vector3f F_Schlick(const Vector3f f0, const float theta);
+
+    const float F_Schlick(const float f0, const float f90, const float theta);
+
+    float D_GTR(float roughness, float NoH, float k);
+
+    float SmithG(float NoV, float roughness2);
+
+    float GeometryTerm(float NoL, float NoV, float roughness);
+
+    Vector3f SampleGGXVNDF(Vector3f V, float ax, float ay, float r1, float r2);
+
+    float GGXVNDFPdf(float NoH, float NoV, float roughness);
+
+    struct RayState
+    {
+        bool isRefracted;
+        bool hasBeenRefracted;
+        float lastIOR;
+
+        RayState()
+        {
+            hasBeenRefracted = false;
+            isRefracted = false;
+            lastIOR = 1.;
+        }
+    };
 }
 #endif // MATHFUNC_H
