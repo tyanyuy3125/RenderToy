@@ -175,8 +175,8 @@ namespace RenderToy
         v0v1_w = vert_w[1] - vert_w[0];
         v0v2_w = vert_w[2] - vert_w[0];
         area = Area();
-        normal = Normal();
         tangent = Tangent();
+        normal = Normal();
     }
 
     void Mesh::SetO2W(const Matrix4x4f &object_to_world_)

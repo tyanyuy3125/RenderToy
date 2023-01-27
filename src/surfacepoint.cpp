@@ -10,7 +10,7 @@ namespace RenderToy
     {
     }
 
-    const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const
+    const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle, float &pdf) const
     {
         /*             current point
         emitter    ----*----
@@ -26,10 +26,11 @@ namespace RenderToy
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
         const float solid_angle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : 0.0f) : 1.0f;
+        pdf = std::abs(1.0f / solid_angle); // TODO: Optimize. abs for culling.
 #ifdef ENABLE_CULLING
-        return cos_area > 0.0f ? triangle->parent->tex->emission * solid_angle : Vector3f::O;
+        return cos_area > 0.0f ? triangle->parent->tex->emission : Vector3f::O;
 #else
-        return triangle->parent->tex->emission * std::abs(solid_angle);
+        return triangle->parent->tex->emission;
 #endif
     }
 
@@ -174,12 +175,12 @@ namespace RenderToy
         return triangle;
     }
 
-    const Vector3f SurfacePoint::GetPosition()
+    Vector3f &SurfacePoint::GetPosition()
     {
         return position;
     }
 
-    const Vector3f SurfacePoint::GetPosition() const
+    const Vector3f &SurfacePoint::GetPosition() const
     {
         return position;
     }

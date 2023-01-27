@@ -236,13 +236,21 @@ namespace RenderToy
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
-#pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < iteration_count; ++i)
         {
             for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
             {
                 for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
                 {
+                    if (x == 850 && y == 554)
+                    {
+                        const int a = 2;
+                    }
+                    if (x == 885 && y == 554)
+                    {
+                        const int a = 2;
+                    }
                     // (x, y) is the point in Raster Space.
                     Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
                     Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
@@ -271,7 +279,8 @@ namespace RenderToy
         {
             SurfacePoint surface_point(hit_obj, hitPosition);
 
-            radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false));
+            float placeholder;
+            radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false, placeholder));
 
             radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
@@ -294,7 +303,7 @@ namespace RenderToy
                     {
                         normal = -normal;
                     }
-                    radiance += (color / pdf) * Radiance(surface_point.GetPosition()/* + 0.0001f * normal */, nextDirection, surface_point.GetHitTriangle(), state);
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition() + 0.0001f * normal, nextDirection, surface_point.GetHitTriangle(), state);
 #endif
                     // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
                     //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
@@ -316,7 +325,17 @@ namespace RenderToy
 
     const Vector3f PathTracingRenderer::DirectLight(const RayState state, const Vector3f &original_ray_dir, const SurfacePoint &surface_point) const
     {
+
         Vector3f ret;
+        auto tri = surface_point.GetHitTriangle();
+        auto normal = tri->NormalC();
+#ifndef ENABLE_CULLING
+        if (Vector3f::Dot(-original_ray_dir, normal) < 0.0f)
+        {
+            normal = -normal;
+        }
+        // surface_point.GetPosition() += 0.0001 * normal;
+#endif
 
         Vector3f emit_pos;
         const Triangle *emit_triangle = nullptr;
@@ -329,12 +348,13 @@ namespace RenderToy
             // Send test intersection ray.
             const Triangle *test_triangle = nullptr;
             Vector3f test_triangle_hit;
-            test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, surface_point.GetHitTriangle());
+            test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, tri);
 
             if ((test_triangle == nullptr) | (test_triangle == emit_triangle))
             {
-                auto tri = surface_point.GetHitTriangle();
-                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
+
+                float lightpdf;
+                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true, lightpdf);
 
                 /*
                 -original_ray_dir     dir_to_emitter
@@ -346,34 +366,28 @@ namespace RenderToy
                           -------*-------
                           surface_point
                 */
-                auto normal = tri->NormalC();
-#ifndef ENABLE_CULLING
-                if (Vector3f::Dot(-original_ray_dir, normal) < 0.0f)
-                {
-                    normal = -normal;
-                }
-#endif
-                const float in_dot = dir_to_emitter.Dot(normal);
-                const float out_dot = -original_ray_dir.Dot(normal);
-                if ((in_dot < 0.0f) ^ (out_dot < 0.0f)) // TODO(DISABLE_CULLING): 这里强制性假定了三条线都在界面的同一侧，忽略了透射的情况！
-                {
-                    ret = Vector3f::O;
-                }
-                else
-                {
-                    float bsdfpdf;
-                    // auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
-                    auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, normal, dir_to_emitter, bsdfpdf);
 
-                    // float weight = 1.0;
-                    // if(light.area > 0.0) // No MIS for distant light
-                    //     weight = PowerHeuristic(lightSampleRec.pdf, bsdfSampleRec.pdf);
+                // const float in_dot = dir_to_emitter.Dot(normal);
+                // const float out_dot = -original_ray_dir.Dot(normal);
+                // if ((in_dot < 0.0f) ^ (out_dot < 0.0f))
+                // {
+                //     ret = Vector3f::O;
+                // }
+                // else
+                // {
+                float bsdfpdf;
+                // auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
+                auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, normal, dir_to_emitter, bsdfpdf);
 
-                    if (bsdfpdf > 0.0f)
-                    {
-                        ret += /* weight * */ f * emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot);
-                    }
+                float weight = 1.0f;
+                // if(light.area > 0.0) // No MIS for distant light
+                weight = PowerHeuristic(lightpdf, bsdfpdf);
+
+                if (bsdfpdf > 0.0f)
+                {
+                    ret += weight * f * emission_in * static_cast<float>(render_context->world->CountEmitters()) /** std::abs(in_dot)*/ / lightpdf;
                 }
+                // }
                 // ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));
             }
         }
