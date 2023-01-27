@@ -166,11 +166,6 @@ namespace RenderToy
         return Vector3f(std::pow(a.x, b.x), std::pow(a.y, b.y), std::pow(a.z, b.z));
     }
 
-    const Vector3f Vector3f::Mix(const Vector3f &x, const Vector3f &y, const Vector3f &a)
-    {
-        return x * (Vector3f(1.0f) - a) + y * a;
-    }
-
     const float Vector3f::Dot(const Vector3f &a) const
     {
         return x * a.x + y * a.y + z * a.z;
@@ -1022,7 +1017,7 @@ namespace RenderToy
         return Z * Y * X;
     }
 
-    float GTR1(float NDotH, float a)
+    const float GTR1(const float NDotH, const float a)
     {
         if (a >= 1.0f)
             return (1.0f / M_PIf32);
@@ -1031,7 +1026,7 @@ namespace RenderToy
         return (a2 - 1.0f) / (M_PIf32 * std::log(a2) * t);
     }
 
-    Vector3f SampleGTR1(float rgh, float r1, float r2)
+    const Vector3f SampleGTR1(const float rgh, const float r1, const float r2)
     {
         float a = std::max(0.001f, rgh);
         float a2 = a * a;
@@ -1046,14 +1041,14 @@ namespace RenderToy
         return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
     }
 
-    float GTR2(float NDotH, float a)
+    const float GTR2(const float NDotH, const float a)
     {
         float a2 = a * a;
-        float t = 1.0 + (a2 - 1.0) * NDotH * NDotH;
+        float t = 1.0f + (a2 - 1.0f) * NDotH * NDotH;
         return a2 / (M_PIf32 * t * t);
     }
 
-    Vector3f SampleGTR2(float rgh, float r1, float r2)
+    const Vector3f SampleGTR2(const float rgh, const float r1, const float r2)
     {
         float a = std::max(0.001f, rgh);
 
@@ -1067,7 +1062,7 @@ namespace RenderToy
         return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
     }
 
-    Vector3f SampleGGXVNDF(Vector3f V, float rgh, float r1, float r2)
+    const Vector3f SampleGGXVNDF(const Vector3f V, const float rgh, const float r1, const float r2)
     {
         Vector3f Vh = Vector3f(rgh * V.x, rgh * V.y, V.z).Normalized();
 
@@ -1087,7 +1082,7 @@ namespace RenderToy
         return Vector3f(rgh * Nh.x, rgh * Nh.y, std::max(0.0f, Nh.z)).Normalized();
     }
 
-    float GTR2Aniso(float NDotH, float HDotX, float HDotY, float ax, float ay)
+    const float GTR2Aniso(const float NDotH, const float HDotX, const float HDotY, const float ax, const float ay)
     {
         float a = HDotX / ax;
         float b = HDotY / ay;
@@ -1095,7 +1090,7 @@ namespace RenderToy
         return 1.0f / (M_PIf32 * ax * ay * c * c);
     }
 
-    Vector3f SampleGTR2Aniso(float ax, float ay, float r1, float r2)
+    const Vector3f SampleGTR2Aniso(const float ax, const float ay, const float r1, const float r2)
     {
         float phi = r1 * 2.0f * M_PIf32;
 
@@ -1106,14 +1101,14 @@ namespace RenderToy
         return Vector3f(tanTheta * cosPhi, tanTheta * sinPhi, 1.0f);
     }
 
-    float SmithG(float NDotV, float alphaG)
+    const float SmithG(const float NDotV, const float alphaG)
     {
         float a = alphaG * alphaG;
         float b = NDotV * NDotV;
         return (2.0f * NDotV) / (NDotV + std::sqrt(a + b - a * b));
     }
 
-    float SmithGAniso(float NDotV, float VDotX, float VDotY, float ax, float ay)
+    const float SmithGAniso(const float NDotV, const float VDotX, const float VDotY, const float ax, const float ay)
     {
         float a = VDotX * ax;
         float b = VDotY * ay;
@@ -1121,14 +1116,14 @@ namespace RenderToy
         return 1.0f / (NDotV + std::sqrt(a * a + b * b + c * c));
     }
 
-    float SchlickFresnel(float u)
+    const float SchlickFresnel(const float u)
     {
         float m = std::clamp(1.0f - u, 0.0f, 1.0f);
         float m2 = m * m;
         return m2 * m2 * m;
     }
 
-    float DielectricFresnel(float cosThetaI, float eta)
+    const float DielectricFresnel(const float cosThetaI, const float eta)
     {
         float sinThetaTSq = eta * eta * (1.0f - cosThetaI * cosThetaI);
 
@@ -1144,25 +1139,25 @@ namespace RenderToy
         return 0.5f * (rs * rs + rp * rp);
     }
 
-    Vector3f CosineSampleHemisphere(float r1, float r2)
+    const Vector3f CosineSampleHemisphere(const float r1, const float r2)
     {
         Vector3f dir;
         float r = std::sqrt(r1);
         float phi = 2.0f * M_PIf32 * r2;
         dir.x = r * std::cos(phi);
         dir.y = r * std::sin(phi);
-        dir.z = std::sqrt(std::max(0.0, 1.0 - dir.x * dir.x - dir.y * dir.y));
+        dir.z = std::sqrt(std::max(0.0f, 1.0f - dir.x * dir.x - dir.y * dir.y));
         return dir;
     }
 
-    Vector3f UniformSampleHemisphere(float r1, float r2)
+    const Vector3f UniformSampleHemisphere(const float r1, const float r2)
     {
         float r = std::sqrt(std::max(0.0f, 1.0f - r1 * r1));
         float phi = 2.0f * M_PIf32 * r2;
         return Vector3f(r * std::cos(phi), r * std::sin(phi), r1);
     }
 
-    Vector3f UniformSampleSphere(float r1, float r2)
+    const Vector3f UniformSampleSphere(const float r1, const float r2)
     {
         float z = 1.0f - 2.0f * r1;
         float r = std::sqrt(std::max(0.0f, 1.0f - z * z));
@@ -1170,7 +1165,7 @@ namespace RenderToy
         return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
     }
 
-    float PowerHeuristic(float a, float b)
+    const float PowerHeuristic(const float a, const float b)
     {
         float t = a * a;
         return t / (b * b + t);
@@ -1183,12 +1178,12 @@ namespace RenderToy
         B = Vector3f::Cross(N, T);
     }
 
-    Vector3f ToWorld(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V)
+    const Vector3f ToWorld(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V)
     {
         return V.x * X + V.y * Y + V.z * Z;
     }
 
-    Vector3f ToLocal(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V)
+    const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V)
     {
         return Vector3f(Vector3f::Dot(V, X), Vector3f::Dot(V, Y), Vector3f::Dot(V, Z));
     }
@@ -1198,11 +1193,6 @@ namespace RenderToy
     // {
     //     return x * (T(1) - a) + y * a;
     // }
-
-    float Luminance(Vector3f c)
-    {
-        return 0.212671 * c.x + 0.715160 * c.y + 0.072169 * c.z;
-    }
 
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal)
     {

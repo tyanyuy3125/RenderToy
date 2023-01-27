@@ -115,7 +115,6 @@ namespace RenderToy
         /// @param b
         /// @return
         const static Vector3f Pow(const Vector3f &a, const Vector3f &b);
-        const static Vector3f Mix(const Vector3f &x, const Vector3f &y, const Vector3f &a);
 
         const float Dot(const Vector3f &a) const;
         const Vector3f Cross(const Vector3f &a) const;
@@ -346,41 +345,27 @@ namespace RenderToy
 
     const float SSE_InvSqrt(const float number);
 
-    float GTR1(float NDotH, float a);
+    const float GTR1(const float NDotH, const float a);
+    const Vector3f SampleGTR1(const float rgh, const float r1, const float r2);
+    const float GTR2(const float NDotH, const float a);
+    const Vector3f SampleGTR2(const float rgh, const float r1, const float r2);
+    const Vector3f SampleGGXVNDF(const Vector3f V, const float rgh, const float r1, const float r2);
+    const float GTR2Aniso(const float NDotH, const float HDotX, const float HDotY, const float ax, const float ay);
+    const Vector3f SampleGTR2Aniso(const float ax, const float ay, const float r1, const float r2);
+    const float SmithG(const float NDotV, const float alphaG);
+    const float SmithGAniso(const float NDotV, const float VDotX, const float VDotY, const float ax, const float ay);
+    const float SchlickFresnel(const float u);
+    const float DielectricFresnel(const float cosThetaI, const float eta);
 
-    Vector3f SampleGTR1(float rgh, float r1, float r2);
+    const Vector3f CosineSampleHemisphere(const float r1, const float r2);
+    const Vector3f UniformSampleHemisphere(const float r1, const float r2);
+    const Vector3f UniformSampleSphere(const float r1, const float r2);
 
-    float GTR2(float NDotH, float a);
-
-    Vector3f SampleGTR2(float rgh, float r1, float r2);
-
-    Vector3f SampleGGXVNDF(Vector3f V, float rgh, float r1, float r2);
-
-    float GTR2Aniso(float NDotH, float HDotX, float HDotY, float ax, float ay);
-
-    Vector3f SampleGTR2Aniso(float ax, float ay, float r1, float r2);
-
-    float SmithG(float NDotV, float alphaG);
-
-    float SmithGAniso(float NDotV, float VDotX, float VDotY, float ax, float ay);
-
-    float SchlickFresnel(float u);
-
-    float DielectricFresnel(float cosThetaI, float eta);
-
-    Vector3f CosineSampleHemisphere(float r1, float r2);
-
-    Vector3f UniformSampleHemisphere(float r1, float r2);
-
-    Vector3f UniformSampleSphere(float r1, float r2);
-
-    float PowerHeuristic(float a, float b);
-
+    const float PowerHeuristic(const float a, const float b);
     void Onb(const Vector3f N, Vector3f &T, Vector3f &B);
 
-    Vector3f ToWorld(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
-
-    Vector3f ToLocal(Vector3f X, Vector3f Y, Vector3f Z, Vector3f V);
+    const Vector3f ToWorld(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
+    const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
 
     // template <typename T>
     // const T Mix(const T x, const T y, const T a);
@@ -390,8 +375,6 @@ namespace RenderToy
     {
         return x * (T(1) - a) + y * a;
     }
-
-    float Luminance(Vector3f c);
 
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
 

@@ -119,7 +119,7 @@ namespace RenderToy
 
     void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
     {
-        float lum = Luminance(base_color);
+        float lum = Convert::RGBToLuminance(base_color);
         Vector3f ctint = lum > 0.0 ? base_color / lum : Vector3f(1.0f);
         float F0 = (1.0 - eta) / (1.0 + eta);
         specCol = Mix(F0 * F0 * Mix(Vector3f(1.0), ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
@@ -128,9 +128,9 @@ namespace RenderToy
 
     void PrincipledBSDF::GetLobeProbabilities(float eta, Vector3f specCol, float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
     {
-        diffuseWt = Luminance(base_color) * (1.0 - metallic) * (1.0 - spec_trans);
-        specReflectWt = Luminance(Mix(specCol, Vector3f(1.0), Vector3f(approxFresnel)));
-        specRefractWt = (1.0 - approxFresnel) * (1.0 - metallic) * spec_trans * Luminance(base_color);
+        diffuseWt = Convert::RGBToLuminance(base_color) * (1.0 - metallic) * (1.0 - spec_trans);
+        specReflectWt = Convert::RGBToLuminance(Mix(specCol, Vector3f(1.0), Vector3f(approxFresnel)));
+        specRefractWt = (1.0 - approxFresnel) * (1.0 - metallic) * spec_trans * Convert::RGBToLuminance(base_color);
         clearcoatWt = clearcoat * (1.0 - metallic);
         float totalWt = diffuseWt + specReflectWt + specRefractWt + clearcoatWt;
 
