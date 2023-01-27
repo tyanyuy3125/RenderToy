@@ -206,7 +206,7 @@ namespace RenderToy
                     BUFFER(x, y, render_context->format_settings.resolution.width) = (sp.GetNormal() + Vector3f::White) / 2.0f;
 #else
                     auto normal = sp.GetNormal();
-                    if(Vector3f::Dot(normal, -cast_ray.direction) < 0.0f)
+                    if (Vector3f::Dot(normal, -cast_ray.direction) < 0.0f)
                     {
                         normal = -normal;
                     }
@@ -285,8 +285,17 @@ namespace RenderToy
             {
                 if (pdf > 0.0f)
                 {
-                    // auto current_tri = surface_point.GetHitTriangle()->parent;
+// auto current_tri = surface_point.GetHitTriangle()->parent;
+#ifdef ENABLE_CULLING
                     radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state);
+#else
+                    auto normal = surface_point.GetNormal();
+                    if (Vector3f::Dot(-ray_dir, normal) < 0.0f)
+                    {
+                        normal = -normal;
+                    }
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition()/* + 0.0001f * normal */, nextDirection, surface_point.GetHitTriangle(), state);
+#endif
                     // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
                     //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
                     //                            Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) /
