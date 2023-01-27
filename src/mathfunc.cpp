@@ -1188,12 +1188,6 @@ namespace RenderToy
         return Vector3f(Vector3f::Dot(V, X), Vector3f::Dot(V, Y), Vector3f::Dot(V, Z));
     }
 
-    // template <typename T>
-    // const T Mix(const T x, const T y, const T a)
-    // {
-    //     return x * (T(1) - a) + y * a;
-    // }
-
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal)
     {
         return incidentVec - 2.0f * Vector3f::Dot(incidentVec, normal) * normal;

@@ -12,14 +12,25 @@ namespace RenderToy
 
     const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const
     {
-        // emitivity * (out_dir dot lightnorm) * area / distance^2
+        /*             current point
+        emitter    ----*----
+                        \
+                         \
+                          \ out_dir
+                           \
+                            v
+                         ----*----     receiver
+                              to_pos
+        */
         const Vector3f ray(to_pos - position);
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
-
-        const float solidAngle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : 0.0f) : 1.0f;
-
-        return Vector3f(cos_area > 0.0f ? triangle->parent->tex->emission * solidAngle : Vector3f::O);
+        const float solid_angle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : 0.0f) : 1.0f;
+#ifdef ENABLE_CULLING
+        return cos_area > 0.0f ? triangle->parent->tex->emission * solid_angle : Vector3f::O;
+#else
+        return triangle->parent->tex->emission * std::abs(solid_angle);
+#endif
     }
 
     // const Vector3f SurfacePoint::GetReflection(const Vector3f &in_dir, const Vector3f &in_rad, const Vector3f &out_dir) const
@@ -53,6 +64,14 @@ namespace RenderToy
         pdf = 0.0f;
         Vector3f f = Vector3f(0.0f);
         auto N = GetNormal();
+
+#ifndef ENABLE_CULLING
+        if (Vector3f::Dot(in_dir, N) < 0.0f)
+        {
+            N = -N;
+        }
+#endif
+
         auto V = in_dir;
         auto mat = GetMaterial();
 

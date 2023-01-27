@@ -189,11 +189,30 @@ namespace RenderToy
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
+#ifdef USE_PREDEFINED_NORMAL
                 auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
+#else
+                Vector3f position;
+                auto intersected = render_context->bvh->Intersect(cast_ray, position, nullptr);
+                SurfacePoint sp(intersected, position);
+#endif
 
                 if (intersected != nullptr)
                 {
+#ifdef USE_PREDEFINED_NORMAL
                     BUFFER(x, y, render_context->format_settings.resolution.width) = (((1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2]) + Vector3f::White) / 2.0f;
+#else
+#ifdef ENABLE_CULLING
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = (sp.GetNormal() + Vector3f::White) / 2.0f;
+#else
+                    auto normal = sp.GetNormal();
+                    if(Vector3f::Dot(normal, -cast_ray.direction) < 0.0f)
+                    {
+                        normal = -normal;
+                    }
+                    BUFFER(x, y, render_context->format_settings.resolution.width) = (normal + Vector3f::White) / 2.0f;
+#endif
+#endif
                 }
                 else
                 {
@@ -217,7 +236,7 @@ namespace RenderToy
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
-        #pragma omp parallel for
+#pragma omp parallel for
         for (int i = 0; i < iteration_count; ++i)
         {
             for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
@@ -253,12 +272,6 @@ namespace RenderToy
             SurfacePoint surface_point(hit_obj, hitPosition);
 
             radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false));
-
-            // if (radiance != Vector3f::O)
-            // {
-            //     int a = 2;
-            //     a /= 2;
-            // }
 
             radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
@@ -309,20 +322,39 @@ namespace RenderToy
             Vector3f test_triangle_hit;
             test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, surface_point.GetHitTriangle());
 
-            if ((test_triangle == nullptr) | (emit_triangle == test_triangle))
+            if ((test_triangle == nullptr) | (test_triangle == emit_triangle))
             {
                 auto tri = surface_point.GetHitTriangle();
                 Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true);
-                const float in_dot = dir_to_emitter.Dot(surface_point.GetHitTriangle()->NormalC());
-                const float out_dot = -original_ray_dir.Dot(surface_point.GetHitTriangle()->NormalC());
-                if ((in_dot < 0.0f) ^ (out_dot < 0.0f))
+
+                /*
+                -original_ray_dir     dir_to_emitter
+                            ^         ^
+                             \normal /
+                              \  |  /
+                               \ | /
+                                \|/
+                          -------*-------
+                          surface_point
+                */
+                auto normal = tri->NormalC();
+#ifndef ENABLE_CULLING
+                if (Vector3f::Dot(-original_ray_dir, normal) < 0.0f)
+                {
+                    normal = -normal;
+                }
+#endif
+                const float in_dot = dir_to_emitter.Dot(normal);
+                const float out_dot = -original_ray_dir.Dot(normal);
+                if ((in_dot < 0.0f) ^ (out_dot < 0.0f)) // TODO(DISABLE_CULLING): 这里强制性假定了三条线都在界面的同一侧，忽略了透射的情况！
                 {
                     ret = Vector3f::O;
                 }
                 else
                 {
                     float bsdfpdf;
-                    auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
+                    // auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, tri->NormalC(), dir_to_emitter, bsdfpdf);
+                    auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, normal, dir_to_emitter, bsdfpdf);
 
                     // float weight = 1.0;
                     // if(light.area > 0.0) // No MIS for distant light
