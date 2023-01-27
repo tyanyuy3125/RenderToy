@@ -217,9 +217,7 @@ namespace RenderToy
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+        #pragma omp parallel for
         for (int i = 0; i < iteration_count; ++i)
         {
             for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
@@ -256,12 +254,11 @@ namespace RenderToy
 
             radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false));
 
-            // if(radiance != Vector3f::O)
+            // if (radiance != Vector3f::O)
             // {
             //     int a = 2;
             //     a /= 2;
             // }
-
 
             radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
@@ -273,20 +270,22 @@ namespace RenderToy
             // check surface reflects ray
             if (surface_point.GetNextDirection(-ray_dir, nextDirection, color, pdf, state))
             {
-                // auto current_tri = surface_point.GetHitTriangle()->parent;
-                radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state);
-                // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
-                //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
-                //                            Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) /
-                //                            (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
+                if (pdf > 0.0f)
+                {
+                    // auto current_tri = surface_point.GetHitTriangle()->parent;
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state);
+                    // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
+                    //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
+                    //                            Vector3f::Dot(nextDirection, surface_point.GetHitTriangle()->NormalC()) /
+                    //                            (surface_point.GetHitTriangle()->parent->tex.PDF(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) * rr));
+                }
             }
-
-
         }
         else
         {
             // no hit: default/background scene emission
             radiance = render_context->world->GetDefaultEmission(-ray_dir);
+            // radiance = Vector3f::X;
             // radiance = Vector3f::O;
         }
 
@@ -331,7 +330,7 @@ namespace RenderToy
 
                     if (bsdfpdf > 0.0f)
                     {
-                        ret += /* weight * */f * emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot);
+                        ret += /* weight * */ f * emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot);
                     }
                 }
                 // ret = (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (emission_in * static_cast<float>(render_context->world->CountEmitters()) * std::abs(in_dot) * tri->parent->tex.Eval(dir_to_emitter, -original_ray_dir, tri->NormalC()));

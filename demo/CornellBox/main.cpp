@@ -20,7 +20,7 @@ int main()
     PrincipledBSDF mat_green(Vector3f::Y);
     PrincipledBSDF mat_white(Vector3f::White, Vector3f::O, 1.0f);
     PrincipledBSDF mat_light(Vector3f::White, light_color);
-    PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.001f, 1.0f);
+    PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.1f, 1.0f);
     // mat.base_color = Vector3f(0.93, 0.89, 0.85);
     // mat.roughness = 1.0f;
     // mat.subsurface = 1.0f;
@@ -45,7 +45,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 32);
+    PathTracingRenderer renderer(&rc, 256);
     auto t1 = std::chrono::system_clock::now();
     renderer.Render();
     auto t2 = std::chrono::system_clock::now();
