@@ -236,21 +236,18 @@ namespace RenderToy
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
-        #pragma omp parallel for
+#pragma omp parallel for
         for (int i = 0; i < iteration_count; ++i)
         {
             for (int y = 0; y < render_context->format_settings.resolution.height; ++y)
             {
                 for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
                 {
-                    if (x == 850 && y == 554)
+                    if (x == 638 && y == 720 - 509)
                     {
                         const int a = 2;
                     }
-                    if (x == 885 && y == 554)
-                    {
-                        const int a = 2;
-                    }
+
                     // (x, y) is the point in Raster Space.
                     Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
                     Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
@@ -260,14 +257,18 @@ namespace RenderToy
                     cast_ray = cam->O2WTransform(cast_ray);
 
                     RayState state;
-                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray.src, cast_ray.direction, nullptr, state) / static_cast<float>(iteration_count);
+                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray.src, cast_ray.direction, nullptr, state, 0) / static_cast<float>(iteration_count);
                 }
             }
         }
     }
 
-    const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state) const
+    const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state, int depth) const
     {
+        if(depth > 8)
+        {
+            return Vector3f::O;
+        }
         // intersect ray with scene
         const Triangle *hit_obj = nullptr;
         Vector3f hitPosition;
@@ -279,8 +280,10 @@ namespace RenderToy
         {
             SurfacePoint surface_point(hit_obj, hitPosition);
 
-            float placeholder;
-            radiance = (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false, placeholder));
+            float selfpdf;
+            // radiance += (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false, placeholder));
+            radiance = surface_point.GetEmission(ray_src, -ray_dir, false, selfpdf);
+            radiance *= selfpdf;
 
             radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
@@ -296,14 +299,14 @@ namespace RenderToy
                 {
 // auto current_tri = surface_point.GetHitTriangle()->parent;
 #ifdef ENABLE_CULLING
-                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state);
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth+1);
 #else
                     auto normal = surface_point.GetNormal();
                     if (Vector3f::Dot(-ray_dir, normal) < 0.0f)
                     {
                         normal = -normal;
                     }
-                    radiance += (color / pdf) * Radiance(surface_point.GetPosition() + 0.0001f * normal, nextDirection, surface_point.GetHitTriangle(), state);
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth+1);
 #endif
                     // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
                     //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *
@@ -334,7 +337,6 @@ namespace RenderToy
         {
             normal = -normal;
         }
-        // surface_point.GetPosition() += 0.0001 * normal;
 #endif
 
         Vector3f emit_pos;
@@ -349,6 +351,12 @@ namespace RenderToy
             const Triangle *test_triangle = nullptr;
             Vector3f test_triangle_hit;
             test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, tri);
+
+            // if(test_triangle != nullptr && test_triangle->parent->tex->emission!=Vector3f::O)
+            // {
+            //     emit_triangle = test_triangle;
+            //     emit_pos = test_triangle_hit;
+            // }
 
             if ((test_triangle == nullptr) | (test_triangle == emit_triangle))
             {

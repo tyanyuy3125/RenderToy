@@ -66,16 +66,16 @@ namespace RenderToy
 
     Vector3f PrincipledBSDF::EvalSpecReflection(float eta, Vector3f specCol, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
-        pdf = 0.0;
-        if (L.z <= 0.0)
-            return Vector3f(0.0);
+        pdf = 0.0f;
+        if (L.z <= 0.0f)
+            return Vector3f(0.0f);
 
         float FM = FresnelMix(eta, Vector3f::Dot(L, H));
-        Vector3f F = Mix(specCol, Vector3f(1.0), Vector3f(FM));
+        Vector3f F = Mix(specCol, Vector3f(1.0f), Vector3f(FM));
         float D = GTR2(H.z, roughness);
         float G1 = SmithG(std::abs(V.z), roughness);
         float G2 = G1 * SmithG(std::abs(L.z), roughness);
-        float jacobian = 1.0 / (4.0 * Vector3f::Dot(V, H));
+        float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
 
         pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z;
         return F * D * G2 / (4.0f * L.z * V.z);
