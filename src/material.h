@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "mathfunc.h"
+#include "ray.h"
 
 namespace RenderToy
 {
@@ -58,6 +59,10 @@ namespace RenderToy
                        const float at_distance_ = 1.0f,
                        const Vector3f &extinction_ = Vector3f::White);
 
+        const Vector3f DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const;
+        const bool DisneySample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const;
+
+    private:
         const float FresnelMix(const float eta, const float VDotH) const;
         const Vector3f EvalDiffuse(const Vector3f Csheen, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const;
         const Vector3f EvalSpecReflection(const float eta, const Vector3f specCol, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const;
@@ -65,7 +70,6 @@ namespace RenderToy
         const Vector3f EvalClearcoat(const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const;
         void GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const;
         void GetLobeProbabilities(const float eta, const Vector3f specCol, const float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const;
-        const Vector3f DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const;
     };
 
     struct ITexture

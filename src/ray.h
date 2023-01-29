@@ -16,6 +16,15 @@ namespace RenderToy
 
         Vector3f src;
         Vector3f direction;
+
+        const Ray operator-(const Ray &ray);
+    };
+
+    struct RayState
+    {
+        float eta;
+        Vector3f absorption;
+        Vector3f ffnormal;
     };
 }
 

@@ -239,27 +239,20 @@ namespace RenderToy
             {
                 for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
                 {
-                    if (x == 638 && y == 720 - 509)
-                    {
-                        const int a = 2;
-                    }
-
                     // (x, y) is the point in Raster Space.
                     Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
                     Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
-
                     // Blender convention: Camera directing towards -z.
                     Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
                     cast_ray = cam->O2WTransform(cast_ray);
-
                     RayState state;
-                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray.src, cast_ray.direction, nullptr, state, 0, 0.0f) / static_cast<float>(iteration_count);
+                    BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray, nullptr, state, 0, 0.0f) / static_cast<float>(iteration_count);
                 }
             }
         }
     }
 
-    const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state, const int depth, const float last_bsdfpdf) const
+    const Vector3f PathTracingRenderer::Radiance(const Ray &cast_ray, const Triangle *last_hit, RayState &state, const int depth, const float last_bsdfpdf) const
     {
         if (depth > 4)
         {
@@ -268,17 +261,16 @@ namespace RenderToy
         // intersect ray with scene
         const Triangle *hit_obj = nullptr;
         Vector3f hitPosition;
-        Ray cast_ray(ray_src, ray_dir);
         hit_obj = render_context->bvh->Intersect(cast_ray, hitPosition, last_hit);
 
         Vector3f radiance;
         if (hit_obj != nullptr)
         {
             SurfacePoint surface_point(hit_obj, hitPosition);
-            auto ffnormal = surface_point.GetNormal();
-            if (Vector3f::Dot(-ray_dir, ffnormal) < 0.0f)
+            state.ffnormal = surface_point.GetNormal();
+            if (Vector3f::Dot(cast_ray.direction, state.ffnormal) > 0.0f)
             {
-                ffnormal = -ffnormal;
+                state.ffnormal = -state.ffnormal;
                 state.eta = surface_point.GetMaterial()->ior;
                 state.absorption = Vector3f::O;
             }
@@ -288,7 +280,7 @@ namespace RenderToy
             }
 
             float self_emission_pdf;
-            auto self_emission = surface_point.GetEmission(ray_src, -ray_dir, true, self_emission_pdf);
+            auto self_emission = surface_point.GetEmission(cast_ray.src, -cast_ray.direction, true, self_emission_pdf);
             if (depth == 0)
             {
                 radiance += self_emission;
@@ -298,25 +290,25 @@ namespace RenderToy
                 radiance += PowerHeuristic(last_bsdfpdf, self_emission_pdf) * self_emission;
             }
 
-            auto bounce_ratio = Vector3f::Pow(Vector3f(M_Ef32), -state.absorption * (hitPosition - ray_src).Length());
+            auto bounce_ratio = Vector3f::Pow(Vector3f(M_Ef32), -state.absorption * (hitPosition - cast_ray.src).Length());
 
-            radiance += DirectLight(state, ray_dir, surface_point) * bounce_ratio;
+            radiance += DirectLight(state, cast_ray.direction, surface_point) * bounce_ratio;
             Vector3f nextDirection;
             Vector3f color;
             float bsdfpdf;
-            if (surface_point.GetNextDirection(-ray_dir, nextDirection, color, bsdfpdf, state))
+            if (surface_point.GetMaterial()->DisneySample(-cast_ray.direction, nextDirection, color, bsdfpdf, state))
             {
                 state.absorption = -Vector3f::Log(surface_point.GetMaterial()->extinction) / surface_point.GetMaterial()->at_distance;
 
                 if (bsdfpdf > 0.0f)
                 {
-                    radiance += bounce_ratio * color / bsdfpdf * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth + 1, bsdfpdf);
+                    radiance += bounce_ratio * color / bsdfpdf * Radiance(Ray(surface_point.GetPosition(), nextDirection), surface_point.GetHitTriangle(), state, depth + 1, bsdfpdf);
                 }
             }
         }
         else
         {
-            radiance = render_context->world->GetDefaultEmission(-ray_dir);
+            radiance = render_context->world->GetDefaultEmission(-cast_ray.direction);
         }
 
         return radiance;
@@ -327,11 +319,6 @@ namespace RenderToy
 
         Vector3f ret;
         auto tri = surface_point.GetHitTriangle();
-        auto normal = tri->NormalC();
-        if (Vector3f::Dot(-original_ray_dir, normal) < 0.0f)
-        {
-            normal = -normal; // TODO: 优化重复计算
-        }
 
         Vector3f emit_pos;
         const Triangle *emit_triangle = nullptr;
@@ -344,7 +331,7 @@ namespace RenderToy
             const Triangle *test_triangle = nullptr;
             Vector3f test_triangle_hit;
             test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, tri);
-            
+
             if ((test_triangle == nullptr) | (test_triangle == emit_triangle))
             {
 
@@ -362,14 +349,14 @@ namespace RenderToy
                           surface_point
                 */
                 float bsdfpdf;
-                auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, normal, dir_to_emitter, bsdfpdf);
+                auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, state.ffnormal, dir_to_emitter, bsdfpdf);
 
                 float weight = 1.0f;
                 weight = PowerHeuristic(lightpdf, bsdfpdf);
 
                 if (bsdfpdf > 0.0f)
                 {
-                    ret += weight * f * emission_in * static_cast<float>(render_context->world->CountEmitters()) /** std::abs(in_dot)*/ / lightpdf;
+                    ret += weight * f * emission_in * static_cast<float>(render_context->world->CountEmitters()) / lightpdf;
                 }
             }
         }

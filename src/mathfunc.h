@@ -382,10 +382,6 @@ namespace RenderToy
 
     const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
 
-    struct RayState
-    {
-        float eta;
-        Vector3f absorption;
-    };
+
 }
 #endif // MATHFUNC_H
