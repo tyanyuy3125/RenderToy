@@ -118,6 +118,8 @@ namespace RenderToy
 
         const float Dot(const Vector3f &a) const;
         const Vector3f Cross(const Vector3f &a) const;
+
+        const static Vector3f Log(const Vector3f &a);
     };
 
     const Vector3f operator*(const float lambda, const Vector3f &a);
@@ -380,5 +382,10 @@ namespace RenderToy
 
     const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
 
+    struct RayState
+    {
+        float eta;
+        Vector3f absorption;
+    };
 }
 #endif // MATHFUNC_H

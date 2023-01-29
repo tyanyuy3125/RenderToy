@@ -69,25 +69,25 @@ namespace RenderToy
         Vector3f pvec = ray.direction.Cross(v0v2_w);
         float det = v0v1_w.Dot(pvec);
 
-        if (det > EPS)
+        if (det > 0.0f)
         {
             Vector3f tvec = ray.src - vert_w[0];
             auto alpha = pvec.Dot(tvec);
-            if (alpha < EPS || alpha > det)
+            if (alpha < 0.0f || alpha > det)
             {
                 return false;
             }
 
             Vector3f qvec = tvec.Cross(v0v1_w);
             auto beta = qvec.Dot(ray.direction);
-            if (beta < EPS || alpha + beta > det)
+            if (beta < 0.0f || alpha + beta > det)
             {
                 return false;
             }
 
             float inv_det = 1.0f / det;
             t = v0v2_w.Dot(qvec) * inv_det;
-            if (t < EPS)
+            if (t < 0.0f)
             {
                 return false;
             }
@@ -96,25 +96,25 @@ namespace RenderToy
 
             return true;
         }
-        else if (det < EPS)
+        else if (det < 0.0f)
         {
             Vector3f tvec = ray.src - vert_w[0];
             auto alpha = pvec.Dot(tvec);
-            if (alpha > EPS || alpha < det)
+            if (alpha > 0.0f || alpha < det)
             {
                 return false;
             }
 
             Vector3f qvec = tvec.Cross(v0v1_w);
             auto beta = qvec.Dot(ray.direction);
-            if (beta > EPS || alpha + beta < det)
+            if (beta > 0.0f || alpha + beta < det)
             {
                 return false;
             }
 
             float inv_det = 1.0f / det;
             t = v0v2_w.Dot(qvec) * inv_det;
-            if (t < EPS)
+            if (t < 0.0f)
             {
                 return false;
             }

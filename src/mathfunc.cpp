@@ -178,6 +178,11 @@ namespace RenderToy
                         x * a.y - y * a.x);
     }
 
+    const Vector3f Vector3f::Log(const Vector3f &a)
+    {
+        return Vector3f(std::log(a.x), std::log(a.y), std::log(a.z));
+    }
+
     std::istream &operator>>(std::istream &is, Vector3f &a)
     {
         is >> a.x >> a.y >> a.z;

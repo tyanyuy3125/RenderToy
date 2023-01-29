@@ -17,13 +17,14 @@ int main()
     // OBJModelImporter::Import(world, "./cornellbox2l.obj");
     // OBJModelImporter::Import(world, "./illumiplane.obj");
 
-    Vector3f light_color = Convert::BlackBody(6000) * 3.0f;
+    Vector3f light_color = Convert::BlackBody(6000) * 5.0f;
 
     PrincipledBSDF mat_red(Vector3f::X);
     PrincipledBSDF mat_green(Vector3f::Y);
     PrincipledBSDF mat_white(Vector3f::White);
     PrincipledBSDF mat_light(Vector3f::White, light_color);
-    PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.0f, 1.0f);
+    PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.05f, 1.0f, 0.0f, 1.45f, 1.0f);
+    PrincipledBSDF mat_glass(2.0f * Vector3f::White, Vector3f::O, 0.0f, 0.0f, 1.0f, 1.33f);
 
     // mat.base_color = Vector3f(0.93, 0.89, 0.85);
     // mat.roughness = 1.0f;
@@ -32,15 +33,15 @@ int main()
     // world.meshes[0]->tex = &mat_white;
     // world.meshes[3]->tex = &mat_red;
     // world.meshes[5]->tex = &mat_green;
-    // world.meshes[1]->tex = &mat_white;
-    // world.meshes[2]->tex = &mat_white;
+    // world.meshes[1]->tex = &mat_silver;
+    // world.meshes[2]->tex = &mat_silver;
     // world.meshes[4]->tex = &mat_light;
 
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
     world.meshes[4]->tex = &mat_green;
-    world.meshes[1]->tex = &mat_white;
-    world.meshes[2]->tex = &mat_white;
+    world.meshes[1]->tex = &mat_silver;
+    world.meshes[2]->tex = &mat_silver;
     world.meshes[5]->tex = &mat_light;
 
     // world.meshes[0]->tex = &mat_white;
@@ -65,8 +66,8 @@ int main()
 
     std::cout << "Begin rendering...\n";
 
-    RenderContext rc(&world, FormatSettings(Size(1280, 720), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 64);
+    RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
+    PathTracingRenderer renderer(&rc, 512);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
     // NormalRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();

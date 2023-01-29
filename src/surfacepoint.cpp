@@ -44,34 +44,13 @@ namespace RenderToy
 
     bool SurfacePoint::GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state)
     {
-        // out_dir = Vector3f::O;
-
-        // float rr = triangle->parent->tex.kd.Dot(Vector3f::White) / 3.0f;
-
-        // if (Random::Float() < rr)
-        // {
-        //     Vector3f normal(triangle->NormalC());
-        //     normal = normal.Dot(in_dir) >= 0.0f ? normal : -normal;
-        //     out_dir = triangle->parent->tex.Sample(in_dir, GetNormal());
-        // }
-
-        // color_o = GetMaterial().Eval(out_dir, in_dir, GetNormal()) *
-        //           Vector3f::Dot(out_dir, GetNormal()) /
-        //           (GetMaterial().PDF(out_dir, in_dir, GetNormal()) * rr);
-
-        // return !(out_dir == Vector3f::O);
-        state.hasBeenRefracted = state.isRefracted;
-
         pdf = 0.0f;
         Vector3f f = Vector3f(0.0f);
         auto N = GetNormal();
-
-#ifndef ENABLE_CULLING
         if (Vector3f::Dot(in_dir, N) < 0.0f)
         {
-            N = -N;
+            N = -N; // TODO: 删减多余计算！
         }
-#endif
 
         auto V = in_dir;
         auto mat = GetMaterial();
@@ -86,7 +65,7 @@ namespace RenderToy
         // Specular and sheen color
         Vector3f specCol, sheenCol;
 
-        float eta = state.lastIOR / mat->ior;
+        float eta = state.eta;
         mat->GetSpecColor(eta, specCol, sheenCol);
 
         // Lobe weights
@@ -123,8 +102,6 @@ namespace RenderToy
 
             out_dir = (Reflect(-V, H)).Normalized();
 
-            float eta = state.lastIOR / mat->ior;
-
             f = mat->EvalSpecReflection(eta, specCol, V, out_dir, H, pdf);
             pdf *= specReflectWt;
         }
@@ -135,10 +112,6 @@ namespace RenderToy
 
             if (H.z < 0.0)
                 H = -H;
-
-            float eta = state.lastIOR / mat->ior;
-            state.lastIOR = mat->ior;
-            state.isRefracted = !state.isRefracted;
 
             out_dir = Refract(-V, H, eta).Normalized();
 
