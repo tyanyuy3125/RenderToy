@@ -380,12 +380,5 @@ namespace RenderToy
 
     const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
 
-    struct RayState
-    {
-        bool isRefracted;
-        bool hasBeenRefracted;
-        float lastIOR;
-        RayState();
-    };
 }
 #endif // MATHFUNC_H

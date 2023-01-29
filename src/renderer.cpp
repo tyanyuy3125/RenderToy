@@ -265,7 +265,7 @@ namespace RenderToy
 
     const Vector3f PathTracingRenderer::Radiance(const Vector3f &ray_src, const Vector3f &ray_dir, const Triangle *last_hit, RayState &state, int depth) const
     {
-        if(depth > 8)
+        if (depth > 8)
         {
             return Vector3f::O;
         }
@@ -281,9 +281,11 @@ namespace RenderToy
             SurfacePoint surface_point(hit_obj, hitPosition);
 
             float selfpdf;
-            // radiance += (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false, placeholder));
-            radiance = surface_point.GetEmission(ray_src, -ray_dir, false, selfpdf);
-            radiance *= selfpdf;
+
+            // 这里的两种方法要么产生大量白色噪点，要么无法正确反射光源。
+            radiance += (last_hit != nullptr ? Vector3f::O : surface_point.GetEmission(ray_src, -ray_dir, false, selfpdf));
+            // radiance = surface_point.GetEmission(ray_src, -ray_dir, false, selfpdf);
+            // radiance *= selfpdf;
 
             radiance = radiance + DirectLight(state, ray_dir, surface_point);
 
@@ -299,14 +301,14 @@ namespace RenderToy
                 {
 // auto current_tri = surface_point.GetHitTriangle()->parent;
 #ifdef ENABLE_CULLING
-                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth+1);
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth + 1);
 #else
                     auto normal = surface_point.GetNormal();
                     if (Vector3f::Dot(-ray_dir, normal) < 0.0f)
                     {
                         normal = -normal;
                     }
-                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth+1);
+                    radiance += (color / pdf) * Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle(), state, depth + 1);
 #endif
                     // radiance = radiance + Radiance(surface_point.GetPosition(), nextDirection, surface_point.GetHitTriangle()) *
                     //                           (surface_point.GetHitTriangle()->parent->tex.Eval(nextDirection, -ray_dir, surface_point.GetHitTriangle()->NormalC()) *

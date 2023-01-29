@@ -1202,11 +1202,4 @@ namespace RenderToy
         else
             return eta * incidentVec - (eta * N_dot_I + sqrtf(k)) * normal;
     }
-
-    RayState::RayState()
-    {
-        hasBeenRefracted = false;
-        isRefracted = false;
-        lastIOR = 1.0f;
-    }
 }
