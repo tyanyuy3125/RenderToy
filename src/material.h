@@ -29,6 +29,8 @@ namespace RenderToy
         /// @param emission_ Light emission from the surface.
         /// @param roughness_ Specifies microfacet roughness of the surface for diffuse and specular reflection.
         /// @param metallic_ Blends between a non-metallic and metallic material model
+        /// @param spec_trans_ Mix between fully opaque surface at zero and fully glass like transmission at one.
+        /// @param ior_ Index of refraction for transmission.
         /// @param anisotropic_ Amount of anisotropy for specular reflection.
         /// @param subsurface_ Mix between diffuse and subsurface scattering.
         /// @param specular_tint_ Tints the facing specular reflection using the base color, while glancing reflection remains white.
@@ -36,23 +38,21 @@ namespace RenderToy
         /// @param sheen_tint_ Mix between white and using base color for sheen reflection.
         /// @param clearcoat_ Extra white specular layer on top of others.
         /// @param clearcoat_roughness_ Roughness of clearcoat specular.
-        /// @param spec_trans_
-        /// @param ior_ Index of refraction for transmission.
         /// @param at_distance_
         /// @param extinction_
         PrincipledBSDF(const Vector3f &base_color_,
                        const Vector3f &emission_ = Vector3f::O,
                        const float roughness_ = 0.5f,
                        const float metallic_ = 0.0f,
+                       const float spec_trans_ = 0.0f,
+                       const float ior_ = 1.45f,
                        const float anisotropic_ = 0.0f,
                        const float subsurface_ = 0.0f,
                        const float specular_tint_ = 0.0f,
                        const float sheen_ = 0.0f,
-                       const float sheen_tint_ = 0.5f,
+                       const float sheen_tint_ = 0.0f,
                        const float clearcoat_ = 0.0f,
-                       const float clearcoat_roughness_ = 0.03f,
-                       const float spec_trans_ = 0.0f,
-                       const float ior_ = 1.00f,
+                       const float clearcoat_roughness_ = 0.0f,
                        const float at_distance_ = 1.0f,
                        const Vector3f &extinction_ = Vector3f::White);
 

@@ -240,6 +240,9 @@ namespace RenderToy
     }
 
     BVH::BVH(std::vector<Triangle *> &models)
+#ifdef DISABLE_BVH
+        : models(&models)
+#endif
     {
         BoundingBox tree_bbox;
         bbox_list.reserve(models.size());
@@ -260,25 +263,27 @@ namespace RenderToy
         octree->Build();
     }
 
-    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle * const exclude) const
+    const Triangle *BVH::Intersect(const Ray &ray, float &t, float &u, float &v, const Triangle *const exclude) const
     {
-        // const Triangle *intersected = nullptr;
-        // t = INF;
-        // for(auto tri : (*models))
-        // {
-        //     float it, iu, iv;
-        //     if(tri != exclude && tri->Intersect(ray, it, iu, iv))
-        //     {
-        //         if(it < t)
-        //         {
-        //             t = it;
-        //             u = iu;
-        //             v = iv;
-        //             intersected = tri;
-        //         }
-        //     }
-        // }
-        // return intersected;
+#ifdef DISABLE_BVH
+        const Triangle *intersected = nullptr;
+        t = INF;
+        for (auto tri : (*models))
+        {
+            float it, iu, iv;
+            if (tri != exclude && tri->Intersect(ray, it, iu, iv))
+            {
+                if (it < t)
+                {
+                    t = it;
+                    u = iu;
+                    v = iv;
+                    intersected = tri;
+                }
+            }
+        }
+        return intersected;
+#else
         t = INF;
         const Triangle *intersected = nullptr;
         float t_min, t_max = INF;
@@ -331,9 +336,10 @@ namespace RenderToy
         }
 
         return intersected;
+#endif
     }
 
-    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position, const Triangle * const exclude) const
+    const Triangle *BVH::Intersect(const Ray &ray, Vector3f &position, const Triangle *const exclude) const
     {
         float t, u, v;
         auto ret = Intersect(ray, t, u, v, exclude);

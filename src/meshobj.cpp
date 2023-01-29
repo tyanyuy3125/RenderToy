@@ -32,6 +32,7 @@ namespace RenderToy
 
     const bool Triangle::Intersect(const Ray &ray, float &t, float &u, float &v) const
     {
+#ifdef ENABLE_CULLING
         Vector3f pvec = ray.direction.Cross(v0v2_w);
         float det = v0v1_w.Dot(pvec);
 
@@ -64,65 +65,66 @@ namespace RenderToy
         v = beta * inv_det;
 
         return true;
+#else
+        Vector3f pvec = ray.direction.Cross(v0v2_w);
+        float det = v0v1_w.Dot(pvec);
 
-        // Vector3f pvec = ray.direction.Cross(v0v2_w);
-        // float det = v0v1_w.Dot(pvec);
+        if (det > 0.0f)
+        {
+            Vector3f tvec = ray.src - vert_w[0];
+            auto alpha = pvec.Dot(tvec);
+            if (alpha < 0.0f || alpha > det)
+            {
+                return false;
+            }
 
-        // if (det > EPS)
-        // {
-        //     Vector3f tvec = ray.src - vert_w[0];
-        //     auto alpha = pvec.Dot(tvec);
-        //     if (alpha < EPS || alpha > det)
-        //     {
-        //         return false;
-        //     }
+            Vector3f qvec = tvec.Cross(v0v1_w);
+            auto beta = qvec.Dot(ray.direction);
+            if (beta < 0.0f || alpha + beta > det)
+            {
+                return false;
+            }
 
-        //     Vector3f qvec = tvec.Cross(v0v1_w);
-        //     auto beta = qvec.Dot(ray.direction);
-        //     if (beta < EPS || alpha + beta > det)
-        //     {
-        //         return false;
-        //     }
+            float inv_det = 1.0f / det;
+            t = v0v2_w.Dot(qvec) * inv_det;
+            if (t < 0.0f)
+            {
+                return false;
+            }
+            u = alpha * inv_det;
+            v = beta * inv_det;
 
-        //     float inv_det = 1.0f / det;
-        //     t = v0v2_w.Dot(qvec) * inv_det;
-        //     if (t < EPS)
-        //     {
-        //         return false;
-        //     }
-        //     u = alpha * inv_det;
-        //     v = beta * inv_det;
+            return true;
+        }
+        else if (det < 0.0f)
+        {
+            Vector3f tvec = ray.src - vert_w[0];
+            auto alpha = pvec.Dot(tvec);
+            if (alpha > 0.0f || alpha < det)
+            {
+                return false;
+            }
 
-        //     return true;
-        // }
-        // else if (det < EPS)
-        // {
-        //     Vector3f tvec = ray.src - vert_w[0];
-        //     auto alpha = pvec.Dot(tvec);
-        //     if (alpha > EPS || alpha < det)
-        //     {
-        //         return false;
-        //     }
+            Vector3f qvec = tvec.Cross(v0v1_w);
+            auto beta = qvec.Dot(ray.direction);
+            if (beta > 0.0f || alpha + beta < det)
+            {
+                return false;
+            }
 
-        //     Vector3f qvec = tvec.Cross(v0v1_w);
-        //     auto beta = qvec.Dot(ray.direction);
-        //     if (beta > EPS || alpha + beta < det)
-        //     {
-        //         return false;
-        //     }
+            float inv_det = 1.0f / det;
+            t = v0v2_w.Dot(qvec) * inv_det;
+            if (t < 0.0f)
+            {
+                return false;
+            }
+            u = alpha * inv_det;
+            v = beta * inv_det;
 
-        //     float inv_det = 1.0f / det;
-        //     t = v0v2_w.Dot(qvec) * inv_det;
-        //     if (t < EPS)
-        //     {
-        //         return false;
-        //     }
-        //     u = alpha * inv_det;
-        //     v = beta * inv_det;
-
-        //     return true;
-        // }
-        // return false;
+            return true;
+        }
+        return false;
+#endif
     }
 
     const Vector3f Triangle::GetSamplePoint() const
@@ -173,8 +175,8 @@ namespace RenderToy
         v0v1_w = vert_w[1] - vert_w[0];
         v0v2_w = vert_w[2] - vert_w[0];
         area = Area();
-        normal = Normal();
         tangent = Tangent();
+        normal = Normal();
     }
 
     void Mesh::SetO2W(const Matrix4x4f &object_to_world_)

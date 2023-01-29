@@ -9,11 +9,13 @@ using namespace RenderToy;
 
 namespace RenderToy
 {
-    PrincipledBSDF::PrincipledBSDF(const Vector3f &base_color_, const Vector3f &emission_, const float roughness_, const float metallic_, const float anisotropic_, const float subsurface_, const float specular_tint_, const float sheen_, const float sheen_tint_, const float clearcoat_, const float clearcoat_roughness_, const float spec_trans_, const float ior_, const float at_distance_, const Vector3f &extinction_)
+    PrincipledBSDF::PrincipledBSDF(const Vector3f &base_color_, const Vector3f &emission_, const float roughness_, const float metallic_, const float spec_trans_, const float ior_, const float anisotropic_, const float subsurface_, const float specular_tint_, const float sheen_, const float sheen_tint_, const float clearcoat_, const float clearcoat_roughness_, const float at_distance_, const Vector3f &extinction_)
         : base_color(base_color_),
           emission(emission_),
           roughness(roughness_),
           metallic(metallic_),
+          spec_trans(spec_trans_),
+          ior(ior_),
           anisotropic(anisotropic_),
           subsurface(subsurface_),
           specular_tint(specular_tint_),
@@ -21,8 +23,6 @@ namespace RenderToy
           sheen_tint(sheen_tint_),
           clearcoat(clearcoat_),
           clearcoat_roughness(clearcoat_roughness_),
-          spec_trans(spec_trans_),
-          ior(ior_),
           at_distance(at_distance_),
           extinction(extinction_)
     {
@@ -66,16 +66,16 @@ namespace RenderToy
 
     Vector3f PrincipledBSDF::EvalSpecReflection(float eta, Vector3f specCol, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
     {
-        pdf = 0.0;
-        if (L.z <= 0.0)
-            return Vector3f(0.0);
+        pdf = 0.0f;
+        if (L.z <= 0.0f)
+            return Vector3f(0.0f);
 
         float FM = FresnelMix(eta, Vector3f::Dot(L, H));
-        Vector3f F = Mix(specCol, Vector3f(1.0), Vector3f(FM));
+        Vector3f F = Mix(specCol, Vector3f(1.0f), Vector3f(FM));
         float D = GTR2(H.z, roughness);
         float G1 = SmithG(std::abs(V.z), roughness);
         float G2 = G1 * SmithG(std::abs(L.z), roughness);
-        float jacobian = 1.0 / (4.0 * Vector3f::Dot(V, H));
+        float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
 
         pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z;
         return F * D * G2 / (4.0f * L.z * V.z);
@@ -142,7 +142,7 @@ namespace RenderToy
 
     Vector3f PrincipledBSDF::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdfPdf) const
     {
-        float eta = state.lastIOR / ior;
+        float eta = state.eta;
 
         bsdfPdf = 0.0;
         Vector3f f = Vector3f(0.0);

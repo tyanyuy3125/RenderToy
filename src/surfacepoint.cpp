@@ -10,16 +10,28 @@ namespace RenderToy
     {
     }
 
-    const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle) const
+    const Vector3f SurfacePoint::GetEmission(const Vector3f &to_pos, const Vector3f &out_dir, const bool is_solid_angle, float &pdf) const
     {
-        // emitivity * (out_dir dot lightnorm) * area / distance^2
+        /*             current point
+        emitter    ----*----
+                        \
+                         \
+                          \ out_dir
+                           \
+                            v
+                         ----*----     receiver
+                              to_pos
+        */
         const Vector3f ray(to_pos - position);
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
-
-        const float solidAngle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : 0.0f) : 1.0f;
-
-        return Vector3f(cos_area > 0.0f ? triangle->parent->tex->emission * solidAngle : Vector3f::O);
+        const float solid_angle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : EPS) : 1.0f / (distance2 >= EPS ? distance2 : EPS);
+        pdf = std::abs(1.0f / solid_angle); // TODO: Optimize. abs for culling.
+#ifdef ENABLE_CULLING
+        return cos_area > 0.0f ? triangle->parent->tex->emission : Vector3f::O;
+#else
+        return triangle->parent->tex->emission;
+#endif
     }
 
     // const Vector3f SurfacePoint::GetReflection(const Vector3f &in_dir, const Vector3f &in_rad, const Vector3f &out_dir) const
@@ -32,27 +44,14 @@ namespace RenderToy
 
     bool SurfacePoint::GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state)
     {
-        // out_dir = Vector3f::O;
-
-        // float rr = triangle->parent->tex.kd.Dot(Vector3f::White) / 3.0f;
-
-        // if (Random::Float() < rr)
-        // {
-        //     Vector3f normal(triangle->NormalC());
-        //     normal = normal.Dot(in_dir) >= 0.0f ? normal : -normal;
-        //     out_dir = triangle->parent->tex.Sample(in_dir, GetNormal());
-        // }
-
-        // color_o = GetMaterial().Eval(out_dir, in_dir, GetNormal()) *
-        //           Vector3f::Dot(out_dir, GetNormal()) /
-        //           (GetMaterial().PDF(out_dir, in_dir, GetNormal()) * rr);
-
-        // return !(out_dir == Vector3f::O);
-        state.hasBeenRefracted = state.isRefracted;
-
         pdf = 0.0f;
         Vector3f f = Vector3f(0.0f);
         auto N = GetNormal();
+        if (Vector3f::Dot(in_dir, N) < 0.0f)
+        {
+            N = -N; // TODO: 删减多余计算！
+        }
+
         auto V = in_dir;
         auto mat = GetMaterial();
 
@@ -66,7 +65,7 @@ namespace RenderToy
         // Specular and sheen color
         Vector3f specCol, sheenCol;
 
-        float eta = state.lastIOR / mat->ior;
+        float eta = state.eta;
         mat->GetSpecColor(eta, specCol, sheenCol);
 
         // Lobe weights
@@ -103,8 +102,6 @@ namespace RenderToy
 
             out_dir = (Reflect(-V, H)).Normalized();
 
-            float eta = state.lastIOR / mat->ior;
-
             f = mat->EvalSpecReflection(eta, specCol, V, out_dir, H, pdf);
             pdf *= specReflectWt;
         }
@@ -115,10 +112,6 @@ namespace RenderToy
 
             if (H.z < 0.0)
                 H = -H;
-
-            float eta = state.lastIOR / mat->ior;
-            state.lastIOR = mat->ior;
-            state.isRefracted = !state.isRefracted;
 
             out_dir = Refract(-V, H, eta).Normalized();
 
@@ -155,12 +148,12 @@ namespace RenderToy
         return triangle;
     }
 
-    const Vector3f SurfacePoint::GetPosition()
+    Vector3f &SurfacePoint::GetPosition()
     {
         return position;
     }
 
-    const Vector3f SurfacePoint::GetPosition() const
+    const Vector3f &SurfacePoint::GetPosition() const
     {
         return position;
     }

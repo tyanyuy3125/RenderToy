@@ -31,9 +31,8 @@ namespace RenderToy
         uv.push_back(Vector2f::O);
 
         int a, b, c, d, e, f, g, h, i;
-        while (!fs.eof())
+        while (fs >> identifier)
         {
-            fs >> identifier;
             if (identifier == "o")
             {
                 if (current_mesh!=nullptr)
