@@ -32,39 +32,39 @@ namespace RenderToy
         }
     }
 
-    float PrincipledBSDF::FresnelMix(float eta, float VDotH) const
+    const float PrincipledBSDF::FresnelMix(const float eta, const float VDotH) const
     {
-        float metallicFresnel = SchlickFresnel(VDotH);
-        float dielectricFresnel = DielectricFresnel(VDotH, eta);
-        return Mix(dielectricFresnel, metallicFresnel, metallic);
+        float metallic_fresnel = SchlickFresnel(VDotH);
+        float dielectric_fresnel = DielectricFresnel(VDotH, eta);
+        return Mix(dielectric_fresnel, metallic_fresnel, metallic);
     }
 
-    Vector3f PrincipledBSDF::EvalDiffuse(Vector3f Csheen, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    const Vector3f PrincipledBSDF::EvalDiffuse(const Vector3f Csheen, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
-        pdf = 0.0;
-        if (L.z <= 0.0)
-            return Vector3f(0.0);
+        pdf = 0.0f;
+        if (L.z <= 0.0f)
+            return Vector3f::O;
 
         // Diffuse
         float FL = SchlickFresnel(L.z);
         float FV = SchlickFresnel(V.z);
         float FH = SchlickFresnel(Vector3f::Dot(L, H));
-        float Fd90 = 0.5 + 2.0 * Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
+        float Fd90 = 0.5f + 2.0f * Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
         float Fd = Mix(1.0f, Fd90, FL) * Mix(1.0f, Fd90, FV);
 
         // Fake Subsurface TODO: Replace with volumetric scattering
         float Fss90 = Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
         float Fss = Mix(1.0f, Fss90, FL) * Mix(1.0f, Fss90, FV);
-        float ss = 1.25 * (Fss * (1.0 / (L.z + V.z) - 0.5) + 0.5);
+        float ss = 1.25f * (Fss * (1.0f / (L.z + V.z) - 0.5f) + 0.5f);
 
         // Sheen
         Vector3f Fsheen = FH * sheen * Csheen;
 
         pdf = L.z * (1.0f / M_PIf32);
-        return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0 - metallic) * (1.0 - spec_trans);
+        return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
     }
 
-    Vector3f PrincipledBSDF::EvalSpecReflection(float eta, Vector3f specCol, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    const Vector3f PrincipledBSDF::EvalSpecReflection(const float eta, const Vector3f specCol, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
         pdf = 0.0f;
         if (L.z <= 0.0f)
@@ -81,11 +81,11 @@ namespace RenderToy
         return F * D * G2 / (4.0f * L.z * V.z);
     }
 
-    Vector3f PrincipledBSDF::EvalSpecRefraction(float eta, Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    const Vector3f PrincipledBSDF::EvalSpecRefraction(const float eta, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
-        pdf = 0.0;
-        if (L.z >= 0.0)
-            return Vector3f(0.0);
+        pdf = 0.0f;
+        if (L.z >= 0.0f)
+            return Vector3f::O;
 
         float F = DielectricFresnel(std::abs(Vector3f::Dot(V, H)), eta);
         float D = GTR2(H.z, roughness);
@@ -101,37 +101,37 @@ namespace RenderToy
         return specColor * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z) * std::abs(V.z));
     }
 
-    Vector3f PrincipledBSDF::EvalClearcoat(Vector3f V, Vector3f L, Vector3f H, float &pdf) const
+    const Vector3f PrincipledBSDF::EvalClearcoat(const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
-        pdf = 0.0;
-        if (L.z <= 0.0)
-            return Vector3f(0.0);
+        pdf = 0.0f;
+        if (L.z <= 0.0f)
+            return Vector3f::O;
 
-        float FH = DielectricFresnel(Vector3f::Dot(V, H), 1.0 / 1.5);
+        float FH = DielectricFresnel(Vector3f::Dot(V, H), 1.0f / 1.5f);
         float F = Mix(0.04f, 1.0f, FH);
         float D = GTR1(H.z, clearcoat_roughness);
-        float G = SmithG(L.z, 0.25) * SmithG(V.z, 0.25);
-        float jacobian = 1.0 / (4.0 * Vector3f::Dot(V, H));
+        float G = SmithG(L.z, 0.25f) * SmithG(V.z, 0.25f);
+        float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
 
         pdf = D * H.z * jacobian;
-        return Vector3f(0.25) * clearcoat * F * D * G / (4.0 * L.z * V.z);
+        return Vector3f(0.25f) * clearcoat * F * D * G / (4.0f * L.z * V.z);
     }
 
     void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
     {
         float lum = Convert::RGBToLuminance(base_color);
-        Vector3f ctint = lum > 0.0 ? base_color / lum : Vector3f(1.0f);
-        float F0 = (1.0 - eta) / (1.0 + eta);
-        specCol = Mix(F0 * F0 * Mix(Vector3f(1.0), ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
-        sheenCol = Mix(Vector3f(1.0), Vector3f(ctint), Vector3f(sheen_tint));
+        Vector3f ctint = lum > 0.0f ? base_color / lum : Vector3f(1.0f);
+        float F0 = (1.0f - eta) / (1.0f + eta);
+        specCol = Mix(F0 * F0 * Mix(Vector3f::White, ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
+        sheenCol = Mix(Vector3f::White, Vector3f(ctint), Vector3f(sheen_tint));
     }
 
-    void PrincipledBSDF::GetLobeProbabilities(float eta, Vector3f specCol, float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
+    void PrincipledBSDF::GetLobeProbabilities(const float eta, const Vector3f specCol, const float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
     {
-        diffuseWt = Convert::RGBToLuminance(base_color) * (1.0 - metallic) * (1.0 - spec_trans);
-        specReflectWt = Convert::RGBToLuminance(Mix(specCol, Vector3f(1.0), Vector3f(approxFresnel)));
-        specRefractWt = (1.0 - approxFresnel) * (1.0 - metallic) * spec_trans * Convert::RGBToLuminance(base_color);
-        clearcoatWt = clearcoat * (1.0 - metallic);
+        diffuseWt = Convert::RGBToLuminance(base_color) * (1.0f - metallic) * (1.0f - spec_trans);
+        specReflectWt = Convert::RGBToLuminance(Mix(specCol, Vector3f::White, Vector3f(approxFresnel)));
+        specRefractWt = (1.0f - approxFresnel) * (1.0f - metallic) * spec_trans * Convert::RGBToLuminance(base_color);
+        clearcoatWt = clearcoat * (1.0f - metallic);
         float totalWt = diffuseWt + specReflectWt + specRefractWt + clearcoatWt;
 
         diffuseWt /= totalWt;
@@ -140,12 +140,12 @@ namespace RenderToy
         clearcoatWt /= totalWt;
     }
 
-    Vector3f PrincipledBSDF::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdfPdf) const
+    const Vector3f PrincipledBSDF::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const
     {
         float eta = state.eta;
 
-        bsdfPdf = 0.0;
-        Vector3f f = Vector3f(0.0);
+        bsdf_pdf = 0.0;
+        Vector3f f = Vector3f::O;
 
         Vector3f T, B;
         Onb(N, T, B);
@@ -162,42 +162,42 @@ namespace RenderToy
             H = -H;
 
         // Specular and sheen color
-        Vector3f specCol, sheenCol;
-        GetSpecColor(eta, specCol, sheenCol);
+        Vector3f spec_color, sheen_color;
+        GetSpecColor(eta, spec_color, sheen_color);
 
         // Lobe weights
-        float diffuseWt, specReflectWt, specRefractWt, clearcoatWt;
+        float diffuse_weight, spec_reflect_weight, spec_refract_weight, clearcoat_weight;
         float fresnel = FresnelMix(eta, Vector3f::Dot(V, H));
-        GetLobeProbabilities(eta, specCol, fresnel, diffuseWt, specReflectWt, specRefractWt, clearcoatWt);
+        GetLobeProbabilities(eta, spec_color, fresnel, diffuse_weight, spec_reflect_weight, spec_refract_weight, clearcoat_weight);
 
         float pdf;
 
         // Diffuse
-        if (diffuseWt > 0.0 && L.z > 0.0)
+        if (diffuse_weight > 0.0f && L.z > 0.0f)
         {
-            f += EvalDiffuse(sheenCol, V, L, H, pdf);
-            bsdfPdf += pdf * diffuseWt;
+            f += EvalDiffuse(sheen_color, V, L, H, pdf);
+            bsdf_pdf += pdf * diffuse_weight;
         }
 
         // Specular Reflection
-        if (specReflectWt > 0.0 && L.z > 0.0 && V.z > 0.0)
+        if (spec_reflect_weight > 0.0f && L.z > 0.0f && V.z > 0.0f)
         {
-            f += EvalSpecReflection(eta, specCol, V, L, H, pdf);
-            bsdfPdf += pdf * specReflectWt;
+            f += EvalSpecReflection(eta, spec_color, V, L, H, pdf);
+            bsdf_pdf += pdf * spec_reflect_weight;
         }
 
         // Specular Refraction
-        if (specRefractWt > 0.0 && L.z < 0.0)
+        if (spec_refract_weight > 0.0f && L.z < 0.0f)
         {
             f += EvalSpecRefraction(eta, V, L, H, pdf);
-            bsdfPdf += pdf * specRefractWt;
+            bsdf_pdf += pdf * spec_refract_weight;
         }
 
         // Clearcoat
-        if (clearcoatWt > 0.0 && L.z > 0.0 && V.z > 0.0)
+        if (clearcoat_weight > 0.0f && L.z > 0.0f && V.z > 0.0f)
         {
             f += EvalClearcoat(V, L, H, pdf);
-            bsdfPdf += pdf * clearcoatWt;
+            bsdf_pdf += pdf * clearcoat_weight;
         }
 
         return f * std::abs(L.z);

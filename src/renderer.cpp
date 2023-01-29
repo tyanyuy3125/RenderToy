@@ -202,16 +202,12 @@ namespace RenderToy
 #ifdef USE_PREDEFINED_NORMAL
                     BUFFER(x, y, render_context->format_settings.resolution.width) = (((1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2]) + Vector3f::White) / 2.0f;
 #else
-#ifdef ENABLE_CULLING
-                    BUFFER(x, y, render_context->format_settings.resolution.width) = (sp.GetNormal() + Vector3f::White) / 2.0f;
-#else
                     auto normal = sp.GetNormal();
                     if (Vector3f::Dot(normal, -cast_ray.direction) < 0.0f)
                     {
                         normal = -normal;
                     }
                     BUFFER(x, y, render_context->format_settings.resolution.width) = (normal + Vector3f::White) / 2.0f;
-#endif
 #endif
                 }
                 else

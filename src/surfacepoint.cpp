@@ -27,20 +27,8 @@ namespace RenderToy
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
         const float solid_angle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : EPS) : 1.0f / (distance2 >= EPS ? distance2 : EPS);
         pdf = std::abs(1.0f / solid_angle); // TODO: Optimize. abs for culling.
-#ifdef ENABLE_CULLING
-        return cos_area > 0.0f ? triangle->parent->tex->emission : Vector3f::O;
-#else
         return triangle->parent->tex->emission;
-#endif
     }
-
-    // const Vector3f SurfacePoint::GetReflection(const Vector3f &in_dir, const Vector3f &in_rad, const Vector3f &out_dir) const
-    // {
-    //     const float in_dot = in_dir.Dot(triangle->NormalC());
-    //     const float out_dot = out_dir.Dot(triangle->NormalC());
-
-    //     return (in_dot < 0.0f) ^ (out_dot < 0.0f) ? Vector3f::O : (in_rad * triangle->parent->tex.kd) * (std::abs(in_dot) / M_PIf32);
-    // }
 
     bool SurfacePoint::GetNextDirection(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state)
     {
@@ -49,7 +37,7 @@ namespace RenderToy
         auto N = GetNormal();
         if (Vector3f::Dot(in_dir, N) < 0.0f)
         {
-            N = -N; // TODO: 删减多余计算！
+            N = -N;
         }
 
         auto V = in_dir;

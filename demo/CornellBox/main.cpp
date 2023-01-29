@@ -12,8 +12,8 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    OBJModelImporter::Import(world, "./cornellbox_rot.obj");
-    // OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
+    // OBJModelImporter::Import(world, "./cornellbox_rot.obj");
+    OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
     // OBJModelImporter::Import(world, "./cornellbox2l.obj");
     // OBJModelImporter::Import(world, "./illumiplane.obj");
 
@@ -30,19 +30,19 @@ int main()
     // mat.roughness = 1.0f;
     // mat.subsurface = 1.0f;
 
-    world.meshes[0]->tex = &mat_white;
-    world.meshes[3]->tex = &mat_red;
-    world.meshes[5]->tex = &mat_green;
-    world.meshes[1]->tex = &mat_silver;
-    world.meshes[2]->tex = &mat_silver;
-    world.meshes[4]->tex = &mat_light;
-
     // world.meshes[0]->tex = &mat_white;
     // world.meshes[3]->tex = &mat_red;
-    // world.meshes[4]->tex = &mat_green;
+    // world.meshes[5]->tex = &mat_green;
     // world.meshes[1]->tex = &mat_silver;
     // world.meshes[2]->tex = &mat_silver;
-    // world.meshes[5]->tex = &mat_light;
+    // world.meshes[4]->tex = &mat_light;
+
+    world.meshes[0]->tex = &mat_white;
+    world.meshes[3]->tex = &mat_red;
+    world.meshes[4]->tex = &mat_green;
+    world.meshes[1]->tex = &mat_silver;
+    world.meshes[2]->tex = &mat_silver;
+    world.meshes[5]->tex = &mat_light;
 
     // world.meshes[0]->tex = &mat_white;
     // world.meshes[3]->tex = &mat_red;
@@ -67,7 +67,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 512);
+    PathTracingRenderer renderer(&rc, 64);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
     // NormalRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();
