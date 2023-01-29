@@ -12,8 +12,8 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    // OBJModelImporter::Import(world, "./cornellbox_rot.obj");
-    OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
+    OBJModelImporter::Import(world, "./cornellbox_rot.obj");
+    // OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
     // OBJModelImporter::Import(world, "./cornellbox2l.obj");
     // OBJModelImporter::Import(world, "./illumiplane.obj");
 
@@ -30,19 +30,19 @@ int main()
     // mat.roughness = 1.0f;
     // mat.subsurface = 1.0f;
 
-    // world.meshes[0]->tex = &mat_white;
-    // world.meshes[3]->tex = &mat_red;
-    // world.meshes[5]->tex = &mat_green;
-    // world.meshes[1]->tex = &mat_silver;
-    // world.meshes[2]->tex = &mat_silver;
-    // world.meshes[4]->tex = &mat_light;
-
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
-    world.meshes[4]->tex = &mat_green;
+    world.meshes[5]->tex = &mat_green;
     world.meshes[1]->tex = &mat_silver;
     world.meshes[2]->tex = &mat_silver;
-    world.meshes[5]->tex = &mat_light;
+    world.meshes[4]->tex = &mat_light;
+
+    // world.meshes[0]->tex = &mat_white;
+    // world.meshes[3]->tex = &mat_red;
+    // world.meshes[4]->tex = &mat_green;
+    // world.meshes[1]->tex = &mat_silver;
+    // world.meshes[2]->tex = &mat_silver;
+    // world.meshes[5]->tex = &mat_light;
 
     // world.meshes[0]->tex = &mat_white;
     // world.meshes[3]->tex = &mat_red;
