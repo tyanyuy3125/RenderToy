@@ -20,7 +20,12 @@ namespace RenderToy
         /// @param position_o
         /// @param id_o
         void SampleEmitter(Vector3f &position_o, const Triangle *&id_o) const;
+
+        /// @brief Count all emissive triangles in the world.
+        /// @return 
         int CountEmitters() const;
+
+        /// @brief A must-evaluate function (for DLS) marking all emissive triangles in the world.
         void PrepareDirectLightSampling();
 
         Vector3f sky_emission;

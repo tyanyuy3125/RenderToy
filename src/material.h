@@ -5,6 +5,7 @@
 
 namespace RenderToy
 {
+    /// @brief Disney Principled BSDF
     struct PrincipledBSDF
     {
         Vector3f base_color = Vector3f::White;
@@ -23,6 +24,7 @@ namespace RenderToy
         float at_distance = 1.0f;
         Vector3f extinction = Vector3f::White;
 
+        /// @brief Construct a default Principled BSDF object.
         PrincipledBSDF() = default;
         /// @brief Construct PrincipledBSDF. Explanations on parameters are copied from Principled BSDF section of Blender Manual.
         /// @param base_color_ Diffuse or metal surface color.

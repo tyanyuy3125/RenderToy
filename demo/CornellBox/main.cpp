@@ -40,8 +40,8 @@ int main()
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
     world.meshes[4]->tex = &mat_green;
-    world.meshes[1]->tex = &mat_silver;
-    world.meshes[2]->tex = &mat_silver;
+    world.meshes[1]->tex = &mat_white;
+    world.meshes[2]->tex = &mat_white;
     world.meshes[5]->tex = &mat_light;
 
     // world.meshes[0]->tex = &mat_white;

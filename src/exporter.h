@@ -8,6 +8,7 @@
 
 namespace RenderToy
 {
+    /// @brief Interface for all exporters.
     struct IExporter
     {
         RenderContext *render_context;
@@ -16,6 +17,7 @@ namespace RenderToy
         IExporter(RenderContext *render_context_);
     };
 
+    /// @brief Exports image as .ppm file.
     struct PPMExporter : public IExporter
     {
         virtual void Export(std::ostream &os) override final;
@@ -23,6 +25,7 @@ namespace RenderToy
         PPMExporter(RenderContext *render_context_);
     };
 
+    /// @brief Exports image as .bmp file.
     struct BMPExporter : public IExporter
     {
         virtual void Export(std::ostream &os) override final;

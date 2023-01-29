@@ -24,9 +24,12 @@ namespace RenderToy
 {
     class Mesh;
 
+    /// @brief Triangle is the basic discrete element of every mesh in the scene. It directly composites BVH.
     class Triangle
     {
     public:
+        /// @brief Get the bounding box of the triangle.
+        /// @return Bounding box of the triangle.
         const BoundingBox BBox() const;
 
         std::array<Vector3f, 3> vert;
@@ -36,7 +39,7 @@ namespace RenderToy
 
         Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_, Mesh *const parent_);
         /// @brief Do ray-triangle intersection test in WORLD SPACE.
-        /// @param ray
+        /// @param ray Incoming ray.
         /// @param t
         /// @param u
         /// @param v
@@ -49,9 +52,14 @@ namespace RenderToy
         /// @brief Get cached area.
         /// @return
         const float AreaC() const;
+        /// @brief Get cached tangent.
+        /// @return 
         const Vector3f TangentC() const;
+        /// @brief Get cached normal.
+        /// @return 
         const Vector3f NormalC() const;
 
+        /// @brief Update cache. Should be evaluated after O2W matrix having been changed.
         void UpdateCache();
 
         Mesh *parent;
