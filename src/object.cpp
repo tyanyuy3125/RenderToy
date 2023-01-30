@@ -209,6 +209,9 @@ namespace RenderToy
 
     void Triangle::UpdateCache()
     {
+        vert_w[0] = parent->O2WTransform(vert[0]);
+        vert_w[1] = parent->O2WTransform(vert[1]);
+        vert_w[2] = parent->O2WTransform(vert[2]);
         v0v1_w = vert_w[1] - vert_w[0];
         v0v2_w = vert_w[2] - vert_w[0];
         area = Area();
@@ -221,9 +224,6 @@ namespace RenderToy
         Geometry::SetO2W(object_to_world_);
         for (auto tri : faces)
         {
-            tri->vert_w[0] = O2WTransform(tri->vert[0]);
-            tri->vert_w[1] = O2WTransform(tri->vert[1]);
-            tri->vert_w[2] = O2WTransform(tri->vert[2]);
             tri->UpdateCache();
         }
     }

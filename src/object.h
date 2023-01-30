@@ -70,22 +70,19 @@ namespace RenderToy
         /// @brief Get the bounding box of the triangle.
         /// @return Bounding box of the triangle.
         const BoundingBox BBox() const;
-
         std::array<Vector3f, 3> vert;
-        std::array<Vector3f, 3> vert_w;
         std::array<Vector3f, 3> norm;
         std::array<Vector2f, 3> uv;
 
         Triangle(const std::array<Vector3f, 3> &vert_, const std::array<Vector3f, 3> &norm_, const std::array<Vector2f, 3> &uv_, Mesh *const parent_);
         /// @brief Do ray-triangle intersection test in WORLD SPACE.
         /// @param ray Incoming ray.
-        /// @param t
-        /// @param u
-        /// @param v
-        /// @return
+        /// @param t Distance.
+        /// @param u Barycentric U.
+        /// @param v Barycentric V.
+        /// @return Intersected(TRUE) or not(FALSE).
         const bool Intersect(const Ray &ray, float &t, float &u, float &v) const;
         /// @brief Get sample point in WORLD SPACE.
-        /// @param random
         /// @return
         const Vector3f GetSamplePoint() const;
         /// @brief Get cached area.
@@ -110,6 +107,7 @@ namespace RenderToy
 
         Vector3f v0v1_w;
         Vector3f v0v2_w;
+        std::array<Vector3f, 3> vert_w;
 
         float area;
         Vector3f normal;

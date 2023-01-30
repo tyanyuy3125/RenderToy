@@ -361,20 +361,14 @@ namespace RenderToy
 
     const Vector3f ToWorld(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
     const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
-
-    // template <typename T>
-    // const T Mix(const T x, const T y, const T a);
+    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
+    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
 
     template <typename T>
     const T Mix(const T x, const T y, const T a)
     {
         return x * (T(1) - a) + y * a;
     }
-
-    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
-
-    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
-
 
 }
 #endif // RTMATH_H
