@@ -1,9 +1,8 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "meshobj.h"
-#include "camera.h"
-#include "mathfunc.h"
+#include "object.h"
+#include "rtmath.h"
 
 #include <vector>
 

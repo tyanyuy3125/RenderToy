@@ -3,8 +3,7 @@
 
 #include <vector>
 
-#include "geoobj.h"
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "ray.h"
 
 namespace RenderToy

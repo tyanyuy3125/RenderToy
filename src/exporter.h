@@ -1,7 +1,7 @@
 #ifndef EXPORTER_H
 #define EXPORTER_H
 
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "renderer.h"
 
 #include <ostream>

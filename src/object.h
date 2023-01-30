@@ -1,15 +1,8 @@
-/*
- *  RenderToy - Mesh Object Module
- *  File created on 2023/1/11
- *  Last edited on 2023/1/21
- *  Tianyu Huang <tianyu@illumiart.net>
- */
+#ifndef OBJECT_H
+#define OBJECT_H
 
-#ifndef MESHOBJ_H
-#define MESHOBJ_H
-
-#include "mathfunc.h"
-#include "geoobj.h"
+#include "rtmath.h"
+#include "object.h"
 #include "ray.h"
 #include "bvh.h"
 #include "random.h"
@@ -23,6 +16,52 @@
 namespace RenderToy
 {
     class Mesh;
+
+    class Geometry
+    {
+    protected:
+        Matrix4x4f object_to_world;
+        Matrix4x4f world_to_object;
+
+    public:
+        std::string name;
+        /// @brief Construct a Geometry Object with a default O2W matrix.
+        Geometry();
+
+        /// @brief Set object to world matrix.
+        /// @param object_to_world O2W Matrix, should be an AFFINE matrix.
+        virtual void SetO2W(const Matrix4x4f &object_to_world_);
+
+        /// @brief Get O2W matrix of the Geometry Object.
+        /// @return
+        const Matrix4x4f &GetO2W() const;
+        /// @brief Get W2O matrix of the Geometry Object.
+        /// @return
+        const Matrix4x4f &GetW2O() const;
+
+        const Vector3f O2WTransform(const Vector3f &vec) const;
+        const Vector3f W2OTransform(const Vector3f &vec) const;
+
+        const Ray O2WTransform(const Ray &ray) const;
+        const Ray W2OTransform(const Ray &ray) const;
+    };
+
+    class Camera : public Geometry
+    {
+    public:
+        float focal_length;      // in mm
+        Vector2f gate_dimension; // in inches
+        float near_clipping_plane;
+        float far_clipping_plane;
+
+        Camera(Matrix4x4f object_to_world_,
+               float focal_length_,
+               Vector2f gate_dimension_,
+               float near_clipping_plane_,
+               float far_clipping_plane_);
+    };
+
+    static const Camera academy_camera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825f, 0.446f), 0.1f, 1000.0f);
 
     /// @brief Triangle is the basic discrete element of every mesh in the scene. It directly composites BVH.
     class Triangle
@@ -53,10 +92,10 @@ namespace RenderToy
         /// @return
         const float AreaC() const;
         /// @brief Get cached tangent.
-        /// @return 
+        /// @return
         const Vector3f TangentC() const;
         /// @brief Get cached normal.
-        /// @return 
+        /// @return
         const Vector3f NormalC() const;
 
         /// @brief Update cache. Should be evaluated after O2W matrix having been changed.
@@ -77,12 +116,12 @@ namespace RenderToy
         Vector3f tangent;
     };
 
-    class Mesh : public GeoObj
+    class Mesh : public Geometry
     {
     public:
         std::vector<Triangle *> faces;
-
         PrincipledBSDF *tex;
+        bool smooth{false};
 
         /// @brief Set object to world matrix.
         /// @param object_to_world O2W Matrix, should be an AFFINE matrix.
@@ -90,4 +129,4 @@ namespace RenderToy
     };
 };
 
-#endif // MESHOBJ_H
+#endif // OBJECT_H

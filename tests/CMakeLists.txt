@@ -1,10 +1,3 @@
-#
-# CMakeLists.txt for unit testing module
-# File created on 2023/1/10
-# Last edited on 2023/1/11
-# Tianyu Huang <tianyu@illumiart.net>
-#
-
 # Include(FetchContent)
 # FetchContent_Declare(
 #   Catch2

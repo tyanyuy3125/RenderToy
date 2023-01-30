@@ -4,9 +4,8 @@
 #include <ostream>
 
 #include "world.h"
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "bvh.h"
-#include "camera.h"
 #include "surfacepoint.h"
 #include "random.h"
 

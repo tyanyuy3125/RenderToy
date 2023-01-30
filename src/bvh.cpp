@@ -1,5 +1,5 @@
 #include "bvh.h"
-#include "meshobj.h"
+#include "object.h"
 
 #include <cstring>
 #include <queue>

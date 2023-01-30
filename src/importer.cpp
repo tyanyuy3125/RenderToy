@@ -1,6 +1,6 @@
 #include "importer.h"
-#include "meshobj.h"
-#include "mathfunc.h"
+#include "object.h"
+#include "rtmath.h"
 
 #include <fstream>
 #include <string>
@@ -62,6 +62,12 @@ namespace RenderToy
             {
                 fs >> tmp_vec2;
                 uv.push_back(tmp_vec2);
+                continue;
+            }
+
+            if (identifier == "s")
+            {
+                fs >> current_mesh->smooth;
                 continue;
             }
 

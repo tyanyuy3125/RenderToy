@@ -7,7 +7,7 @@
 
 #define CATCH_CONFIG_MAIN
 #include "../lib/Catch2/catch.hpp"
-#include "../src/mathfunc.h"
+#include "../src/rtmath.h"
 
 #include <array>
 #include <cmath>

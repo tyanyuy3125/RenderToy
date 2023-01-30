@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "ray.h"
 
 namespace RenderToy

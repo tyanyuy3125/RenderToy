@@ -6,14 +6,12 @@
 #
 
 add_library(RenderToy 
-            mathfunc.cpp mathfunc.h 
-            meshobj.cpp meshobj.h
+            rtmath.cpp rtmath.h 
+            object.cpp object.h
             importer.cpp importer.h 
-            world.cpp world.h 
-            geoobj.h geoobj.cpp
+            world.cpp world.h
             renderer.h renderer.cpp
             exporter.h exporter.cpp
-            camera.h camera.cpp
             procedural.h procedural.cpp
             ray.h ray.cpp
             bvh.h bvh.cpp

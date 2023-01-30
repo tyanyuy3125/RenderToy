@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "exporter.h"
 
 namespace RenderToy

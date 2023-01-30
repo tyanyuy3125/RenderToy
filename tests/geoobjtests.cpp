@@ -14,7 +14,7 @@ using namespace RenderToy;
 
 TEST_CASE("SetO2W Test")
 {
-    GeoObj obj;
+    Geometry obj;
     REQUIRE(obj.GetO2W() == obj.GetW2O());
     REQUIRE(obj.GetW2O() == Matrix4x4f::I);
 

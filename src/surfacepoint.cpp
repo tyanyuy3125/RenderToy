@@ -1,5 +1,5 @@
 #include "surfacepoint.h"
-#include "meshobj.h"
+#include "object.h"
 
 #include <cmath>
 

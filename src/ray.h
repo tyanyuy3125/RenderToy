@@ -1,7 +1,7 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "mathfunc.h"
+#include "rtmath.h"
 
 namespace RenderToy
 {

@@ -7,9 +7,9 @@
 
 #define CATCH_CONFIG_MAIN
 #include "../lib/Catch2/catch.hpp"
-#include "../src/mathfunc.h"
+#include "../src/rtmath.h"
 #include "../src/importer.h"
-#include "../src/meshobj.h"
+#include "../src/object.h"
 
 #include <sstream>
 #include <string>

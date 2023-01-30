@@ -1,7 +1,6 @@
 #define BUFFER(x, y, width) render_context->buffer[y * width + x]
 
 #include "renderer.h"
-#include "camera.h"
 #include "ray.h"
 #include "bvh.h"
 #include "surfacepoint.h"

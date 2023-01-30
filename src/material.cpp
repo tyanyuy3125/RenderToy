@@ -1,5 +1,5 @@
 #include "material.h"
-#include "mathfunc.h"
+#include "rtmath.h"
 #include "random.h"
 
 #include <cmath>

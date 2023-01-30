@@ -1,8 +1,8 @@
 #ifndef SURFACEPOINT_H
 #define SURFACEPOINT_H
 
-#include "meshobj.h"
-#include "mathfunc.h"
+#include "object.h"
+#include "rtmath.h"
 
 namespace RenderToy
 {

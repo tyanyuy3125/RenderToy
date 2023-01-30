@@ -1,14 +1,7 @@
-/*
- *  RenderToy - Math Function Module
- *  File created on 2023/1/10
- *  Last edited on 2023/1/17
- *  Tianyu Huang <tianyu@illumiart.net>
- */
-
 #include <cmath>
 #include <immintrin.h>
 
-#include "mathfunc.h"
+#include "rtmath.h"
 
 /// @brief Multiply 4 floats by another 4 floats.
 /// @tparam offset Offset from the first float.

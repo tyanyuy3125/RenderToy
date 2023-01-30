@@ -1,12 +1,5 @@
-/*
- *  RenderToy - Math Function Module
- *  File created on 2023/1/10
- *  Last edited on 2023/1/16
- *  Tianyu Huang <tianyu@illumiart.net>
- */
-
-#ifndef MATHFUNC_H
-#define MATHFUNC_H
+#ifndef RTMATH_H
+#define RTMATH_H
 
 #define EPS 1e-7
 #define INF 1e7
@@ -384,4 +377,4 @@ namespace RenderToy
 
 
 }
-#endif // MATHFUNC_H
+#endif // RTMATH_H
