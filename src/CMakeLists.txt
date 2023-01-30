@@ -17,7 +17,8 @@ add_library(RenderToy
             bvh.h bvh.cpp
             material.h material.cpp
             random.h random.cpp
-            surfacepoint.h surfacepoint.cpp)
+            surfacepoint.h surfacepoint.cpp
+            compositor.h compositor.cpp)
 
 set_property(TARGET RenderToy PROPERTY CXX_STANDARD 17)
 

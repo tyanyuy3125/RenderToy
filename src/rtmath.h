@@ -18,6 +18,18 @@ namespace RenderToy
     struct Point;
 
 #pragma region Basic Vector Math
+
+    template <class T, uint32_t d>
+    class Vector
+    {
+        std::array<T, d> val = {};
+
+        Vector() = default;
+        Vector(const std::array<T, d> &val_);
+    };
+
+    using Vector2d = Vector<double, 2>;
+
     class Vector2f
     {
     public:
