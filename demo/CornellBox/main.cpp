@@ -67,7 +67,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 64);
+    PathTracingRenderer renderer(&rc, 256);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
     // NormalRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();

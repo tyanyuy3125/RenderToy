@@ -23,6 +23,8 @@ namespace RenderToy
 #pragma region Basic Vector Math
     template <typename _Tp, std::size_t _Dm>
     struct VectorConstants;
+    template <typename _Tp, size_t _Dm>
+    struct Matrix;
 
     /// @brief Generalized Vector definition.
     /// @tparam _Tp Numerical type.
@@ -34,17 +36,17 @@ namespace RenderToy
         /// @tparam _Tp Numerical type.
         /// @tparam _Dm Dimension.
         constexpr Vector() = default;
-        
+
         /// @brief Construct a vector with each component specified value.
         /// @param ...values Value specification.
         /// @warning You should be careful with the TYPE, or a warning may be generated.
         template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
         constexpr Vector(Args &&...values)
             : arr{std::forward<Args>(values)...} {}
-        
+
         /// @brief Construct a vector with all components the same value.
-        /// @param value 
-        Vector(const _Tp& value)
+        /// @param value
+        Vector(const _Tp &value)
             : arr()
         {
             std::generate(arr.begin(), arr.end(), [&]()
@@ -52,7 +54,7 @@ namespace RenderToy
         }
 
         /// @brief
-        /// @return Returns length of the vector. 
+        /// @return Returns length of the vector.
         inline const _Tp
         Length() const
         {
@@ -71,7 +73,7 @@ namespace RenderToy
                 a /= length;
         }
 
-        /// @brief 
+        /// @brief
         /// @return Returns a normalized copy of the vector.
         inline const Vector
         Normalized() const
@@ -96,40 +98,40 @@ namespace RenderToy
         inline const Vector
         operator+(const Vector &a) const
         {
-            Vector<_Tp, _Dm> ret(*this);
+            Vector<_Tp, _Dm> ret;
             for (size_t i = 0; i < _Dm; ++i)
             {
-                ret.arr[i] += a.arr[i];
+                ret.arr[i] = arr[i] + a.arr[i];
             }
             return ret;
         }
         inline const Vector
         operator-(const Vector &a) const
         {
-            Vector<_Tp, _Dm> ret(*this);
+            Vector<_Tp, _Dm> ret;
             for (size_t i = 0; i < _Dm; ++i)
             {
-                ret.arr[i] -= a.arr[i];
+                ret.arr[i] = arr[i] - a.arr[i];
             }
             return ret;
         }
         inline const Vector
         operator-(void) const
         {
-            Vector<_Tp, _Dm> ret(*this);
+            Vector<_Tp, _Dm> ret;
             for (size_t i = 0; i < _Dm; ++i)
             {
-                ret.arr[i] = -ret.arr[i];
+                ret.arr[i] = -arr[i];
             }
             return ret;
         }
         inline const Vector
         operator*(const _Tp a) const
         {
-            Vector<_Tp, _Dm> ret(*this);
-            for (auto &elem : ret.arr)
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
             {
-                elem *= a;
+                ret.arr[i] = arr[i] * a;
             }
             return ret;
         }
@@ -146,10 +148,10 @@ namespace RenderToy
         inline const Vector
         operator/(const _Tp a) const
         {
-            Vector<_Tp, _Dm> ret(*this);
-            for (_Tp &elem : ret.arr)
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
             {
-                elem /= a;
+                ret.arr[i] = arr[i] / a;
             }
             return ret;
         }
@@ -208,7 +210,7 @@ namespace RenderToy
         inline const bool
         operator!=(const Vector &a) const
         {
-            return !(arr == a.arr);
+            return !((*this) == a);
         }
 
         inline const static _Tp Dot(const Vector &a, const Vector &b)
@@ -361,6 +363,8 @@ namespace RenderToy
             return is;
         }
 
+        friend Matrix<_Tp, _Dm>;
+
     private:
         std::array<_Tp, _Dm> arr = {};
         // _Tp arr[d] = {};
@@ -410,6 +414,105 @@ namespace RenderToy
 #pragma endregion
 
 #pragma region Basic Matrix Math
+
+    template <typename _Tp, size_t _Dm>
+    struct Matrix
+    {
+        typedef Vector<_Tp, _Dm> Vector_Type;
+
+        constexpr Matrix() = default;
+        template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
+        constexpr Matrix(Args &&...rows)
+            : row{std::forward<Args>(rows)...} {}
+
+        constexpr Vector_Type &
+        operator[](const size_t i)
+        {
+            return row[i];
+        }
+
+        constexpr const Vector_Type &
+        operator[](const size_t i) const
+        {
+            return row[i];
+        }
+
+        const bool
+        operator==(const Matrix &a) const
+        {
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                if (row[i] != a.row[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        const bool
+        operator!=(const Matrix &a) const
+        {
+            return !((*this) == a);
+        }
+
+        const Matrix
+        operator+(const Matrix &a) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = row[i] + a.row[i];
+            }
+            return ret;
+        }
+
+        const Matrix
+        operator-(const Matrix &a) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = row[i] - a.row[i];
+            }
+            return ret;
+        }
+
+        const Matrix
+        operator-(void) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = -row[i];
+            }
+            return ret;
+        }
+
+        const Vector_Type operator*(const Vector_Type &a) const
+        {
+            Vector_Type ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = row[i].Dot(a);
+            }
+            return ret;
+        }
+
+        const Matrix operator*(const Matrix &a) const;
+
+        const Matrix &operator+=(const Matrix &a);
+        const Matrix &operator-=(const Matrix &a);
+
+        void Transpose();
+        const Matrix Transposed() const;
+
+        const static float Determinant(const Matrix &mat);
+
+    private:
+        std::array<Vector_Type, _Dm> row = {};
+    };
+
     class Matrix3x3f
     {
     private:
