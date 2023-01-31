@@ -42,12 +42,12 @@ namespace RenderToy
     const Vector3f PrincipledBSDF::EvalDiffuse(const Vector3f Csheen, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
         pdf = 0.0f;
-        if (L.z <= 0.0f)
+        if (L.z() <= 0.0f)
             return Vector3f::O;
 
         // Diffuse
-        float FL = SchlickFresnel(L.z);
-        float FV = SchlickFresnel(V.z);
+        float FL = SchlickFresnel(L.z());
+        float FV = SchlickFresnel(V.z());
         float FH = SchlickFresnel(Vector3f::Dot(L, H));
         float Fd90 = 0.5f + 2.0f * Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
         float Fd = Mix(1.0f, Fd90, FL) * Mix(1.0f, Fd90, FV);
@@ -55,66 +55,66 @@ namespace RenderToy
         // Fake Subsurface TODO: Replace with volumetric scattering
         float Fss90 = Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
         float Fss = Mix(1.0f, Fss90, FL) * Mix(1.0f, Fss90, FV);
-        float ss = 1.25f * (Fss * (1.0f / (L.z + V.z) - 0.5f) + 0.5f);
+        float ss = 1.25f * (Fss * (1.0f / (L.z() + V.z()) - 0.5f) + 0.5f);
 
         // Sheen
         Vector3f Fsheen = FH * sheen * Csheen;
 
-        pdf = L.z * (1.0f / M_PIf32);
+        pdf = L.z() * (1.0f / M_PIf32);
         return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
     }
 
     const Vector3f PrincipledBSDF::EvalSpecReflection(const float eta, const Vector3f specCol, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
         pdf = 0.0f;
-        if (L.z <= 0.0f)
+        if (L.z() <= 0.0f)
             return Vector3f(0.0f);
 
         float FM = FresnelMix(eta, Vector3f::Dot(L, H));
         Vector3f F = Mix(specCol, Vector3f(1.0f), Vector3f(FM));
-        float D = GTR2(H.z, roughness);
-        float G1 = SmithG(std::abs(V.z), roughness);
-        float G2 = G1 * SmithG(std::abs(L.z), roughness);
+        float D = GTR2(H.z(), roughness);
+        float G1 = SmithG(std::abs(V.z()), roughness);
+        float G2 = G1 * SmithG(std::abs(L.z()), roughness);
         float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
 
-        pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z;
-        return F * D * G2 / (4.0f * L.z * V.z);
+        pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z();
+        return F * D * G2 / (4.0f * L.z() * V.z());
     }
 
     const Vector3f PrincipledBSDF::EvalSpecRefraction(const float eta, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
         pdf = 0.0f;
-        if (L.z >= 0.0f)
+        if (L.z() >= 0.0f)
             return Vector3f::O;
 
         float F = DielectricFresnel(std::abs(Vector3f::Dot(V, H)), eta);
-        float D = GTR2(H.z, roughness);
+        float D = GTR2(H.z(), roughness);
         float denom = Vector3f::Dot(L, H) + Vector3f::Dot(V, H) * eta;
         denom *= denom;
-        float G1 = SmithG(std::abs(V.z), roughness);
-        float G2 = G1 * SmithG(std::abs(L.z), roughness);
+        float G1 = SmithG(std::abs(V.z()), roughness);
+        float G2 = G1 * SmithG(std::abs(L.z()), roughness);
         float jacobian = std::abs(Vector3f::Dot(L, H)) / denom;
 
-        pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z;
+        pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z();
 
         Vector3f specColor = Vector3f::Pow(base_color, Vector3f(0.5));
-        return specColor * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z) * std::abs(V.z));
+        return specColor * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z()) * std::abs(V.z()));
     }
 
     const Vector3f PrincipledBSDF::EvalClearcoat(const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
     {
         pdf = 0.0f;
-        if (L.z <= 0.0f)
+        if (L.z() <= 0.0f)
             return Vector3f::O;
 
         float FH = DielectricFresnel(Vector3f::Dot(V, H), 1.0f / 1.5f);
         float F = Mix(0.04f, 1.0f, FH);
-        float D = GTR1(H.z, clearcoat_roughness);
-        float G = SmithG(L.z, 0.25f) * SmithG(V.z, 0.25f);
+        float D = GTR1(H.z(), clearcoat_roughness);
+        float G = SmithG(L.z(), 0.25f) * SmithG(V.z(), 0.25f);
         float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
 
-        pdf = D * H.z * jacobian;
-        return Vector3f(0.25f) * clearcoat * F * D * G / (4.0f * L.z * V.z);
+        pdf = D * H.z() * jacobian;
+        return Vector3f(0.25f) * clearcoat * F * D * G / (4.0f * L.z() * V.z());
     }
 
     void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
@@ -149,16 +149,16 @@ namespace RenderToy
 
         Vector3f T, B;
         Onb(N, T, B);
-        V = ToLocal(T, B, N, V); // NDotL = L.z; NDotV = V.z; NDotH = H.z
+        V = ToLocal(T, B, N, V); // NDotL = L.z(); NDotV = V.z(); NDotH = H.z()
         L = ToLocal(T, B, N, L);
 
         Vector3f H;
-        if (L.z > 0.0)
+        if (L.z() > 0.0)
             H = (L + V).Normalized();
         else
             H = (L + V * eta).Normalized();
 
-        if (H.z < 0.0)
+        if (H.z() < 0.0)
             H = -H;
 
         // Specular and sheen color
@@ -173,34 +173,34 @@ namespace RenderToy
         float pdf;
 
         // Diffuse
-        if (diffuse_weight > 0.0f && L.z > 0.0f)
+        if (diffuse_weight > 0.0f && L.z() > 0.0f)
         {
             f += EvalDiffuse(sheen_color, V, L, H, pdf);
             bsdf_pdf += pdf * diffuse_weight;
         }
 
         // Specular Reflection
-        if (spec_reflect_weight > 0.0f && L.z > 0.0f && V.z > 0.0f)
+        if (spec_reflect_weight > 0.0f && L.z() > 0.0f && V.z() > 0.0f)
         {
             f += EvalSpecReflection(eta, spec_color, V, L, H, pdf);
             bsdf_pdf += pdf * spec_reflect_weight;
         }
 
         // Specular Refraction
-        if (spec_refract_weight > 0.0f && L.z < 0.0f)
+        if (spec_refract_weight > 0.0f && L.z() < 0.0f)
         {
             f += EvalSpecRefraction(eta, V, L, H, pdf);
             bsdf_pdf += pdf * spec_refract_weight;
         }
 
         // Clearcoat
-        if (clearcoat_weight > 0.0f && L.z > 0.0f && V.z > 0.0f)
+        if (clearcoat_weight > 0.0f && L.z() > 0.0f && V.z() > 0.0f)
         {
             f += EvalClearcoat(V, L, H, pdf);
             bsdf_pdf += pdf * clearcoat_weight;
         }
 
-        return f * std::abs(L.z);
+        return f * std::abs(L.z());
     }
 
     const bool PrincipledBSDF::DisneySample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const
@@ -216,7 +216,7 @@ namespace RenderToy
 
         Vector3f T, B;
         Onb(N, T, B);
-        V = ToLocal(T, B, N, V); // NDotL = L.z; NDotV = V.z; NDotH = H.z
+        V = ToLocal(T, B, N, V); // NDotL = L.z(); NDotV = V.z(); NDotH = H.z()
 
         // Specular and sheen color
         Vector3f specCol, sheenCol;
@@ -228,7 +228,7 @@ namespace RenderToy
         float diffuseWt, specReflectWt, specRefractWt, clearcoatWt;
         // TODO: Recheck fresnel. Not sure if correct. VDotN produces fireflies with rough dielectric.
         // VDotH matches Mitsuba and gets rid of all fireflies but H isn't available at this stage
-        float approxFresnel = FresnelMix(eta, V.z);
+        float approxFresnel = FresnelMix(eta, V.z());
         GetLobeProbabilities(eta, specCol, approxFresnel, diffuseWt, specReflectWt, specRefractWt, clearcoatWt);
 
         // CDF for picking a lobe
@@ -253,7 +253,7 @@ namespace RenderToy
             r1 = (r1 - cdf[0]) / (cdf[1] - cdf[0]);
             Vector3f H = SampleGGXVNDF(V, roughness, r1, r2);
 
-            if (H.z < 0.0f)
+            if (H.z() < 0.0f)
                 H = -H;
 
             out_dir = (Reflect(-V, H)).Normalized();
@@ -266,7 +266,7 @@ namespace RenderToy
             r1 = (r1 - cdf[1]) / (cdf[2] - cdf[1]);
             Vector3f H = SampleGGXVNDF(V, roughness, r1, r2);
 
-            if (H.z < 0.0f)
+            if (H.z() < 0.0f)
                 H = -H;
 
             out_dir = Refract(-V, H, eta).Normalized();
@@ -279,7 +279,7 @@ namespace RenderToy
             r1 = (r1 - cdf[2]) / (1.0 - cdf[2]);
             Vector3f H = SampleGTR1(clearcoat_roughness, r1, r2);
 
-            if (H.z < 0.0f)
+            if (H.z() < 0.0f)
                 H = -H;
 
             out_dir = Reflect(-V, H).Normalized();

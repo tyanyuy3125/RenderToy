@@ -9,6 +9,9 @@
 #include <stack>
 #include <cmath>
 #include <algorithm>
+#include <initializer_list>
+#include <complex>
+#include <type_traits>
 
 #include "random.h"
 
@@ -18,164 +21,498 @@ namespace RenderToy
     struct Point;
 
 #pragma region Basic Vector Math
+    template <typename _Tp, std::size_t _Dm>
+    struct VectorConstants;
+    template <typename _Tp, size_t _Dm>
+    struct Matrix;
 
-    template <class T, uint32_t d>
-    class Vector
+    /// @brief Generalized Vector definition.
+    /// @tparam _Tp Numerical type.
+    /// @tparam _Dm Dimension.
+    template <typename _Tp, std::size_t _Dm>
+    struct Vector : VectorConstants<_Tp, _Dm>
     {
-        std::array<T, d> val = {};
+        /// @brief Construct default Vector with all components zero.
+        /// @tparam _Tp Numerical type.
+        /// @tparam _Dm Dimension.
+        constexpr Vector() = default;
 
-        Vector() = default;
-        Vector(const std::array<T, d> &val_);
+        /// @brief Construct a vector with each component specified value.
+        /// @param ...values Value specification.
+        /// @warning You should be careful with the TYPE, or a warning may be generated.
+        template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
+        constexpr Vector(Args &&...values)
+            : arr{std::forward<Args>(values)...} {}
+
+        /// @brief Construct a vector with all components the same value.
+        /// @param value
+        Vector(const _Tp &value)
+            : arr()
+        {
+            std::generate(arr.begin(), arr.end(), [&]()
+                          { return value; });
+        }
+
+        /// @brief
+        /// @return Returns length of the vector.
+        inline const _Tp
+        Length() const
+        {
+            _Tp ret = _Tp(0);
+            for (_Tp a : arr)
+                ret += a * a;
+            return std::sqrt(ret);
+        }
+
+        /// @brief Normalizes the vector itself.
+        inline void
+        Normalize()
+        {
+            _Tp length = Length();
+            for (_Tp &a : arr)
+                a /= length;
+        }
+
+        /// @brief
+        /// @return Returns a normalized copy of the vector.
+        inline const Vector
+        Normalized() const
+        {
+            Vector<_Tp, _Dm> ret(*this);
+            ret.Normalize();
+            return ret;
+        }
+
+        constexpr inline const _Tp &
+        operator[](const size_t i) const
+        {
+            return arr[i];
+        }
+
+        constexpr inline _Tp &
+        operator[](const size_t i)
+        {
+            return arr[i];
+        }
+
+        inline const Vector
+        operator+(const Vector &a) const
+        {
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = arr[i] + a.arr[i];
+            }
+            return ret;
+        }
+        inline const Vector
+        operator-(const Vector &a) const
+        {
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = arr[i] - a.arr[i];
+            }
+            return ret;
+        }
+        inline const Vector
+        operator-(void) const
+        {
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = -arr[i];
+            }
+            return ret;
+        }
+        inline const Vector
+        operator*(const _Tp a) const
+        {
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = arr[i] * a;
+            }
+            return ret;
+        }
+        inline const Vector
+        operator*(const Vector &a) const
+        {
+            Vector<_Tp, _Dm> ret(*this);
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] *= a.arr[i];
+            }
+            return ret;
+        }
+        inline const Vector
+        operator/(const _Tp a) const
+        {
+            Vector<_Tp, _Dm> ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = arr[i] / a;
+            }
+            return ret;
+        }
+
+        inline const Vector &
+        operator+=(const Vector &a)
+        {
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                arr[i] += a.arr[i];
+            }
+            return (*this);
+        }
+        inline const Vector &
+        operator-=(const Vector &a)
+        {
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                arr[i] -= a.arr[i];
+            }
+            return (*this);
+        }
+        inline const Vector &
+        operator*=(const _Tp a)
+        {
+            for (_Tp &elem : arr)
+            {
+                elem *= a;
+            }
+            return (*this);
+        }
+        inline const Vector &
+        operator/=(const _Tp a)
+        {
+            for (_Tp &elem : arr)
+            {
+                elem /= a;
+            }
+            return (*this);
+        }
+
+        inline const bool
+        operator==(const Vector &a) const
+        {
+            // return arr == a.arr;
+            for (int i = 0; i < _Dm; ++i)
+            {
+                if (std::abs(arr[i] - a.arr[i]) > EPS)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        inline const bool
+        operator!=(const Vector &a) const
+        {
+            return !((*this) == a);
+        }
+
+        inline const static _Tp Dot(const Vector &a, const Vector &b)
+        {
+            _Tp ret(0);
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret += a.arr[i] * b.arr[i];
+            }
+            return ret;
+        }
+
+        inline const static Vector
+        Pow(const Vector &a, const Vector &b)
+        {
+            Vector ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = std::pow(a.arr[i], b.arr[i]);
+            }
+            return ret;
+        }
+
+        const static Vector
+        Log(const Vector &a)
+        {
+            Vector ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = std::log(a.arr[i]);
+            }
+            return ret;
+        }
+
+        inline const _Tp
+        Dot(const Vector &a) const
+        {
+            _Tp ret(0);
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret += arr[i] * a.arr[i];
+            }
+            return ret;
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<I == 2, bool> = true>
+        constexpr inline const static Vector
+        Cross(const Vector &a, const Vector &b)
+        {
+            return a.arr[0] * b.arr[1] - a.arr[1] * b.arr[0];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<I == 2, bool> = true>
+        constexpr inline const Vector
+        Cross(const Vector &a) const
+        {
+            return arr[0] * a.arr[1] - arr[1] * a.arr[0];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<I == 3, bool> = true>
+        constexpr inline const static Vector
+        Cross(const Vector &a, const Vector &b)
+        {
+            return Vector(a.arr[1] * b.arr[2] - a.arr[2] * b.arr[1],
+                          a.arr[2] * b.arr[0] - a.arr[0] * b.arr[2],
+                          a.arr[0] * b.arr[1] - a.arr[1] * b.arr[0]);
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<I == 3, bool> = true>
+        constexpr inline const Vector
+        Cross(const Vector &a) const
+        {
+            return Vector(arr[1] * a.arr[2] - arr[2] * a.arr[1],
+                          arr[2] * a.arr[0] - arr[0] * a.arr[2],
+                          arr[0] * a.arr[1] - arr[1] * a.arr[0]);
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 0), bool> = true>
+        constexpr inline _Tp &
+        x()
+        {
+            return arr[0];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 0), bool> = true>
+        constexpr inline const _Tp &
+        x() const
+        {
+            return arr[0];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 1), bool> = true>
+        constexpr inline _Tp &
+        y()
+        {
+            return arr[1];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 1), bool> = true>
+        constexpr inline const _Tp &
+        y() const
+        {
+            return arr[1];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 2), bool> = true>
+        constexpr inline _Tp &
+        z()
+        {
+            return arr[2];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 2), bool> = true>
+        constexpr inline const _Tp &
+        z() const
+        {
+            return arr[2];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 3), bool> = true>
+        constexpr inline _Tp &
+        w()
+        {
+            return arr[3];
+        }
+
+        template <int..., size_t I = _Dm, std::enable_if_t<(I > 3), bool> = true>
+        constexpr inline const _Tp &
+        w() const
+        {
+            return arr[3];
+        }
+
+        friend inline const Vector operator*(const float lambda, const Vector &a)
+        {
+            Vector ret(a);
+            for (auto &val : ret.arr)
+            {
+                val *= lambda;
+            }
+            return ret;
+        }
+
+        friend std::istream &operator>>(std::istream &is, Vector &a)
+        {
+            for (int i = 0; i < _Dm; ++i)
+            {
+                is >> a.arr[i];
+            }
+            return is;
+        }
+
+        friend Matrix<_Tp, _Dm>;
+
+    private:
+        std::array<_Tp, _Dm> arr = {};
+        // _Tp arr[d] = {};
+    };
+
+    template <typename _Tp, size_t _Dm>
+    struct VectorConstants
+    {
+    };
+
+    template <typename _Tp>
+    struct VectorConstants<_Tp, 2>
+    {
+        constexpr static Vector<_Tp, 2> O = Vector<_Tp, 2>(_Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 2> X = Vector<_Tp, 2>(_Tp(1), _Tp(0));
+        constexpr static Vector<_Tp, 2> Y = Vector<_Tp, 2>(_Tp(0), _Tp(1));
+    };
+
+    template <typename _Tp>
+    struct VectorConstants<_Tp, 3>
+    {
+        constexpr static Vector<_Tp, 3> O = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 3> X = Vector<_Tp, 3>(_Tp(1), _Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 3> Y = Vector<_Tp, 3>(_Tp(0), _Tp(1), _Tp(0));
+        constexpr static Vector<_Tp, 3> Z = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(1));
+        constexpr static Vector<_Tp, 3> White = Vector<_Tp, 3>(_Tp(1), _Tp(1), _Tp(1));
+    };
+
+    template <typename _Tp>
+    struct VectorConstants<_Tp, 4>
+    {
+        constexpr static Vector<_Tp, 4> O = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 4> X = Vector<_Tp, 4>(_Tp(1), _Tp(0), _Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 4> Y = Vector<_Tp, 4>(_Tp(0), _Tp(1), _Tp(0), _Tp(0));
+        constexpr static Vector<_Tp, 4> Z = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(1), _Tp(0));
+        constexpr static Vector<_Tp, 4> W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
     };
 
     using Vector2d = Vector<double, 2>;
+    using Vector3d = Vector<double, 3>;
+    using Vector4d = Vector<double, 4>;
 
-    class Vector2f
-    {
-    public:
-        const static Vector2f O;
-        const static Vector2f X;
-        const static Vector2f Y;
-
-        float x, y;
-
-        Vector2f();
-        Vector2f(const float x_, const float y_);
-        Vector2f(const std::array<float, 2> &tuple);
-        Vector2f(const Point &p);
-
-        float Length() const;
-
-        void Normalize();
-        const Vector2f Normalized() const;
-
-        float &operator[](const size_t i);
-        const float operator[](const size_t i) const;
-
-        const Vector2f operator+(const Vector2f &a) const;
-        const Vector2f operator-(const Vector2f &a) const;
-        const Vector2f operator-(void) const;
-        const Vector2f operator*(const float a) const;
-        const Vector2f operator/(const float a) const;
-
-        const Vector2f &operator+=(const Vector2f &a);
-        const Vector2f &operator-=(const Vector2f &a);
-        const Vector2f &operator*=(const float a);
-        const Vector2f &operator/=(const float a);
-
-        const bool operator==(const Vector2f &a) const;
-
-        const static float Dot(const Vector2f &a, const Vector2f &b);
-        const static float Cross(const Vector2f &a, const Vector2f &b);
-    };
-
-    const Vector2f operator*(const float lambda, const Vector2f &a);
-    std::istream &operator>>(std::istream &is, Vector2f &a);
-
-    class Vector3f
-    {
-    public:
-        const static Vector3f O;
-        const static Vector3f X;
-        const static Vector3f Y;
-        const static Vector3f Z;
-        const static Vector3f White;
-        const static Vector3f Inf;
-
-        float x, y, z;
-
-        Vector3f();
-        Vector3f(const float x_, const float y_, const float z_);
-        Vector3f(const std::array<float, 3> &triple);
-        Vector3f(const Vector2f &vec2, float val3);
-        Vector3f(const float val);
-
-        float Length() const;
-
-        void Normalize();
-        const Vector3f Normalized() const;
-
-        float &operator[](const size_t i);
-        const float operator[](const size_t i) const;
-
-        const Vector3f operator+(const Vector3f &a) const;
-        const Vector3f operator-(const Vector3f &a) const;
-        const Vector3f operator-(void) const;
-        const Vector3f operator*(const float a) const;
-        const Vector3f operator*(const Vector3f &vec) const;
-        const Vector3f operator/(const float a) const;
-
-        const Vector3f &operator+=(const Vector3f &a);
-        const Vector3f &operator-=(const Vector3f &a);
-        const Vector3f &operator*=(const float a);
-        const Vector3f &operator/=(const float a);
-
-        const bool operator==(const Vector3f &a) const;
-        const bool operator!=(const Vector3f &a) const;
-
-        const static float Dot(const Vector3f &a, const Vector3f &b);
-        const static Vector3f Cross(const Vector3f &a, const Vector3f &b);
-        /// @brief GLSL-like respective pow.
-        /// @param a
-        /// @param b
-        /// @return
-        const static Vector3f Pow(const Vector3f &a, const Vector3f &b);
-
-        const float Dot(const Vector3f &a) const;
-        const Vector3f Cross(const Vector3f &a) const;
-
-        const static Vector3f Log(const Vector3f &a);
-    };
-
-    const Vector3f operator*(const float lambda, const Vector3f &a);
-    std::istream &operator>>(std::istream &is, Vector3f &a);
-
-    class Vector4f
-    {
-    public:
-        const static Vector4f O;
-        const static Vector4f X;
-        const static Vector4f Y;
-        const static Vector4f Z;
-        const static Vector4f W;
-
-        float x, y, z, w;
-
-        Vector4f();
-        Vector4f(const float x_, const float y_, const float z_, const float w_);
-        Vector4f(const std::array<float, 4> &quadruple);
-        Vector4f(const Vector3f &Vector3f, float val4);
-
-        float Length() const;
-
-        void Normalize();
-        const Vector4f Normalized() const;
-
-        float &operator[](const size_t i);
-        const float operator[](const size_t i) const;
-
-        const Vector4f operator+(const Vector4f &a) const;
-        const Vector4f operator-(const Vector4f &a) const;
-        const Vector4f operator-(void) const;
-        const Vector4f operator*(const float a) const;
-        const Vector4f operator/(const float a) const;
-
-        const Vector4f &operator+=(const Vector4f &a);
-        const Vector4f &operator-=(const Vector4f &a);
-        const Vector4f &operator*=(const float a);
-        const Vector4f &operator/=(const float a);
-
-        const bool operator==(const Vector4f &a) const;
-
-        const static float Dot(const Vector4f &a, const Vector4f &b);
-        const static Vector4f Cross(const Vector4f &a, const Vector4f &b);
-    };
-
-    const Vector4f operator*(const float lambda, const Vector4f &a);
+    using Vector2f = Vector<float, 2>;
+    using Vector3f = Vector<float, 3>;
+    using Vector4f = Vector<float, 4>;
 
 #pragma endregion
 
 #pragma region Basic Matrix Math
+
+    template <typename _Tp, size_t _Dm>
+    struct Matrix
+    {
+        typedef Vector<_Tp, _Dm> Vector_Type;
+
+        constexpr Matrix() = default;
+        template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
+        constexpr Matrix(Args &&...rows)
+            : row{std::forward<Args>(rows)...} {}
+
+        constexpr Vector_Type &
+        operator[](const size_t i)
+        {
+            return row[i];
+        }
+
+        constexpr const Vector_Type &
+        operator[](const size_t i) const
+        {
+            return row[i];
+        }
+
+        const bool
+        operator==(const Matrix &a) const
+        {
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                if (row[i] != a.row[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        const bool
+        operator!=(const Matrix &a) const
+        {
+            return !((*this) == a);
+        }
+
+        const Matrix
+        operator+(const Matrix &a) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = row[i] + a.row[i];
+            }
+            return ret;
+        }
+
+        const Matrix
+        operator-(const Matrix &a) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = row[i] - a.row[i];
+            }
+            return ret;
+        }
+
+        const Matrix
+        operator-(void) const
+        {
+            Matrix ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.row[i] = -row[i];
+            }
+            return ret;
+        }
+
+        const Vector_Type operator*(const Vector_Type &a) const
+        {
+            Vector_Type ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = row[i].Dot(a);
+            }
+            return ret;
+        }
+
+        const Matrix operator*(const Matrix &a) const;
+
+        const Matrix &operator+=(const Matrix &a);
+        const Matrix &operator-=(const Matrix &a);
+
+        void Transpose();
+        const Matrix Transposed() const;
+
+        const static float Determinant(const Matrix &mat);
+
+    private:
+        std::array<Vector_Type, _Dm> row = {};
+    };
+
     class Matrix3x3f
     {
     private:
@@ -376,10 +713,10 @@ namespace RenderToy
     const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
     const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
 
-    template <typename T>
-    const T Mix(const T x, const T y, const T a)
+    template <typename _Tp>
+    const _Tp Mix(const _Tp x, const _Tp y, const _Tp a)
     {
-        return x * (T(1) - a) + y * a;
+        return x * (_Tp(1) - a) + y * a;
     }
 
 }

@@ -19,396 +19,6 @@ inline __m128 mul4(const float *p1, const float *p2)
 
 namespace RenderToy
 {
-    Vector3f::Vector3f(const float x_, const float y_, const float z_) : x(x_), y(y_), z(z_) {}
-    Vector3f::Vector3f() : Vector3f(0.0f, 0.0f, 0.0f) {}
-    Vector3f::Vector3f(const std::array<float, 3> &triple) : Vector3f(triple[0], triple[1], triple[2]) {}
-
-    Vector3f::Vector3f(const Vector2f &vec2, float val3)
-        : x(vec2.x), y(vec2.y), z(val3)
-    {
-    }
-
-    Vector3f::Vector3f(const float val)
-        : Vector3f(val, val, val)
-    {
-    }
-
-    const Vector3f Vector3f::O = Vector3f();
-    const Vector3f Vector3f::X = Vector3f(1.0f, 0.0f, 0.0f);
-    const Vector3f Vector3f::Y = Vector3f(0.0f, 1.0f, 0.0f);
-    const Vector3f Vector3f::Z = Vector3f(0.0f, 0.0f, 1.0f);
-    const Vector3f Vector3f::White = Vector3f(1.0f, 1.0f, 1.0f);
-    const Vector3f Vector3f::Inf = Vector3f(INF, INF, INF);
-
-    float Vector3f::Length() const
-    {
-        return sqrt(x * x + y * y + z * z);
-    }
-
-    void Vector3f::Normalize()
-    {
-        (*this) /= Length();
-    }
-
-    const Vector3f Vector3f::Normalized() const
-    {
-        return Vector3f(*this) / Length();
-    }
-
-    float &Vector3f::operator[](const size_t i)
-    {
-        return *((&x) + i);
-    }
-
-    const float Vector3f::operator[](const size_t i) const
-    {
-        return *((&x) + i);
-    }
-
-    const Vector3f Vector3f::operator+(const Vector3f &a) const
-    {
-        return Vector3f(x + a.x, y + a.y, z + a.z);
-    }
-
-    const Vector3f Vector3f::operator-(const Vector3f &a) const
-    {
-        return Vector3f(x - a.x, y - a.y, z - a.z);
-    }
-
-    const Vector3f Vector3f::operator-(void) const
-    {
-        return Vector3f(-x, -y, -z);
-    }
-
-    const Vector3f Vector3f::operator*(const float a) const
-    {
-        return Vector3f(x * a, y * a, z * a);
-    }
-
-    const Vector3f Vector3f::operator*(const Vector3f &vec) const
-    {
-        return Vector3f(x * vec.x, y * vec.y, z * vec.z);
-    }
-
-    const Vector3f Vector3f::operator/(const float a) const
-    {
-        return Vector3f(x / a, y / a, z / a);
-    }
-
-    const Vector3f &Vector3f::operator+=(const Vector3f &a)
-    {
-        x += a.x;
-        y += a.y;
-        z += a.z;
-        return (*this);
-    }
-
-    const Vector3f &Vector3f::operator-=(const Vector3f &a)
-    {
-        x -= a.x;
-        y -= a.y;
-        z -= a.z;
-        return (*this);
-    }
-
-    const Vector3f &Vector3f::operator*=(const float a)
-    {
-        x *= a;
-        y *= a;
-        z *= a;
-        return (*this);
-    }
-
-    const Vector3f &Vector3f::operator/=(const float a)
-    {
-        x /= a;
-        y /= a;
-        z /= a;
-        return (*this);
-    }
-
-    const bool Vector3f::operator==(const Vector3f &a) const
-    {
-        return ((std::abs(x - a.x) < EPS) && (std::abs(y - a.y) < EPS) && (std::abs(z - a.z) < EPS));
-    }
-
-    const bool Vector3f::operator!=(const Vector3f &a) const
-    {
-        return !((*this) == a);
-    }
-
-    const Vector3f operator*(const float lambda, const Vector3f &a)
-    {
-        return a * lambda;
-    }
-
-    const float Vector3f::Dot(const Vector3f &a, const Vector3f &b)
-    {
-        return a.x * b.x + a.y * b.y + a.z * b.z;
-    }
-
-    const Vector3f Vector3f::Cross(const Vector3f &a, const Vector3f &b)
-    {
-        return Vector3f(a.y * b.z - a.z * b.y,
-                        a.z * b.x - a.x * b.z,
-                        a.x * b.y - a.y * b.x);
-    }
-
-    const Vector3f Vector3f::Pow(const Vector3f &a, const Vector3f &b)
-    {
-        return Vector3f(std::pow(a.x, b.x), std::pow(a.y, b.y), std::pow(a.z, b.z));
-    }
-
-    const float Vector3f::Dot(const Vector3f &a) const
-    {
-        return x * a.x + y * a.y + z * a.z;
-    }
-
-    const Vector3f Vector3f::Cross(const Vector3f &a) const
-    {
-        return Vector3f(y * a.z - z * a.y,
-                        z * a.x - x * a.z,
-                        x * a.y - y * a.x);
-    }
-
-    const Vector3f Vector3f::Log(const Vector3f &a)
-    {
-        return Vector3f(std::log(a.x), std::log(a.y), std::log(a.z));
-    }
-
-    std::istream &operator>>(std::istream &is, Vector3f &a)
-    {
-        is >> a.x >> a.y >> a.z;
-        return is;
-    }
-
-    Vector2f::Vector2f(const float x_, const float y_) : x(x_), y(y_) {}
-    Vector2f::Vector2f() : Vector2f(0.0f, 0.0f) {}
-    Vector2f::Vector2f(const std::array<float, 2> &tuple) : Vector2f(tuple[0], tuple[1]) {}
-
-    Vector2f::Vector2f(const Point &p)
-        : x(p.x), y(p.y)
-    {
-    }
-
-    const Vector2f Vector2f::O = Vector2f();
-    const Vector2f Vector2f::X = Vector2f(1.0f, 0.0f);
-    const Vector2f Vector2f::Y = Vector2f(0.0f, 1.0f);
-
-    float Vector2f::Length() const
-    {
-        return sqrt(x * x + y * y);
-    }
-
-    void Vector2f::Normalize()
-    {
-        (*this) /= Length();
-    }
-
-    const Vector2f Vector2f::Normalized() const
-    {
-        return Vector2f(*this) / Length();
-    }
-
-    float &Vector2f::operator[](const size_t i)
-    {
-        return *((&x) + i);
-    }
-
-    const float Vector2f::operator[](const size_t i) const
-    {
-        return *((&x) + i);
-    }
-
-    const Vector2f Vector2f::operator+(const Vector2f &a) const
-    {
-        return Vector2f(x + a.x, y + a.y);
-    }
-
-    const Vector2f Vector2f::operator-(const Vector2f &a) const
-    {
-        return Vector2f(x - a.x, y - a.y);
-    }
-
-    const Vector2f Vector2f::operator-(void) const
-    {
-        return Vector2f(-x, -y);
-    }
-
-    const Vector2f Vector2f::operator*(const float a) const
-    {
-        return Vector2f(x * a, y * a);
-    }
-
-    const Vector2f Vector2f::operator/(const float a) const
-    {
-        return Vector2f(x / a, y / a);
-    }
-
-    const Vector2f &Vector2f::operator+=(const Vector2f &a)
-    {
-        x += a.x;
-        y += a.y;
-        return (*this);
-    }
-
-    const Vector2f &Vector2f::operator-=(const Vector2f &a)
-    {
-        x -= a.x;
-        y -= a.y;
-        return (*this);
-    }
-
-    const Vector2f &Vector2f::operator*=(const float a)
-    {
-        x *= a;
-        y *= a;
-        return (*this);
-    }
-
-    const Vector2f &Vector2f::operator/=(const float a)
-    {
-        x /= a;
-        y /= a;
-        return (*this);
-    }
-
-    const bool Vector2f::operator==(const Vector2f &a) const
-    {
-        return ((std::abs(x - a.x) < EPS) && (std::abs(y - a.y) < EPS));
-    }
-
-    const Vector2f operator*(const float lambda, const Vector2f &a)
-    {
-        return a * lambda;
-    }
-
-    const float Vector2f::Dot(const Vector2f &a, const Vector2f &b)
-    {
-        return a.x * b.x + a.y * b.y;
-    }
-
-    const float Vector2f::Cross(const Vector2f &a, const Vector2f &b)
-    {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    std::istream &operator>>(std::istream &is, Vector2f &a)
-    {
-        is >> a.x >> a.y;
-        return is;
-    }
-
-    Vector4f::Vector4f(const float x_, const float y_, const float z_, const float w_) : x(x_), y(y_), z(z_), w(w_) {}
-    Vector4f::Vector4f() : Vector4f(0.0f, 0.0f, 0.0f, 0.0f) {}
-    Vector4f::Vector4f(const std::array<float, 4> &quadruple) : Vector4f(quadruple[0], quadruple[1], quadruple[2], quadruple[3]) {}
-
-    Vector4f::Vector4f(const Vector3f &vec3, float val4)
-        : Vector4f(vec3[0], vec3[1], vec3[2], val4)
-    {
-    }
-
-    const Vector4f Vector4f::O = Vector4f();
-    const Vector4f Vector4f::X = Vector4f(1.0f, 0.0f, 0.0f, 0.0f);
-    const Vector4f Vector4f::Y = Vector4f(0.0f, 1.0f, 0.0f, 0.0f);
-    const Vector4f Vector4f::Z = Vector4f(0.0f, 0.0f, 1.0f, 0.0f);
-    const Vector4f Vector4f::W = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
-
-    float Vector4f::Length() const
-    {
-        return sqrt(x * x + y * y + z * z + w * w);
-    }
-
-    void Vector4f::Normalize()
-    {
-        (*this) /= Length();
-    }
-
-    const Vector4f Vector4f::Normalized() const
-    {
-        return Vector4f(*this) / Length();
-    }
-
-    float &Vector4f::operator[](const size_t i)
-    {
-        return *((&x) + i);
-    }
-
-    const float Vector4f::operator[](const size_t i) const
-    {
-        return *((&x) + i);
-    }
-
-    const Vector4f Vector4f::operator+(const Vector4f &a) const
-    {
-        return Vector4f(x + a.x, y + a.y, z + a.z, w + a.w);
-    }
-
-    const Vector4f Vector4f::operator-(const Vector4f &a) const
-    {
-        return Vector4f(x - a.x, y - a.y, z - a.z, w - a.w);
-    }
-
-    const Vector4f Vector4f::operator-(void) const
-    {
-        return Vector4f(-x, -y, -z, -w);
-    }
-
-    const Vector4f Vector4f::operator*(const float a) const
-    {
-        return Vector4f(x * a, y * a, z * a, w * a);
-    }
-
-    const Vector4f Vector4f::operator/(const float a) const
-    {
-        return Vector4f(x / a, y / a, z / a, w / a);
-    }
-
-    const Vector4f &Vector4f::operator+=(const Vector4f &a)
-    {
-        x += a.x;
-        y += a.y;
-        z += a.z;
-        w += a.w;
-        return (*this);
-    }
-
-    const Vector4f &Vector4f::operator-=(const Vector4f &a)
-    {
-        x -= a.x;
-        y -= a.y;
-        z -= a.z;
-        w -= a.w;
-        return (*this);
-    }
-
-    const Vector4f &Vector4f::operator*=(const float a)
-    {
-        x *= a;
-        y *= a;
-        z *= a;
-        w *= a;
-        return (*this);
-    }
-
-    const Vector4f &Vector4f::operator/=(const float a)
-    {
-        x /= a;
-        y /= a;
-        z /= a;
-        w /= a;
-        return (*this);
-    }
-
-    const bool Vector4f::operator==(const Vector4f &a) const
-    {
-        return ((std::abs(x - a.x) < EPS) && (std::abs(y - a.y) < EPS) && (std::abs(z - a.z) < EPS) && (std::abs(w - a.w) < EPS));
-    }
-
-    const Vector4f operator*(const float lambda, const Vector4f &a)
-    {
-        return a * lambda;
-    }
 
     const float SSE_InvSqrt(const float number)
     {
@@ -421,7 +31,7 @@ namespace RenderToy
 
     const float Luma(const Vector3f &color)
     {
-        return Vector3f::Dot(color, Vector3f(0.299, 0.587, 0.114));
+        return Vector3f::Dot(color, Vector3f(0.299f, 0.587f, 0.114f));
     }
 
     const float Convert::InchToMM(const float inch)
@@ -446,55 +56,36 @@ namespace RenderToy
         float v = (0.317398726 + 4.22806245e-5 * t + 4.20481691e-8 * tt) / (1.0 - 2.89741816e-5 * t + 1.61456053e-7 * tt);
 
         // CIE 1960 UCS -> CIE xyY, Y = 1
-        Vector2f xyy = Vector2f(3.0 * u, 2.0 * v) / (2.0 * u - 8.0 * v + 4.0);
+        Vector2f xyy = Vector2f(3.0f * u, 2.0f * v) / (2.0 * u - 8.0 * v + 4.0);
 
         // CIE xyY -> CIE XYZ
-        Vector3f xyz = Vector3f(xyy.x / xyy.y, 1.0, (1.0 - xyy.x - xyy.y) / xyy.y);
+        Vector3f xyz = Vector3f(xyy.x() / xyy.y(), 1.0f, (1.0f - xyy.x() - xyy.y()) / xyy.y());
 
         // CIE XYZ -> linear sRGB
         Vector3f srgb = XYZToSRGB(xyz);
 
         // Normalize RGB to preserve chromaticity
-        return srgb / std::max(srgb.x, std::max(srgb.y, srgb.z));
+        return srgb / std::max(srgb.x(), std::max(srgb.y(), srgb.z()));
     }
 
     const Vector3f Convert::XYZToSRGB(const Vector3f &x)
     {
         // Source: http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
         const Matrix3x3f matrix = {
-            {3.2404542, -1.5371385, -0.4985314},
-            {-0.9692660, 1.8760108, 0.0415560},
-            {0.0556434, -0.2040259, 1.0572252}};
+            {3.2404542f, -1.5371385f, -0.4985314f},
+            {-0.9692660f, 1.8760108f, 0.0415560f},
+            {0.0556434f, -0.2040259f, 1.0572252f}};
         return matrix * x;
     }
 
     const float Convert::RGBToLuminance(const Vector3f &vec)
     {
-        return 0.212671 * vec.x + 0.715160 * vec.y + 0.072169 * vec.z;
+        return 0.212671 * vec.x() + 0.715160 * vec.y() + 0.072169 * vec.z();
     }
 
     const Vector3f Convert::Tonemap(const Vector3f &vec, const float limit)
     {
         return vec * 1.0f / (1.0f + RGBToLuminance(vec) / limit);
-    }
-
-    const float Vector4f::Dot(const Vector4f &a, const Vector4f &b)
-    {
-        // It is NOT recommended to enable SIMD instructions in vector computations.
-#ifndef ENABLE_VECTOR_SIMD
-        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-#else
-        const __m128 mul_arr = mul4<0>(&a.x, &b.x);
-        const __m128 r2 = _mm_add_ps(mul_arr, _mm_movehl_ps(mul_arr, mul_arr));
-        const __m128 r1 = _mm_add_ps(r2, _mm_movehdup_ps(r2));
-        return _mm_cvtss_f32(r1);
-#endif
-    }
-
-    const Vector4f Vector4f::Cross(const Vector4f &a, const Vector4f &b)
-    {
-        // TODO <tianyu@illumiart.net>: Implement 4D-vector cross product ustd::sing matrix operation.
-        return Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     Matrix4x4f::Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3)
@@ -915,7 +506,7 @@ namespace RenderToy
     }
 
     Point::Point(const Vector2f &vec)
-        : x(int(vec.x)), y(int(vec.y))
+        : x(int(vec.x())), y(int(vec.y()))
     {
     }
 
@@ -935,7 +526,7 @@ namespace RenderToy
     }
 
     Size::Size(const Vector2f &vec)
-        : width(int(vec.x)), height(int(vec.y))
+        : width(int(vec.x())), height(int(vec.y()))
     {
     }
 
@@ -975,7 +566,8 @@ namespace RenderToy
 
     void Matrix4x4fStack::Transform(Vector3f &vec3) const
     {
-        Vector4f vec4(vec3, 1.0f);
+        // Vector4f vec4(vec3, 1.0f);
+        Vector4f vec4(vec3.x(), vec3.y(), vec3.z(), 1.0f); // TODO: Optimize.
         vec4 = accumulated.top() * vec4;
         vec3 = Vector3f(vec4[0], vec4[1], vec4[2]);
     }
@@ -994,9 +586,9 @@ namespace RenderToy
     {
         // TODO: Optimize.
 
-        auto x = euler_xyz.x;
-        auto y = euler_xyz.y;
-        auto z = euler_xyz.z;
+        auto x = euler_xyz.x();
+        auto y = euler_xyz.y();
+        auto z = euler_xyz.z();
         Matrix4x4f Z = {{std::cos(z), -std::sin(z), 0.0f, 0.0f},
                         {std::sin(z), std::cos(z), 0.0f, 0.0f},
                         {0.0f, 0.0f, 1.0f, 0.0f},
@@ -1062,22 +654,22 @@ namespace RenderToy
 
     const Vector3f SampleGGXVNDF(const Vector3f V, const float rgh, const float r1, const float r2)
     {
-        Vector3f Vh = Vector3f(rgh * V.x, rgh * V.y, V.z).Normalized();
+        Vector3f Vh = Vector3f(rgh * V.x(), rgh * V.y(), V.z()).Normalized();
 
-        float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
-        Vector3f T1 = lensq > 0.0f ? Vector3f(-Vh.y, Vh.x, 0.0f) * (1.0f / std::sqrt(lensq)) : Vector3f(1, 0, 0);
+        float lensq = Vh.x() * Vh.x() + Vh.y() * Vh.y();
+        Vector3f T1 = lensq > 0.0f ? Vector3f(-Vh.y(), Vh.x(), 0.0f) * (1.0f / std::sqrt(lensq)) : Vector3f(1.0f, 0.0f, 0.0f);
         Vector3f T2 = Vector3f::Cross(Vh, T1);
 
         float r = sqrt(r1);
         float phi = 2.0f * M_PIf32 * r2;
         float t1 = r * std::cos(phi);
         float t2 = r * std::sin(phi);
-        float s = 0.5f * (1.0f + Vh.z);
+        float s = 0.5f * (1.0f + Vh.z());
         t2 = (1.0f - s) * std::sqrt(1.0f - t1 * t1) + s * t2;
 
         Vector3f Nh = t1 * T1 + t2 * T2 + std::sqrt(std::max(0.0f, 1.0f - t1 * t1 - t2 * t2)) * Vh;
 
-        return Vector3f(rgh * Nh.x, rgh * Nh.y, std::max(0.0f, Nh.z)).Normalized();
+        return Vector3f(rgh * Nh.x(), rgh * Nh.y(), std::max(0.0f, Nh.z())).Normalized();
     }
 
     const float GTR2Aniso(const float NDotH, const float HDotX, const float HDotY, const float ax, const float ay)
@@ -1142,9 +734,9 @@ namespace RenderToy
         Vector3f dir;
         float r = std::sqrt(r1);
         float phi = 2.0f * M_PIf32 * r2;
-        dir.x = r * std::cos(phi);
-        dir.y = r * std::sin(phi);
-        dir.z = std::sqrt(std::max(0.0f, 1.0f - dir.x * dir.x - dir.y * dir.y));
+        dir.x() = r * std::cos(phi);
+        dir.y() = r * std::sin(phi);
+        dir.z() = std::sqrt(std::max(0.0f, 1.0f - dir.x() * dir.x() - dir.y() * dir.y()));
         return dir;
     }
 
@@ -1171,14 +763,14 @@ namespace RenderToy
 
     void Onb(const Vector3f N, Vector3f &T, Vector3f &B)
     {
-        Vector3f up = std::abs(N.z) < 0.999f ? Vector3f(0, 0, 1) : Vector3f(1, 0, 0);
+        Vector3f up = std::abs(N.z()) < 0.999f ? Vector3f(0.0f, 0.0f, 1.0f) : Vector3f(1.0f, 0.0f, 0.0f);
         T = Vector3f::Cross(up, N).Normalized();
         B = Vector3f::Cross(N, T);
     }
 
     const Vector3f ToWorld(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V)
     {
-        return V.x * X + V.y * Y + V.z * Z;
+        return V.x() * X + V.y() * Y + V.z() * Z;
     }
 
     const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V)

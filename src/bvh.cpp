@@ -18,16 +18,16 @@ namespace RenderToy
 
     const bool BoundingBox::Intersect(const Ray &ray, float &t_min, float &t_max)
     {
-        float tmin = (vmin.x - ray.src.x) / ray.direction.x;
-        float tmax = (vmax.x - ray.src.x) / ray.direction.x;
+        float tmin = (vmin.x() - ray.src.x()) / ray.direction.x();
+        float tmax = (vmax.x() - ray.src.x()) / ray.direction.x();
 
         if (tmin > tmax)
         {
             std::swap(tmin, tmax);
         }
 
-        float tymin = (vmin.y - ray.src.y) / ray.direction.y;
-        float tymax = (vmax.y - ray.src.y) / ray.direction.y;
+        float tymin = (vmin.y() - ray.src.y()) / ray.direction.y();
+        float tymax = (vmax.y() - ray.src.y()) / ray.direction.y();
 
         if (tymin > tymax)
         {
@@ -45,8 +45,8 @@ namespace RenderToy
         if (tymax < tmax)
             tmax = tymax;
 
-        float tzmin = (vmin.z - ray.src.z) / ray.direction.z;
-        float tzmax = (vmax.z - ray.src.z) / ray.direction.z;
+        float tzmin = (vmin.z() - ray.src.z()) / ray.direction.z();
+        float tzmax = (vmax.z() - ray.src.z()) / ray.direction.z();
 
         if (tzmin > tzmax)
         {
@@ -75,12 +75,12 @@ namespace RenderToy
 
     void BoundingBox::ExtendBy(const BoundingBox &bbox)
     {
-        vmin = {std::min(vmin.x, bbox.vmin.x),
-                std::min(vmin.y, bbox.vmin.y),
-                std::min(vmin.z, bbox.vmin.z)};
-        vmax = {std::max(vmax.x, bbox.vmax.x),
-                std::max(vmax.y, bbox.vmax.y),
-                std::max(vmax.z, bbox.vmax.z)};
+        vmin = {std::min(vmin.x(), bbox.vmin.x()),
+                std::min(vmin.y(), bbox.vmin.y()),
+                std::min(vmin.z(), bbox.vmin.z())};
+        vmax = {std::max(vmax.x(), bbox.vmax.x()),
+                std::max(vmax.y(), bbox.vmax.y()),
+                std::max(vmax.z(), bbox.vmax.z())};
     }
 
     const Vector3f BoundingBox::Centroid() const
@@ -150,40 +150,40 @@ namespace RenderToy
             BoundingBox child_bbox;
             uint8_t child_index = 0;
 
-            if (bbox_insert_centroid.x > node_centroid.x)
+            if (bbox_insert_centroid.x() > node_centroid.x())
             {
                 child_index = 4;
-                child_bbox.vmin.x = node_centroid.x;
-                child_bbox.vmax.x = bbox.vmax.x;
+                child_bbox.vmin.x() = node_centroid.x();
+                child_bbox.vmax.x() = bbox.vmax.x();
             }
             else
             {
-                child_bbox.vmin.x = bbox.vmin.x;
-                child_bbox.vmax.x = node_centroid.x;
+                child_bbox.vmin.x() = bbox.vmin.x();
+                child_bbox.vmax.x() = node_centroid.x();
             }
 
-            if (bbox_insert_centroid.y > node_centroid.y)
+            if (bbox_insert_centroid.y() > node_centroid.y())
             {
                 child_index += 2;
-                child_bbox.vmin.y = node_centroid.y;
-                child_bbox.vmax.y = bbox.vmax.y;
+                child_bbox.vmin.y() = node_centroid.y();
+                child_bbox.vmax.y() = bbox.vmax.y();
             }
             else
             {
-                child_bbox.vmin.y = bbox.vmin.y;
-                child_bbox.vmax.y = node_centroid.y;
+                child_bbox.vmin.y() = bbox.vmin.y();
+                child_bbox.vmax.y() = node_centroid.y();
             }
 
-            if (bbox_insert_centroid.z > node_centroid.z)
+            if (bbox_insert_centroid.z() > node_centroid.z())
             {
                 child_index += 1;
-                child_bbox.vmin.z = node_centroid.z;
-                child_bbox.vmax.z = bbox.vmax.z;
+                child_bbox.vmin.z() = node_centroid.z();
+                child_bbox.vmax.z() = bbox.vmax.z();
             }
             else
             {
-                child_bbox.vmin.z = bbox.vmin.z;
-                child_bbox.vmax.z = node_centroid.z;
+                child_bbox.vmin.z() = bbox.vmin.z();
+                child_bbox.vmax.z() = node_centroid.z();
             }
 
             if (node->child[child_index] == nullptr)
@@ -212,14 +212,14 @@ namespace RenderToy
                     BoundingBox child_bbox;
                     Vector3f centroid = bbox.Centroid();
 
-                    child_bbox.vmin.x = (i & 4) ? centroid.x : bbox.vmin.x;
-                    child_bbox.vmax.x = (i & 4) ? bbox.vmax.x : centroid.x;
+                    child_bbox.vmin.x() = (i & 4) ? centroid.x() : bbox.vmin.x();
+                    child_bbox.vmax.x() = (i & 4) ? bbox.vmax.x() : centroid.x();
 
-                    child_bbox.vmin.y = (i & 2) ? centroid.y : bbox.vmin.y;
-                    child_bbox.vmax.y = (i & 2) ? bbox.vmax.y : centroid.y;
+                    child_bbox.vmin.y() = (i & 2) ? centroid.y() : bbox.vmin.y();
+                    child_bbox.vmax.y() = (i & 2) ? bbox.vmax.y() : centroid.y();
 
-                    child_bbox.vmin.z = (i & 1) ? centroid.z : bbox.vmin.z;
-                    child_bbox.vmax.z = (i & 1) ? bbox.vmax.z : centroid.z;
+                    child_bbox.vmin.z() = (i & 1) ? centroid.z() : bbox.vmin.z();
+                    child_bbox.vmax.z() = (i & 1) ? bbox.vmax.z() : centroid.z();
                     Build(node->child[i], child_bbox);
                     node->bbox.ExtendBy(node->child[i]->bbox);
                 }
