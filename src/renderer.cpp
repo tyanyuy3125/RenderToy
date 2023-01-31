@@ -29,10 +29,10 @@ namespace RenderToy
             {
                 // (x, y) is the point in Raster Space.
                 Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
-                Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+                Vector2f screen_coord = {2.0f * right * NDC_coord.x() - right, 2.0f * top * NDC_coord.y() - top};
 
                 // Blender convention: Camera directing towards -z.
-                Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                Ray cast_ray(Vector3f::O, Vector3f(screen_coord.x(), screen_coord.y(), -1.0f));
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
@@ -86,11 +86,11 @@ namespace RenderToy
 
     void IRenderer::PrepareScreenSpace(Camera *cam, float &top, float &right)
     {
-        top = (Convert::InchToMM(cam->gate_dimension.y) / 2.0f) / cam->focal_length;
-        right = (Convert::InchToMM(cam->gate_dimension.x) / 2.0f) / cam->focal_length;
+        top = (Convert::InchToMM(cam->gate_dimension.y()) / 2.0f) / cam->focal_length;
+        right = (Convert::InchToMM(cam->gate_dimension.x()) / 2.0f) / cam->focal_length;
         // We implement FILL CONVENTION when aspect ratio conflicts with gate dimension.
         // Corresponding to AUTO setting of Sensor Fit in Blender.
-        float gate_aspr = cam->gate_dimension.x / cam->gate_dimension.y;
+        float gate_aspr = cam->gate_dimension.x() / cam->gate_dimension.y();
         float film_aspr = render_context->format_settings.resolution.AspectRatio();
         float xscale = 1.0f, yscale = 1.0f;
         if (gate_aspr >= film_aspr)
@@ -135,10 +135,10 @@ namespace RenderToy
             {
                 // (x, y) is the point in Raster Space.
                 Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
-                Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+                Vector2f screen_coord = {2.0f * right * NDC_coord.x() - right, 2.0f * top * NDC_coord.y() - top};
 
                 // Blender convention: Camera directing towards -z.
-                Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                Ray cast_ray(Vector3f::O, Vector3f(screen_coord.x(), screen_coord.y(), -1.0f));
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
@@ -181,10 +181,10 @@ namespace RenderToy
             {
                 // (x, y) is the point in Raster Space.
                 Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
-                Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+                Vector2f screen_coord = {2.0f * right * NDC_coord.x() - right, 2.0f * top * NDC_coord.y() - top};
 
                 // Blender convention: Camera directing towards -z.
-                Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                Ray cast_ray(Vector3f::O, Vector3f(screen_coord.x(), screen_coord.y(), -1.0f));
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
@@ -240,9 +240,9 @@ namespace RenderToy
                 {
                     // (x, y) is the point in Raster Space.
                     Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
-                    Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+                    Vector2f screen_coord = {2.0f * right * NDC_coord.x() - right, 2.0f * top * NDC_coord.y() - top};
                     // Blender convention: Camera directing towards -z.
-                    Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                    Ray cast_ray(Vector3f::O, Vector3f(screen_coord.x(), screen_coord.y(), -1.0f));
                     cast_ray = cam->O2WTransform(cast_ray);
                     RayState state;
                     BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray, nullptr, state, 0, 0.0f) / static_cast<float>(iteration_count);
@@ -384,10 +384,10 @@ namespace RenderToy
             {
                 // (x, y) is the point in Raster Space.
                 Vector2f NDC_coord = {float(x) * div_resolution_width, float(y) * div_resolution_height};
-                Vector2f screen_coord = {2.0f * right * NDC_coord.x - right, 2.0f * top * NDC_coord.y - top};
+                Vector2f screen_coord = {2.0f * right * NDC_coord.x() - right, 2.0f * top * NDC_coord.y() - top};
 
                 // Blender convention: Camera directing towards -z.
-                Ray cast_ray(Vector3f::O, Vector3f(screen_coord, -1.0f));
+                Ray cast_ray(Vector3f::O, Vector3f(screen_coord.x(), screen_coord.y(), -1.0f));
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;

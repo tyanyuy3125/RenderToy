@@ -41,14 +41,16 @@ namespace RenderToy
 
     const Vector3f Geometry::O2WTransform(const Vector3f &vec) const
     {
-        Vector4f vec4(vec, 1.0f);
+        // Vector4f vec4(vec, 1.0f);
+        Vector4f vec4(vec.x(), vec.y(), vec.z(), 1.0f);
         vec4 = object_to_world * vec4;
         return Vector3f(vec4[0], vec4[1], vec4[2]);
     }
 
     const Vector3f Geometry::W2OTransform(const Vector3f &vec) const
     {
-        Vector4f vec4(vec, 1.0f);
+        // Vector4f vec4(vec, 1.0f);
+        Vector4f vec4(vec.x(), vec.y(), vec.z(), 1.0f);
         vec4 = world_to_object * vec4;
         return Vector3f(vec4[0], vec4[1], vec4[2]);
     }
@@ -85,13 +87,13 @@ namespace RenderToy
         Vector3f v2 = vert_w[2];
 
         Vector3f bmax = {
-            std::max(v0.x, std::max(v1.x, v2.x)),
-            std::max(v0.y, std::max(v1.y, v2.y)),
-            std::max(v0.z, std::max(v1.z, v2.z))};
+            std::max(v0.x(), std::max(v1.x(), v2.x())),
+            std::max(v0.y(), std::max(v1.y(), v2.y())),
+            std::max(v0.z(), std::max(v1.z(), v2.z()))};
         Vector3f bmin = {
-            std::min(v0.x, std::min(v1.x, v2.x)),
-            std::min(v0.y, std::min(v1.y, v2.y)),
-            std::min(v0.z, std::min(v1.z, v2.z))};
+            std::min(v0.x(), std::min(v1.x(), v2.x())),
+            std::min(v0.y(), std::min(v1.y(), v2.y())),
+            std::min(v0.z(), std::min(v1.z(), v2.z()))};
 
         return BoundingBox(bmin, bmax);
     }
@@ -209,9 +211,18 @@ namespace RenderToy
 
     void Triangle::UpdateCache()
     {
-        vert_w[0] = parent->O2WTransform(vert[0]);
-        vert_w[1] = parent->O2WTransform(vert[1]);
-        vert_w[2] = parent->O2WTransform(vert[2]);
+        if (parent != nullptr)
+        {
+            vert_w[0] = parent->O2WTransform(vert[0]);
+            vert_w[1] = parent->O2WTransform(vert[1]);
+            vert_w[2] = parent->O2WTransform(vert[2]);
+        }
+        else
+        {
+            vert_w[0] = vert[0];
+            vert_w[1] = vert[1];
+            vert_w[2] = vert[2];
+        }
         v0v1_w = vert_w[1] - vert_w[0];
         v0v2_w = vert_w[2] - vert_w[0];
         area = Area();

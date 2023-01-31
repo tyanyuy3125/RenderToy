@@ -1,6 +1,6 @@
 #include "compositor.h"
 
-
+using namespace RenderToy;
 
 const Image RenderToy::Image::GaussianBlur(const int diameter) const
 {

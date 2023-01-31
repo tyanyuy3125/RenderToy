@@ -21,9 +21,9 @@ namespace RenderToy
                 auto real_color = BUFFER(j, i, nx);
                 real_color = Convert::Tonemap(real_color, 1.5f);
                 real_color = Vector3f::Pow(real_color, 0.4545f);
-                float r = std::clamp(real_color.x, 0.0f, 1.0f);
-                float g = std::clamp(real_color.y, 0.0f, 1.0f);
-                float b = std::clamp(real_color.z, 0.0f, 1.0f);
+                float r = std::clamp(real_color.x(), 0.0f, 1.0f);
+                float g = std::clamp(real_color.y(), 0.0f, 1.0f);
+                float b = std::clamp(real_color.z(), 0.0f, 1.0f);
                 int ir = int(255.99f * r);
                 int ig = int(255.99f * g);
                 int ib = int(255.99f * b);
@@ -89,9 +89,9 @@ namespace RenderToy
                 // TODO: 把下面的几个函数封装到Posteffects类中。
                 real_color = Convert::Tonemap(real_color, 1.5f);
                 real_color = Vector3f::Pow(real_color, 0.4545f);
-                float r = std::clamp(real_color.x, 0.0f, 1.0f);
-                float g = std::clamp(real_color.y, 0.0f, 1.0f);
-                float b = std::clamp(real_color.z, 0.0f, 1.0f);
+                float r = std::clamp(real_color.x(), 0.0f, 1.0f);
+                float g = std::clamp(real_color.y(), 0.0f, 1.0f);
+                float b = std::clamp(real_color.z(), 0.0f, 1.0f);
                 pixel.red = int(255.99f * r);
                 pixel.green = int(255.99f * g);
                 pixel.blue = int(255.99f * b);
