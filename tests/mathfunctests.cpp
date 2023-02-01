@@ -159,12 +159,12 @@ TEST_CASE("Complement Minor")
     Matrix3x3f minor = {{0.0f, 1.0f, 0.0f},
                         {1.0f, 0.0f, 0.0f},
                         {0.0f, 0.0f, 0.0f}};
-    REQUIRE(b.ComplementMinor(0,0) == minor);
+    REQUIRE(b.ComplementMinor(0, 0) == minor);
 }
 
 TEST_CASE("SSE InvSqrt")
 {
-    REQUIRE(std::abs(SSE_InvSqrt(2.0f)-(1.0f / sqrt(2.0f)))<1e-4); // SSE InvSqrt has low accuracy.
+    REQUIRE(std::abs(SSE_InvSqrt(2.0f) - (1.0f / sqrt(2.0f))) < 1e-4); // SSE InvSqrt has low accuracy.
     // Fails at 1e-5.
 }
 
@@ -184,7 +184,17 @@ TEST_CASE("Vector constexpr tests.")
     STATIC_REQUIRE(t3 == 14.0);
     Vector3d vec_g(1.0);
     constexpr Vector4d vec_h = Vector4d::O;
-    REQUIRE(Vector3d::X+Vector3d::Y+Vector3d::Z == Vector3d::White);
+    REQUIRE(Vector3d::X + Vector3d::Y + Vector3d::Z == Vector3d::White);
     REQUIRE(vec_c == vec_d);
-    REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0)<EPS);
+    REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < EPS);
+}
+
+TEST_CASE("Matrix constexpr tests.")
+{
+    constexpr Matrix2x2d mat_a({{1.0, 2.0}, {3.0, 4.0}});
+    constexpr Matrix2x2d mat_b = {{1.0, 2.0},
+                                  {3.0, 4.0}};
+    STATIC_REQUIRE(mat_a[0][0] == mat_b[0][0]);
+    REQUIRE(mat_a == mat_b);
+    STATIC_REQUIRE(Matrix2x2d::Determinant(mat_a) == Matrix2x2d::Determinant(mat_b));
 }

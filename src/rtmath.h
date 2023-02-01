@@ -23,7 +23,7 @@ namespace RenderToy
 #pragma region Basic Vector Math
     template <typename _Tp, std::size_t _Dm>
     struct VectorConstants;
-    template <typename _Tp, size_t _Dm>
+    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool> = true>
     struct Matrix;
 
     /// @brief Generalized Vector definition.
@@ -75,7 +75,7 @@ namespace RenderToy
 
         /// @brief
         /// @return Returns a normalized copy of the vector.
-        inline const Vector
+        [[nodiscard]] inline const Vector
         Normalized() const
         {
             Vector<_Tp, _Dm> ret(*this);
@@ -403,41 +403,90 @@ namespace RenderToy
         constexpr static Vector<_Tp, 4> W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
     };
 
-    using Vector2d = Vector<double, 2>;
-    using Vector3d = Vector<double, 3>;
-    using Vector4d = Vector<double, 4>;
+    template <typename _Tp>
+    using Vector2 = Vector<_Tp, 2>;
+    template <typename _Tp>
+    using Vector3 = Vector<_Tp, 3>;
+    template <typename _Tp>
+    using Vector4 = Vector<_Tp, 4>;
 
-    using Vector2f = Vector<float, 2>;
-    using Vector3f = Vector<float, 3>;
-    using Vector4f = Vector<float, 4>;
+    using Vector2d = Vector2<double>;
+    using Vector3d = Vector3<double>;
+    using Vector4d = Vector4<double>;
+
+    using Vector2f = Vector2<float>;
+    using Vector3f = Vector3<float>;
+    using Vector4f = Vector4<float>;
 
 #pragma endregion
 
 #pragma region Basic Matrix Math
 
-    template <typename _Tp, size_t _Dm>
-    struct Matrix
+    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool> = true>
+    struct MatrixConstants;
+
+    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool>>
+    struct Matrix : public MatrixConstants<_Tp, _Dm>
     {
-        typedef Vector<_Tp, _Dm> Vector_Type;
+        typedef Vector<_Tp, _Dm> VectorType;
 
         constexpr Matrix() = default;
-        template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
-        constexpr Matrix(Args &&...rows)
-            : row{std::forward<Args>(rows)...} {}
 
-        constexpr Vector_Type &
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
+        constexpr Matrix(Vector2<_Tp> r0, Vector2<_Tp> r1)
+            : row{r0, r1} {}
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
+        constexpr Matrix(std::array<Vector2<_Tp>, 2> tuple)
+            : row(tuple) {}
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 3), bool> = true>
+        constexpr Matrix(Vector3<_Tp> r0, Vector3<_Tp> r1, Vector3<_Tp> r2)
+            : row{r0, r1, r2} {}
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 3), bool> = true>
+        constexpr Matrix(std::array<Vector3<_Tp>, 3> triple)
+            : row(triple) {}
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 4), bool> = true>
+        constexpr Matrix(Vector4<_Tp> r0, Vector4<_Tp> r1, Vector4<_Tp> r2, Vector4<_Tp> r3)
+            : row{r0, r1, r2, r3} {}
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 4), bool> = true>
+        constexpr Matrix(std::array<Vector4<_Tp>, 4> quadruple)
+            : row(quadruple) {}
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I > 4), bool> = true>
+        constexpr Matrix(const std::array<const std::array<_Tp, _Dm>, _Dm> &row_)
+            : row{}
+        {
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                row[i].arr = row_[i];
+            }
+        }
+
+        constexpr inline VectorType &
         operator[](const size_t i)
         {
             return row[i];
         }
 
-        constexpr const Vector_Type &
+        constexpr inline const VectorType &
         operator[](const size_t i) const
         {
             return row[i];
         }
 
-        const bool
+        inline const VectorType &
+        Col(const size_t c)
+        {
+            VectorType ret;
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret[i] = row[i][c];
+            }
+            return ret;
+        }
+
+        inline const bool
         operator==(const Matrix &a) const
         {
             for (std::size_t i = 0; i < _Dm; ++i)
@@ -450,13 +499,13 @@ namespace RenderToy
             return true;
         }
 
-        const bool
+        inline const bool
         operator!=(const Matrix &a) const
         {
             return !((*this) == a);
         }
 
-        const Matrix
+        inline const Matrix
         operator+(const Matrix &a) const
         {
             Matrix ret;
@@ -467,7 +516,7 @@ namespace RenderToy
             return ret;
         }
 
-        const Matrix
+        inline const Matrix
         operator-(const Matrix &a) const
         {
             Matrix ret;
@@ -478,7 +527,7 @@ namespace RenderToy
             return ret;
         }
 
-        const Matrix
+        inline const Matrix
         operator-(void) const
         {
             Matrix ret;
@@ -489,9 +538,10 @@ namespace RenderToy
             return ret;
         }
 
-        const Vector_Type operator*(const Vector_Type &a) const
+        inline const VectorType
+        operator*(const VectorType &a) const
         {
-            Vector_Type ret;
+            VectorType ret;
             for (std::size_t i = 0; i < _Dm; ++i)
             {
                 ret.arr[i] = row[i].Dot(a);
@@ -499,120 +549,163 @@ namespace RenderToy
             return ret;
         }
 
-        const Matrix operator*(const Matrix &a) const;
+        inline const Matrix
+        operator*(const Matrix &a) const
+        {
+            Matrix ret;
+            for (int i = 0; i < _Dm; ++i)
+            {
+                for (int j = 0; j < _Dm; ++j)
+                {
+                    for (int k = 0; k < _Dm; ++k)
+                    {
+                        ret.row[i][j] += row[i][k] * a.row[k][j];
+                    }
+                }
+            }
+            return ret;
+        }
 
-        const Matrix &operator+=(const Matrix &a);
-        const Matrix &operator-=(const Matrix &a);
+        inline const Matrix &
+        operator+=(const Matrix &a)
+        {
+            for (int i = 0; i < _Dm; ++i)
+            {
+                row[i] += a.row[i];
+            }
+            return (*this);
+        }
 
-        void Transpose();
-        const Matrix Transposed() const;
+        inline const Matrix &
+        operator-=(const Matrix &a)
+        {
+            for (int i = 0; i < _Dm; ++i)
+            {
+                row[i] -= a.row[i];
+            }
+            return (*this);
+        }
 
-        const static float Determinant(const Matrix &mat);
+        inline void
+        Transpose()
+        {
+            for (int i = 0; i < _Dm; ++i)
+            {
+                for (int j = 0; j < _Dm; ++j)
+                {
+                    row[i][j] = row[j][i];
+                }
+            }
+        }
+
+        [[nodiscard]] inline const Matrix
+        Transposed() const
+        {
+            Matrix ret;
+            for (int i = 0; i < _Dm; ++i)
+            {
+                for (int j = 0; j < _Dm; ++j)
+                {
+                    ret.row[i][j] = row[j][i];
+                }
+            }
+            return ret;
+        }
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
+        constexpr inline const static float
+        Determinant(const Matrix &mat)
+        {
+            return mat.row[0][0] * mat.row[1][1] - mat.row[0][1] * mat.row[1][0];
+        }
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 3), bool> = true>
+        constexpr inline const static float
+        Determinant(const Matrix &mat)
+        {
+            return mat.row[0][0] * mat.row[1][1] * mat.row[2][2] + mat.row[0][1] * mat.row[1][2] * mat.row[2][0] + mat.row[0][2] * mat.row[1][0] * mat.row[2][1] - mat.row[0][2] * mat.row[1][1] * mat.row[2][0] - mat.row[0][0] * mat.row[1][2] * mat.row[2][1] - mat.row[2][2] * mat.row[0][1] * mat.row[1][0];
+        }
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
+        constexpr inline const _Tp ComplementMinor(const size_t i, const size_t j) const
+        {
+            return row[i ^ 1][j ^ 1];
+        }
+
+        template <int..., std::size_t I = _Dm, std::enable_if_t<(I >= 3), bool> = true>
+        const Matrix<_Tp, I - 1> ComplementMinor(const size_t i, const size_t j) const
+        {
+            Matrix<_Tp, _Dm - 1> ret;
+            for (int x = 0, ret_x = 0; x < _Dm; ++x)
+            {
+                if (x == i)
+                {
+                    continue;
+                }
+                for (int y = 0, ret_y = 0; y < _Dm; ++y)
+                {
+                    if (y == j)
+                    {
+                        continue;
+                    }
+                    ret[ret_x][ret_y] = row[x][y];
+                    ++ret_y;
+                }
+                ++ret_x;
+            }
+            return ret;
+        }
 
     private:
-        std::array<Vector_Type, _Dm> row = {};
+        std::array<VectorType, _Dm> row = {};
     };
 
-    class Matrix3x3f
+    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool>>
+    struct MatrixConstants
     {
-    private:
-        Vector3f row[3];
-
-    public:
-        const static Matrix3x3f I;
-        const static Matrix3x3f O;
-
-        Matrix3x3f();
-        Matrix3x3f(const Matrix3x3f &a);
-        Matrix3x3f(Vector3f r0, Vector3f r1, Vector3f r2);
-        Matrix3x3f(std::array<Vector3f, 3> triple);
-
-        Vector3f &operator[](const size_t i);
-        const Vector3f &operator[](const size_t i) const;
-
-        const bool operator==(const Matrix3x3f &a) const;
-
-        const Matrix3x3f operator+(const Matrix3x3f &a) const;
-        const Matrix3x3f operator-(const Matrix3x3f &a) const;
-        const Matrix3x3f operator-(void) const;
-        const Vector3f operator*(const Vector3f &a) const;
-        const Matrix3x3f operator*(const Matrix3x3f &a) const;
-
-        const Matrix3x3f &operator+=(const Matrix3x3f &a);
-        const Matrix3x3f &operator-=(const Matrix3x3f &a);
-
-        void Transpose();
-        const Matrix3x3f Transposed() const;
-
-        const static float Determinant(const Matrix3x3f &mat);
     };
 
-    class Matrix4x4f
+    template <typename _Tp>
+    struct MatrixConstants<_Tp, 2>
     {
-    private:
-        Vector4f row[4];
-
-    public:
-        const static Matrix4x4f I;
-        const static Matrix4x4f O;
-
-        Matrix4x4f();
-        Matrix4x4f(const Matrix4x4f &a);
-        Matrix4x4f(Vector4f r0, Vector4f r1, Vector4f r2, Vector4f r3);
-        Matrix4x4f(std::array<Vector4f, 4> quadruple);
-
-        Vector4f &operator[](const size_t i);
-        const Vector4f &operator[](const size_t i) const;
-
-        const bool operator==(const Matrix4x4f &a) const;
-
-        const Matrix4x4f operator+(const Matrix4x4f &a) const;
-        const Matrix4x4f operator-(const Matrix4x4f &a) const;
-        const Matrix4x4f operator-(void) const;
-        const Vector4f operator*(const Vector4f &a) const;
-        const Matrix4x4f operator*(const Matrix4x4f &a) const;
-
-        const Matrix4x4f &operator+=(const Matrix4x4f &a);
-        const Matrix4x4f &operator-=(const Matrix4x4f &a);
-
-        void Transpose();
-        const Matrix4x4f Transposed() const;
-        const Matrix3x3f ComplementMinor(const int i, const int j) const;
+        constexpr const static Matrix<_Tp, 2> I = {{_Tp(1), _Tp(0)},
+                                                   {_Tp(0), _Tp(1)}};
+        constexpr const static Matrix<_Tp, 2> O = {{_Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0)}};
     };
 
-    class Matrix2x2f
+    template <typename _Tp>
+    struct MatrixConstants<_Tp, 3>
     {
-    private:
-        Vector2f row[2];
-
-    public:
-        const static Matrix2x2f I;
-        const static Matrix2x2f O;
-
-        Matrix2x2f();
-        Matrix2x2f(const Matrix2x2f &a);
-        Matrix2x2f(Vector2f r0, Vector2f r1);
-        Matrix2x2f(std::array<Vector2f, 2> tuple);
-
-        Vector2f &operator[](const size_t i);
-        const Vector2f &operator[](const size_t i) const;
-
-        const bool operator==(const Matrix2x2f &a) const;
-
-        const Matrix2x2f operator+(const Matrix2x2f &a) const;
-        const Matrix2x2f operator-(const Matrix2x2f &a) const;
-        const Matrix2x2f operator-(void) const;
-        const Vector2f operator*(const Vector2f &a) const;
-        const Matrix2x2f operator*(const Matrix2x2f &a) const;
-
-        const Matrix2x2f &operator+=(const Matrix2x2f &a);
-        const Matrix2x2f &operator-=(const Matrix2x2f &a);
-
-        void Transpose();
-        const Matrix2x2f Transposed() const;
-
-        const static float Determinant(const Matrix2x2f &mat);
+        constexpr const static Matrix<_Tp, 3> I = {{_Tp(1), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(1), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(1)}};
+        constexpr const static Matrix<_Tp, 3> O = {{_Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0)}};
     };
+
+    template <typename _Tp>
+    struct MatrixConstants<_Tp, 4>
+    {
+        constexpr const static Matrix<_Tp, 4> I = {{_Tp(1), _Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(1), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(1), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(1)}};
+        constexpr const static Matrix<_Tp, 4> O = {{_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
+    };
+
+    using Matrix2x2f = Matrix<float, 2>;
+    using Matrix3x3f = Matrix<float, 3>;
+    using Matrix4x4f = Matrix<float, 4>;
+
+    using Matrix2x2d = Matrix<double, 2>;
+    using Matrix3x3d = Matrix<double, 3>;
+    using Matrix4x4d = Matrix<double, 4>;
+
 #pragma endregion
 
 #pragma region Unit Conversion
