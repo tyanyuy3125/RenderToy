@@ -15,7 +15,7 @@ int main()
     // OBJModelImporter::Import(world, "./cornellbox_rot.obj");
     OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
     // OBJModelImporter::Import(world, "./cornellbox2l.obj");
-    // OBJModelImporter::Import(world, "./illumiplane.obj");
+    // OBJModelImporter::Import(world, "./sphereonaplane.obj");
 
     Vector3f light_color = Convert::BlackBody(6000) * 5.0f;
 
@@ -67,7 +67,7 @@ int main()
     std::cout << "Begin rendering...\n";
 
     RenderContext rc(&world, FormatSettings(Size(1920, 1080), Vector2f(16.0f, 9.0f)));
-    PathTracingRenderer renderer(&rc, 256);
+    PathTracingRenderer renderer(&rc, 64);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
     // NormalRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();

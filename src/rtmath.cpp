@@ -29,20 +29,7 @@ namespace RenderToy
         return array[0]; // The result at all the elements are the same
     }
 
-    const float Luma(const Vector3f &color)
-    {
-        return Vector3f::Dot(color, Vector3f(0.299f, 0.587f, 0.114f));
-    }
 
-    const float Convert::InchToMM(const float inch)
-    {
-        return inch * 25.4f;
-    }
-
-    const float Convert::DegreeToRadians(const float deg)
-    {
-        return deg * (M_PIf32 / 180.0f);
-    }
 
     const Vector3f Convert::BlackBody(const float t)
     {
@@ -78,16 +65,6 @@ namespace RenderToy
         return matrix * x;
     }
 
-    const float Convert::RGBToLuminance(const Vector3f &vec)
-    {
-        return 0.212671 * vec.x() + 0.715160 * vec.y() + 0.072169 * vec.z();
-    }
-
-    const Vector3f Convert::Tonemap(const Vector3f &vec, const float limit)
-    {
-        return vec * 1.0f / (1.0f + RGBToLuminance(vec) / limit);
-    }
-
     Point::Point()
         : x(0), y(0)
     {
@@ -113,22 +90,22 @@ namespace RenderToy
     {
     }
 
-    Size::Size(int x_, int y_)
+    Size::Size(std::size_t x_, std::size_t y_)
         : width(x_), height(y_)
     {
     }
 
     Size::Size(const Vector2f &vec)
-        : width(int(vec.x())), height(int(vec.y()))
+        : width(std::size_t(vec.x())), height(std::size_t(vec.y()))
     {
     }
 
-    Size::Size(const std::array<int, 2> &tuple)
+    Size::Size(const std::array<std::size_t, 2> &tuple)
         : width(tuple[0]), height(tuple[1])
     {
     }
 
-    const int Size::Area() const
+    const std::size_t Size::Area() const
     {
         return width * height;
     }
@@ -136,33 +113,6 @@ namespace RenderToy
     const float Size::AspectRatio() const
     {
         return float(width) / float(height);
-    }
-
-    void Matrix4x4fStack::Push(const Matrix4x4f &mat4)
-    {
-        accumulated.push(mat4 * accumulated.top());
-    }
-
-    Matrix4x4fStack::Matrix4x4fStack()
-    {
-        accumulated.push(Matrix4x4f::I);
-    }
-
-    void Matrix4x4fStack::Pop()
-    {
-        if (accumulated.size() == 1)
-        {
-            return;
-        }
-        accumulated.pop();
-    }
-
-    void Matrix4x4fStack::Transform(Vector3f &vec3) const
-    {
-        // Vector4f vec4(vec3, 1.0f);
-        Vector4f vec4(vec3.x(), vec3.y(), vec3.z(), 1.0f); // TODO: Optimize.
-        vec4 = accumulated.top() * vec4;
-        vec3 = Vector3f(vec4[0], vec4[1], vec4[2]);
     }
 
     const Matrix4x4f AffineTransformation::Translation(const Vector3f &origin)

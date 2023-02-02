@@ -10,27 +10,54 @@
 #include <cmath>
 #include <algorithm>
 #include <initializer_list>
-#include <complex>
 #include <type_traits>
 
 #include "random.h"
 
 namespace RenderToy
 {
+    // Forward declarations.
+
     struct Size;
     struct Point;
 
-#pragma region Basic Vector Math
+    template <typename _Tp, std::size_t _Dm>
+    struct Vector;
     template <typename _Tp, std::size_t _Dm>
     struct VectorConstants;
     template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool> = true>
     struct Matrix;
+    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool> = true>
+    struct MatrixConstants;
+
+    template <typename _Tp>
+    using Vector2 = Vector<_Tp, 2>;
+    template <typename _Tp>
+    using Vector3 = Vector<_Tp, 3>;
+    template <typename _Tp>
+    using Vector4 = Vector<_Tp, 4>;
+
+    using Vector2d = Vector2<double>;
+    using Vector3d = Vector3<double>;
+    using Vector4d = Vector4<double>;
+
+    using Vector2f = Vector2<float>;
+    using Vector3f = Vector3<float>;
+    using Vector4f = Vector4<float>;
+
+    using Matrix2x2f = Matrix<float, 2>;
+    using Matrix3x3f = Matrix<float, 3>;
+    using Matrix4x4f = Matrix<float, 4>;
+
+    using Matrix2x2d = Matrix<double, 2>;
+    using Matrix3x3d = Matrix<double, 3>;
+    using Matrix4x4d = Matrix<double, 4>;
 
     /// @brief Generalized Vector definition.
     /// @tparam _Tp Numerical type.
     /// @tparam _Dm Dimension.
     template <typename _Tp, std::size_t _Dm>
-    struct Vector : VectorConstants<_Tp, _Dm>
+    struct Vector : public VectorConstants<_Tp, _Dm>
     {
         /// @brief Construct default Vector with all components zero.
         /// @tparam _Tp Numerical type.
@@ -54,14 +81,37 @@ namespace RenderToy
         }
 
         /// @brief
+        /// @return If Vector is zero, return true.
+        inline const bool
+        IsZero() const
+        {
+            for (_Tp a : arr)
+            {
+                if (std::abs(a) > EPS)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// @brief
         /// @return Returns length of the vector.
         inline const _Tp
-        Length() const
+        Length2() const
         {
             _Tp ret = _Tp(0);
             for (_Tp a : arr)
                 ret += a * a;
-            return std::sqrt(ret);
+            return ret;
+        }
+
+        /// @brief
+        /// @return Returns length of the vector.
+        inline const _Tp
+        Length() const
+        {
+            return std::sqrt(Length2());
         }
 
         /// @brief Normalizes the vector itself.
@@ -78,6 +128,20 @@ namespace RenderToy
         [[nodiscard]] inline const Vector
         Normalized() const
         {
+            Vector<_Tp, _Dm> ret(*this);
+            ret.Normalize();
+            return ret;
+        }
+
+        /// @brief Safe normalize.
+        /// @return Returns O if IsZero() returns true.
+        [[nodiscard]] inline const Vector
+        Normalized_s() const
+        {
+            if (IsZero())
+            {
+                return {};
+            }
             Vector<_Tp, _Dm> ret(*this);
             ret.Normalize();
             return ret;
@@ -213,7 +277,12 @@ namespace RenderToy
             return !((*this) == a);
         }
 
-        inline const static _Tp Dot(const Vector &a, const Vector &b)
+        /// @brief Dot product.
+        /// @param a
+        /// @param b
+        /// @return
+        [[nodiscard]] inline const static _Tp
+        Dot(const Vector &a, const Vector &b)
         {
             _Tp ret(0);
             for (std::size_t i = 0; i < _Dm; ++i)
@@ -223,7 +292,11 @@ namespace RenderToy
             return ret;
         }
 
-        inline const static Vector
+        /// @brief Respective power.
+        /// @param a
+        /// @param b
+        /// @return
+        [[nodiscard]] inline const static Vector
         Pow(const Vector &a, const Vector &b)
         {
             Vector ret;
@@ -234,7 +307,10 @@ namespace RenderToy
             return ret;
         }
 
-        const static Vector
+        /// @brief Respective natural logarithmic.
+        /// @param a
+        /// @return
+        [[nodiscard]] const static Vector
         Log(const Vector &a)
         {
             Vector ret;
@@ -245,6 +321,9 @@ namespace RenderToy
             return ret;
         }
 
+        /// @brief Dot product.
+        /// @param a
+        /// @return
         inline const _Tp
         Dot(const Vector &a) const
         {
@@ -256,13 +335,20 @@ namespace RenderToy
             return ret;
         }
 
+        /// @brief Cross product.
+        /// @param a
+        /// @param b
+        /// @return
         template <int..., size_t I = _Dm, std::enable_if_t<I == 2, bool> = true>
-        constexpr inline const static Vector
+        [[nodiscard]] constexpr inline const static Vector
         Cross(const Vector &a, const Vector &b)
         {
             return a.arr[0] * b.arr[1] - a.arr[1] * b.arr[0];
         }
 
+        /// @brief Cross product.
+        /// @param a
+        /// @return
         template <int..., size_t I = _Dm, std::enable_if_t<I == 2, bool> = true>
         constexpr inline const Vector
         Cross(const Vector &a) const
@@ -270,8 +356,12 @@ namespace RenderToy
             return arr[0] * a.arr[1] - arr[1] * a.arr[0];
         }
 
+        /// @brief Cross product.
+        /// @param a
+        /// @param b
+        /// @return
         template <int..., size_t I = _Dm, std::enable_if_t<I == 3, bool> = true>
-        constexpr inline const static Vector
+        [[nodiscard]] constexpr inline const static Vector
         Cross(const Vector &a, const Vector &b)
         {
             return Vector(a.arr[1] * b.arr[2] - a.arr[2] * b.arr[1],
@@ -279,6 +369,9 @@ namespace RenderToy
                           a.arr[0] * b.arr[1] - a.arr[1] * b.arr[0]);
         }
 
+        /// @brief Cross product.
+        /// @param a
+        /// @return
         template <int..., size_t I = _Dm, std::enable_if_t<I == 3, bool> = true>
         constexpr inline const Vector
         Cross(const Vector &a) const
@@ -403,28 +496,9 @@ namespace RenderToy
         constexpr static Vector<_Tp, 4> W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
     };
 
-    template <typename _Tp>
-    using Vector2 = Vector<_Tp, 2>;
-    template <typename _Tp>
-    using Vector3 = Vector<_Tp, 3>;
-    template <typename _Tp>
-    using Vector4 = Vector<_Tp, 4>;
-
-    using Vector2d = Vector2<double>;
-    using Vector3d = Vector3<double>;
-    using Vector4d = Vector4<double>;
-
-    using Vector2f = Vector2<float>;
-    using Vector3f = Vector3<float>;
-    using Vector4f = Vector4<float>;
-
-#pragma endregion
-
-#pragma region Basic Matrix Math
-
-    template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool> = true>
-    struct MatrixConstants;
-
+    /// @brief Generalized Matrix definition.
+    /// @tparam _Tp Value type.
+    /// @tparam _Dm Dimension.
     template <typename _Tp, size_t _Dm, std::enable_if_t<(_Dm >= 2), bool>>
     struct Matrix : public MatrixConstants<_Tp, _Dm>
     {
@@ -432,25 +506,28 @@ namespace RenderToy
 
         constexpr Matrix() = default;
 
+        // C++ doesn't recognize explicit conversion from initializer_list<_Tp> to array<_Tp, _Dm> for templated classes.
+        // Make it happy:
+
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
-        constexpr Matrix(Vector2<_Tp> r0, Vector2<_Tp> r1)
+        constexpr Matrix(const Vector2<_Tp> &r0, const Vector2<_Tp> &r1)
             : row{r0, r1} {}
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
-        constexpr Matrix(std::array<Vector2<_Tp>, 2> tuple)
+        constexpr Matrix(const std::array<Vector2<_Tp>, 2> &tuple)
             : row(tuple) {}
 
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 3), bool> = true>
-        constexpr Matrix(Vector3<_Tp> r0, Vector3<_Tp> r1, Vector3<_Tp> r2)
+        constexpr Matrix(const Vector3<_Tp> &r0, const Vector3<_Tp> &r1, const Vector3<_Tp> &r2)
             : row{r0, r1, r2} {}
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 3), bool> = true>
-        constexpr Matrix(std::array<Vector3<_Tp>, 3> triple)
+        constexpr Matrix(const std::array<Vector3<_Tp>, 3> &triple)
             : row(triple) {}
 
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 4), bool> = true>
-        constexpr Matrix(Vector4<_Tp> r0, Vector4<_Tp> r1, Vector4<_Tp> r2, Vector4<_Tp> r3)
+        constexpr Matrix(const Vector4<_Tp> &r0, const Vector4<_Tp> &r1, const Vector4<_Tp> &r2, const Vector4<_Tp> &r3)
             : row{r0, r1, r2, r3} {}
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 4), bool> = true>
-        constexpr Matrix(std::array<Vector4<_Tp>, 4> quadruple)
+        constexpr Matrix(const std::array<Vector4<_Tp>, 4> &quadruple)
             : row(quadruple) {}
 
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I > 4), bool> = true>
@@ -475,6 +552,7 @@ namespace RenderToy
             return row[i];
         }
 
+        /// @brief Get column.
         inline const VectorType &
         Col(const size_t c)
         {
@@ -586,6 +664,7 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Transpose itself.
         inline void
         Transpose()
         {
@@ -627,13 +706,15 @@ namespace RenderToy
         }
 
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I == 2), bool> = true>
-        constexpr inline const _Tp ComplementMinor(const size_t i, const size_t j) const
+        constexpr inline const _Tp
+        ComplementMinor(const size_t i, const size_t j) const
         {
             return row[i ^ 1][j ^ 1];
         }
 
         template <int..., std::size_t I = _Dm, std::enable_if_t<(I >= 3), bool> = true>
-        const Matrix<_Tp, I - 1> ComplementMinor(const size_t i, const size_t j) const
+        const Matrix<_Tp, I - 1>
+        ComplementMinor(const size_t i, const size_t j) const
         {
             Matrix<_Tp, _Dm - 1> ret;
             for (int x = 0, ret_x = 0; x < _Dm; ++x)
@@ -698,32 +779,36 @@ namespace RenderToy
                                                    {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
     };
 
-    using Matrix2x2f = Matrix<float, 2>;
-    using Matrix3x3f = Matrix<float, 3>;
-    using Matrix4x4f = Matrix<float, 4>;
-
-    using Matrix2x2d = Matrix<double, 2>;
-    using Matrix3x3d = Matrix<double, 3>;
-    using Matrix4x4d = Matrix<double, 4>;
-
-#pragma endregion
-
-#pragma region Unit Conversion
-    struct Convert
+    namespace Convert
     {
-        Convert() = delete;
-        Convert(const Convert &) = delete;
-        Convert(const Convert &&) = delete;
+        constexpr inline const float
+        InchToMM(const float inch)
+        {
+            return inch * 25.4f;
+        }
 
-        static const float InchToMM(const float inch);
-        static const float DegreeToRadians(const float deg);
-        static const Vector3f BlackBody(const float t);
-        static const Vector3f XYZToSRGB(const Vector3f &x);
+        constexpr inline const float
+        DegreeToRadians(const float deg)
+        {
+            return deg * (M_PIf32 / 180.0f);
+        }
 
-        static const float RGBToLuminance(const Vector3f &vec);
-        static const Vector3f Tonemap(const Vector3f &vec, const float limit);
+        const Vector3f BlackBody(const float t);
+        const Vector3f XYZToSRGB(const Vector3f &x);
+
+        constexpr inline const float
+        RGBToLuminance(const Vector3f &vec)
+        {
+            // Separating components keeps constexpr.
+            return 0.212671f * vec.x() + 0.715160f * vec.y() + 0.072169f * vec.z();
+        }
+
+        inline const Vector3f
+        Tonemap(const Vector3f &vec, const float limit)
+        {
+            return vec * 1.0f / (1.0f + RGBToLuminance(vec) / limit);
+        }
     };
-#pragma endregion
 
 #pragma region Drawing Math
     struct Point
@@ -738,46 +823,27 @@ namespace RenderToy
 
     struct Size
     {
-        int width, height;
+        std::size_t width, height;
 
         Size();
-        Size(int width_, int height_);
+        Size(std::size_t width_, std::size_t height_);
         Size(const Vector2f &vec);
-        Size(const std::array<int, 2> &tuple);
+        Size(const std::array<std::size_t, 2> &tuple);
 
-        const int Area() const;
+        const std::size_t Area() const;
         const float AspectRatio() const;
     };
 
 #pragma endregion
 
-    class Matrix4x4fStack
+    namespace AffineTransformation
     {
-    private:
-        std::stack<Matrix4x4f> accumulated;
-
-    public:
-        Matrix4x4fStack();
-
-        void Push(const Matrix4x4f &mat4);
-        void Pop();
-
-        void Transform(Vector3f &Vector3f) const;
-    };
-
-    class AffineTransformation
-    {
-    public:
-        AffineTransformation() = delete;
-        AffineTransformation(const AffineTransformation &) = delete;
-        AffineTransformation(const AffineTransformation &&) = delete;
-
-        const static Matrix4x4f Translation(const Vector3f &origin);
+        const Matrix4x4f Translation(const Vector3f &origin);
 
         /// @brief Use Blender XYZ-Euler convention, matrix representation of intrinsic transformations: Z*Y*X*v.
         /// @param euler_xyz XYZ-Euler angles, in radius.
         /// @return
-        const static Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
+        const Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
 
     const float SSE_InvSqrt(const float number);
@@ -812,5 +878,5 @@ namespace RenderToy
         return x * (_Tp(1) - a) + y * a;
     }
 
-}
+};
 #endif // RTMATH_H

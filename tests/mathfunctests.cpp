@@ -189,7 +189,7 @@ TEST_CASE("Vector constexpr tests.")
     REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < EPS);
 }
 
-TEST_CASE("Matrix constexpr tests.")
+TEST_CASE("Matrix constexpr test.")
 {
     constexpr Matrix2x2d mat_a({{1.0, 2.0}, {3.0, 4.0}});
     constexpr Matrix2x2d mat_b = {{1.0, 2.0},
@@ -197,4 +197,11 @@ TEST_CASE("Matrix constexpr tests.")
     STATIC_REQUIRE(mat_a[0][0] == mat_b[0][0]);
     REQUIRE(mat_a == mat_b);
     STATIC_REQUIRE(Matrix2x2d::Determinant(mat_a) == Matrix2x2d::Determinant(mat_b));
+}
+
+TEST_CASE("Converter constexpr test.")
+{
+    STATIC_REQUIRE(std::abs(Convert::InchToMM(1.0f) - 25.4f)<EPS);
+    STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - M_PIf32)<EPS);
+    STATIC_REQUIRE(std::abs(Convert::RGBToLuminance({1.0f, 1.0f, 1.0f}) - (0.212671f+0.715160f+0.072169f)) < EPS);
 }

@@ -238,4 +238,20 @@ namespace RenderToy
             tri->UpdateCache();
         }
     }
+
+    Polygon::Polygon(const std::size_t V_, const std::vector<Vector3f> &vert_, const std::vector<Vector3f> &norm_, const std::vector<Vector2f> &uv_, Mesh *parent_)
+        : V(V_), vert(vert_), norm(norm_), uv(uv_), parent(parent_)
+    {
+    }
+
+    std::vector<Triangle *> Polygon::ConvertToTriangle() const
+    {
+        std::vector<Triangle *> ret;
+        std::size_t index_a = 0;
+        for (std::size_t index_b = 1, index_c = 2; index_c < V; ++index_b, ++index_c)
+        {
+            ret.push_back(new Triangle({vert[index_a], vert[index_b], vert[index_c]}, {norm[index_a], norm[index_b], norm[index_c]}, {uv[index_a], uv[index_b], uv[index_c]}, parent));
+        }
+        return ret;
+    }
 }

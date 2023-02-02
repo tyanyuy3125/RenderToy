@@ -1,10 +1,3 @@
-/*
- *  RenderToy - Importer Module
- *  File created on 2023/1/11
- *  Last edited on 2023/1/11
- *  Tianyu Huang <tianyu@illumiart.net>
- */
-
 #ifndef IMPORTER_H
 #define IMPORTER_H
 
