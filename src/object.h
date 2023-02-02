@@ -114,6 +114,20 @@ namespace RenderToy
         Vector3f tangent;
     };
 
+    struct Polygon
+    {
+        std::size_t V;
+        std::vector<Vector3f> vert;
+        std::vector<Vector3f> norm;
+        std::vector<Vector2f> uv;
+
+        Mesh *parent;
+
+        Polygon(const std::size_t V_, const std::vector<Vector3f> &vert_, const std::vector<Vector3f> &norm_, const std::vector<Vector2f> &uv_, Mesh *parent_);
+
+        std::vector<Triangle *> ConvertToTriangle() const;
+    };
+
     class Mesh : public Geometry
     {
     public:

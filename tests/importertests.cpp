@@ -17,7 +17,7 @@
 
 using namespace RenderToy;
 
-TEST_CASE("SStream Functionality Test")
+TEST_CASE("SStream Feature Test")
 {
     SECTION("Vertex")
     {
