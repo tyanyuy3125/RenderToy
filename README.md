@@ -1,5 +1,6 @@
 # RenderToy
 RenderToy is an experimental path tracing rendering library for academic purposes.
+![comparison](./docs/comparison.png)
 
 ## We implement:
 * Fullly multi-threaded path-traced GI.
