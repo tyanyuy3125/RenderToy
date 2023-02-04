@@ -6,3 +6,5 @@
 #include "../../src/exporter.h"
 #include "../../src/world.h"
 #include "../../src/material.h"
+#include "../../src/procedural.h"
+#include "../../src/compositor.h"

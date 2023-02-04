@@ -20,13 +20,12 @@ add_library(RenderToy
             surfacepoint.h surfacepoint.cpp
             compositor.h compositor.cpp)
 
-set_property(TARGET RenderToy PROPERTY CXX_STANDARD 17)
-target_compile_features(RenderToy PRIVATE cxx_std_17)
+set_property(TARGET RenderToy PROPERTY CXX_STANDARD 20)
+target_compile_features(RenderToy PRIVATE cxx_std_20)
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     target_link_libraries(RenderToy PUBLIC OpenMP::OpenMP_CXX)
 endif()
 target_compile_options(RenderToy PUBLIC "-march=native")
-# target_compile_options(RenderToy PUBLIC "-DDISABLE_BVH")
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG")

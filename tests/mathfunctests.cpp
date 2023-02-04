@@ -1,10 +1,3 @@
-/*
- *  RenderToy - Math Function Unit Test
- *  File created on 2023/1/10
- *  Last edited on 2023/1/10
- *  Tianyu Huang <tianyu@illumiart.net>
- */
-
 #define CATCH_CONFIG_MAIN
 #include "../lib/Catch2/catch.hpp"
 #include "../src/rtmath.h"
@@ -16,12 +9,12 @@ using namespace RenderToy;
 
 Vector3f initializer = {0.5f, 0.6f, 0.7f};
 
-TEST_CASE("Testing framework is working fine")
+TEST_CASE("Catch2")
 {
     REQUIRE(true);
 }
 
-TEST_CASE("Vector3f initialization")
+TEST_CASE("Vector")
 {
     Vector3f hanging_vector;
     Vector3f a = initializer;
@@ -38,28 +31,25 @@ TEST_CASE("Vector3f initialization")
             REQUIRE(initializer[i] == a[i]);
         }
     }
-}
 
-TEST_CASE("Vector3f value-modifying test")
-{
-    Vector3f a = initializer;
-    a[0] += 0.1f;
-    REQUIRE(a.x() == initializer[0] + 0.1f);
-    a[1] += 0.1f;
-    REQUIRE(a.y() == initializer[1] + 0.1f);
-    a[2] += 0.1f;
-    REQUIRE(a.z() == initializer[2] + 0.1f);
+    SECTION("Vector3f value-modifying test")
+    {
+        Vector3f a = initializer;
+        a[0] += 0.1f;
+        REQUIRE(a.x() == initializer[0] + 0.1f);
+        a[1] += 0.1f;
+        REQUIRE(a.y() == initializer[1] + 0.1f);
+        a[2] += 0.1f;
+        REQUIRE(a.z() == initializer[2] + 0.1f);
 
-    a.x() -= 0.1f;
-    REQUIRE(a[0] == initializer[0]);
-    a.y() -= 0.1f;
-    REQUIRE(a[1] == initializer[1]);
-    a.z() -= 0.1f;
-    REQUIRE(a[2] == initializer[2]);
-}
+        a.x() -= 0.1f;
+        REQUIRE(a[0] == initializer[0]);
+        a.y() -= 0.1f;
+        REQUIRE(a[1] == initializer[1]);
+        a.z() -= 0.1f;
+        REQUIRE(a[2] == initializer[2]);
+    }
 
-TEST_CASE("Vector3f operation test")
-{
     SECTION("Normalize")
     {
         Vector3f a = initializer;
@@ -104,25 +94,30 @@ TEST_CASE("Vector3f operation test")
         REQUIRE(std::abs(Vector3f::Dot(a, c)) < EPS);
         REQUIRE(std::abs(Vector3f::Dot(b, c)) < EPS);
     }
-}
 
-TEST_CASE("Vector constant test")
-{
-    SECTION("Vector3f")
+    Vector3f ret = Vector3f::O + Vector3f::X + Vector3f::Y + Vector3f::Z;
+    REQUIRE(ret == Vector3f(1.0f, 1.0f, 1.0f));
+
+    SECTION("Negativity")
     {
-        Vector3f ret = Vector3f::O + Vector3f::X + Vector3f::Y + Vector3f::Z;
-        REQUIRE(ret == Vector3f(1.0f, 1.0f, 1.0f));
+        Vector4f a = {1.0f, 2.0f, 3.0f, 4.0f};
+        a = -a;
+        REQUIRE(a[0] == -1.0f);
+    }
+
+    SECTION("Per-component transformation")
+    {
+        Vector2d a = {1.14514, 1.919810};
+        auto b = a.Floor();
+        REQUIRE(b[0] == 1.0);
+        auto c = a.Fract();
+        REQUIRE(c[1] == 0.919810);
+        auto d = a.Sin();
+        REQUIRE(std::abs(d[0] - 0.9107) < 1e-4);
     }
 }
 
-TEST_CASE("Vector test")
-{
-    Vector4f a = {1.0f, 2.0f, 3.0f, 4.0f};
-    a = -a;
-    REQUIRE(a[0] == -1.0f);
-}
-
-TEST_CASE("Matrix4x4f test")
+TEST_CASE("Matrix")
 {
     Matrix4x4f a = Matrix4x4f::I;
     Vector4f vec1 = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -135,31 +130,31 @@ TEST_CASE("Matrix4x4f test")
                     {1.0f, 0.0f, 0.0f, 0.0f}};
     REQUIRE(b * b == Matrix4x4f::I);
     REQUIRE(b * vec1 == (Vector4f){4.0f, 3.0f, 2.0f, 1.0f});
-}
 
-TEST_CASE("Determinant")
-{
-    float det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
-                                                     {4.0f, 5.0f, 6.0f},
-                                                     {7.0f, 8.0f, 9.0f}});
-    REQUIRE(std::abs(det - 0.0f) < EPS);
+    SECTION("Determinant")
+    {
+        float det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
+                                                         {4.0f, 5.0f, 6.0f},
+                                                         {7.0f, 8.0f, 9.0f}});
+        REQUIRE(std::abs(det - 0.0f) < EPS);
 
-    det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
-                                               {4.0f, 5.0f, 6.0f},
-                                               {15.0f, 8.0f, 9.0f}});
-    REQUIRE(std::abs(det + 24.0f) < EPS);
-}
+        det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
+                                                   {4.0f, 5.0f, 6.0f},
+                                                   {15.0f, 8.0f, 9.0f}});
+        REQUIRE(std::abs(det + 24.0f) < EPS);
+    }
 
-TEST_CASE("Complement Minor")
-{
-    Matrix4x4f b = {{0.0f, 0.0f, 0.0f, 1.0f},
-                    {0.0f, 0.0f, 1.0f, 0.0f},
-                    {0.0f, 1.0f, 0.0f, 0.0f},
-                    {1.0f, 0.0f, 0.0f, 0.0f}};
-    Matrix3x3f minor = {{0.0f, 1.0f, 0.0f},
-                        {1.0f, 0.0f, 0.0f},
-                        {0.0f, 0.0f, 0.0f}};
-    REQUIRE(b.ComplementMinor(0, 0) == minor);
+    SECTION("ComplementMinor")
+    {
+        Matrix4x4f b = {{0.0f, 0.0f, 0.0f, 1.0f},
+                        {0.0f, 0.0f, 1.0f, 0.0f},
+                        {0.0f, 1.0f, 0.0f, 0.0f},
+                        {1.0f, 0.0f, 0.0f, 0.0f}};
+        Matrix3x3f minor = {{0.0f, 1.0f, 0.0f},
+                            {1.0f, 0.0f, 0.0f},
+                            {0.0f, 0.0f, 0.0f}};
+        REQUIRE(b.ComplementMinor(0, 0) == minor);
+    }
 }
 
 TEST_CASE("SSE InvSqrt")
@@ -168,7 +163,7 @@ TEST_CASE("SSE InvSqrt")
     // Fails at 1e-5.
 }
 
-TEST_CASE("Vector constexpr tests.")
+TEST_CASE("Vector constexpr")
 {
     constexpr Vector3d vec_a({2.0, 5.0, 4.0});
     constexpr Vector3d vec_b({3.0, 4.0, 6.0});
@@ -189,7 +184,7 @@ TEST_CASE("Vector constexpr tests.")
     REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < EPS);
 }
 
-TEST_CASE("Matrix constexpr test.")
+TEST_CASE("Matrix constexpr")
 {
     constexpr Matrix2x2d mat_a({{1.0, 2.0}, {3.0, 4.0}});
     constexpr Matrix2x2d mat_b = {{1.0, 2.0},

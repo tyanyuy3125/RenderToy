@@ -484,6 +484,37 @@ namespace RenderToy
             return is;
         }
 
+        [[nodiscard]] inline const Vector TransformEach(const std::function<_Tp(_Tp)> &func) const
+        {
+            Vector ret;
+            for (std::size_t i = 0; i < _Dm; ++i)
+            {
+                ret[i] = func(arr[i]);
+            }
+            return ret;
+        }
+
+        inline const Vector Floor() const
+        {
+            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::floor(_)); });
+        }
+
+        inline const Vector Fract() const
+        {
+            return TransformEach([](_Tp _) -> _Tp
+                                 { return _ - _Tp(std::floor(_)); });
+        }
+
+        inline const Vector Sin() const
+        {
+            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::sin(_)); });
+        }
+
+        inline const Vector Cos() const
+        {
+            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::cos(_)); });
+        }
+
         friend Matrix<_Tp, _Dm>;
 
     private:

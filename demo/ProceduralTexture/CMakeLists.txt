@@ -1,0 +1,2 @@
+add_executable(ProceduralTexture main.cpp)
+target_link_libraries(ProceduralTexture PRIVATE RenderToy)
