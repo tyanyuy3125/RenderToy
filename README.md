@@ -10,7 +10,7 @@ RenderToy is an experimental path tracing rendering library for academic purpose
     * ITU-R BT.601
     * ITU-R BT.2020
     * SMPTE 240M
-* Fullly multi-threaded path-traced GI.
+* Fully multi-threaded path-traced GI.
     * Direct Light Sampling (DLS).
         * It also produces fast-GI results.
     * Disney PBR BSDF.
