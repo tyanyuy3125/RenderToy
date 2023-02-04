@@ -4,11 +4,11 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 ![comparison](./docs/comparison.png)
 
 ## We implement:
-* Modern color system.
-    * Tone mapping.
-    * Various color standards.
-        * ITU-R BT.709
-        * ITU-R BT.601
+* Modern color system with multiple color standards.
+    * ITU-R BT.709
+    * ITU-R BT.601
+    * ITU-R BT.2020
+    * SMPTE 240M
 * Fullly multi-threaded path-traced GI.
     * Direct Light Sampling (DLS).
         * It also produces fast-GI results.

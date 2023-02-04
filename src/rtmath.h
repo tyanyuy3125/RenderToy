@@ -997,7 +997,11 @@ namespace RenderToy
             /// @brief ITU-R BT.709 http://www.itu.int/rec/R-REC-BT.709
             kITURBT709 = 0,
             /// @brief ITU-R BT.601 http://www.itu.int/rec/R-REC-BT.601
-            kITURBT601 = 1
+            kITURBT601 = 1,
+            /// @brief ITU-R BT.2020 https://www.itu.int/rec/R-REC-BT.2020/
+            kITURBT2020 = 2,
+            /// @brief SMPTE 240M https://www5.in.tum.de/lehre/vorlesungen/graphik/info/csc/COL_33.htm
+            kSMPTE240M = 3
         };
 
         template <ColorStandard _CS = ColorStandard::kITURBT709>
@@ -1012,6 +1016,14 @@ namespace RenderToy
             else if constexpr (_CS == ColorStandard::kITURBT601)
             {
                 return 0.299f * vec.x() + 0.587f * vec.y() + 0.114f * vec.z();
+            }
+            else if constexpr (_CS == ColorStandard::kITURBT2020)
+            {
+                return 0.2627f * vec.x() + 0.6780f * vec.y() + 0.0593f * vec.z();
+            }
+            else if constexpr (_CS == ColorStandard::kSMPTE240M)
+            {
+                return 0.2122f * vec.x() + 0.7013f * vec.y() + 0.0865f * vec.z();
             }
         }
 
