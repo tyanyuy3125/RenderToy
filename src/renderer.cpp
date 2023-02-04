@@ -61,7 +61,7 @@ namespace RenderToy
         {
             for (int x = 0; x < render_context->format_settings.resolution.width; ++x)
             {
-                BUFFER(x, y, render_context->format_settings.resolution.width) = Vector3f(float(x) / render_context->format_settings.resolution.width, 1.0f, 1.0f);
+                BUFFER(x, y, render_context->format_settings.resolution.width) = Vector3f(float(x) / float(render_context->format_settings.resolution.width), 1.0f, 1.0f);
             }
         }
     }
@@ -74,7 +74,10 @@ namespace RenderToy
     RenderContext::RenderContext(World *world_, FormatSettings format_settings_)
         : world(world_), format_settings(format_settings_)
     {
-        bvh = new BVH(world->triangles);
+        if (world != nullptr)
+        {
+            bvh = new BVH(world->triangles);
+        }
         buffer = new Vector3f[format_settings.resolution.Area()];
     }
 

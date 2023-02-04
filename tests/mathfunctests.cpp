@@ -199,22 +199,57 @@ TEST_CASE("Matrix constexpr test.")
     STATIC_REQUIRE(Matrix2x2d::Determinant(mat_a) == Matrix2x2d::Determinant(mat_b));
 }
 
-TEST_CASE("Converter constexpr test.")
+TEST_CASE("Converter")
 {
-    STATIC_REQUIRE(std::abs(Convert::InchToMM(1.0f) - 25.4f)<EPS);
-    STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - M_PIf32)<EPS);
-    STATIC_REQUIRE(std::abs(Convert::RGBToLuminance({1.0f, 1.0f, 1.0f}) - (0.212671f+0.715160f+0.072169f)) < EPS);
+    STATIC_REQUIRE(std::abs(Convert::InchToMM(1.0f) - 25.4f) < EPS);
+    STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - M_PIf32) < EPS);
+    STATIC_REQUIRE(std::abs(Convert::Luma({1.0f, 1.0f, 1.0f}) - (0.212671f + 0.715160f + 0.072169f)) < EPS);
+}
+
+TEST_CASE("GeneralizedVector")
+{
+    GeneralizedVector<int> gvec(1, 1, 5, 1, 1, 1);
+    REQUIRE(gvec.column == 6);
+    REQUIRE(gvec[2] == 5);
+
+    GeneralizedVector<int> gvec2({1, 9, 1, 9, 8, 1, 0});
+    REQUIRE(gvec2.column == 7);
+    REQUIRE(gvec2[1] == 9);
+
+    GeneralizedVector<int> gvec3 = {1, 1, 4, 5, 1, 4};
+    REQUIRE(gvec3.column == 6);
+    REQUIRE(gvec3[2] == 4);
 }
 
 TEST_CASE("GeneralizedMatrix")
 {
-    GeneralizedMatrix<int> gmat(10,10);
-    gmat[5][5]=16;
+    GeneralizedMatrix<int> gmat(10, 10);
+    gmat[5][5] = 16;
     REQUIRE(gmat[5][5] == 16);
+
+    GeneralizedMatrix<int> gmat2({{1, 2, 3, 4, 5, 6}, {1, 1, 4, 5, 1, 4}});
+    REQUIRE(gmat2.row == 2);
+    REQUIRE(gmat2.column == 6);
+    REQUIRE(gmat2[1][2] == 4);
 }
 
 TEST_CASE("UnitizedGaussianKernel")
 {
     UnitizedGaussianKernel<double> knl(3, 0.8);
-    REQUIRE(std::abs(knl.kernel_mat[1][1]-0.2725)<0.0001);
+    REQUIRE(std::abs(knl.kernel_mat[1][1] - 0.2725) < 0.0001);
+}
+
+TEST_CASE("PrewittKernel")
+{
+    PrewittKernel<int, Orientation::X> knl;
+    REQUIRE(knl.kernel_mat[0][0] == -1);
+    REQUIRE(knl.kernel_mat[0][2] == 1);
+}
+
+TEST_CASE("SobelKernel")
+{
+    SobelKernel<int, Orientation::Y> knl;
+    REQUIRE(knl.kernel_mat[0][0] == 1);
+    REQUIRE(knl.kernel_mat[0][2] == 1);
+    REQUIRE(knl.kernel_mat[2][1] == -2);
 }

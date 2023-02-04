@@ -12,7 +12,7 @@ RenderToy::Image::Image(const RenderContext *const render_context_)
     : resolution(render_context_->format_settings.resolution)
 {
     buffer = new Vector3f[resolution.Area()];
-    for(int i=0;i<resolution.Area();++i)
+    for (int i = 0; i < resolution.Area(); ++i)
     {
         buffer[i] = render_context_->buffer[i];
     }
@@ -22,39 +22,40 @@ RenderToy::Image::Image(const Image &image)
     : resolution(image.resolution)
 {
     buffer = new Vector3f[resolution.Area()];
-    for(int i=0;i<resolution.Area();++i)
+    for (int i = 0; i < resolution.Area(); ++i)
     {
         buffer[i] = image.buffer[i];
     }
 }
 
-const Image RenderToy::Image::Convolute(const IConvolutionKernel<float> &k) const
+Image &RenderToy::Image::GaussianBlur(const std::size_t size, const float sigma)
+{
+    // UnitizedGaussianKernel<float> gk(size, sigma);
+    UnitizedGaussianKernel<float, Orientation::X> gk_x(size, sigma);
+    UnitizedGaussianKernel<float, Orientation::Y> gk_y(size, sigma);
+    Convolute(gk_x).Convolute(gk_y);
+    return (*this);
+}
+
+const Image RenderToy::Image::Extract(const std::function<bool(const Vector3f &)> &pixel_filter, const Vector3f &default_color)
 {
     Image ret(resolution);
-    size_t row_2 = k.kernel_mat.row >> 1;
-    size_t column_2 = k.kernel_mat.column >> 1;
-    for(int i=0;i<resolution.height;++i)
+    for (int i = 0; i < resolution.Area(); ++i)
     {
-        for(int j=0;j<resolution.width;++j)
-        {
-            //ret[i][j]
-            for(int ii=0;ii<k.kernel_mat.row;++ii)
-            {
-                for(int jj=0;jj<k.kernel_mat.column;++jj)
-                {
-                    PointN buffer_pos = IndexWrapper<IndexWrapperType::kReflect>(PointN(i-row_2+ii, j-column_2+jj));
-                    ret.buffer[i * ret.resolution.width + j] += buffer[buffer_pos.x * ret.resolution.width + buffer_pos.y] * k.kernel_mat[ii][jj];
-                }
-            }
-        }
+        ret.buffer[i] = pixel_filter(buffer[i]) ? buffer[i] : default_color;
     }
     return ret;
 }
 
-const Image RenderToy::Image::GaussianBlur(const std::size_t size, const float sigma) const
+Image &RenderToy::Image::Bloom(const std::size_t size, const float sigma, const float threshold)
 {
-    UnitizedGaussianKernel<float> gk(size, sigma);
-    return Convolute(gk);
+    Image bloom_layer = Extract([&threshold](const Vector3f &_) -> bool {
+        return (Convert::Luma(_) > threshold);
+    });
+    bloom_layer.GaussianBlur(size, sigma);
+    (*this) = (*this) + bloom_layer;
+
+    return (*this);
 }
 
 RenderToy::Image::~Image()

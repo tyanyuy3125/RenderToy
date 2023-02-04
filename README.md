@@ -1,8 +1,14 @@
 # RenderToy
 RenderToy is an experimental path tracing rendering library for academic purposes.
+
 ![comparison](./docs/comparison.png)
 
 ## We implement:
+* Modern color system.
+    * Tone mapping.
+    * Various color standards.
+        * ITU-R BT.709
+        * ITU-R BT.601
 * Fullly multi-threaded path-traced GI.
     * Direct Light Sampling (DLS).
         * It also produces fast-GI results.
@@ -10,16 +16,24 @@ RenderToy is an experimental path tracing rendering library for academic purpose
     * Multiple importance sampling (MIS).
 * Triangulated mesh system.
     * Bounding Volume Hierarchy (BVH) acceleration structure.
-* Physically based perspective camera.
+* Physically-based perspective camera.
 * Multi-pass ray-casting renderer, including normal pass, albedo pass & depth pass.
     * Can be linked with denoising library such as OIDN & Nvidia OptiX.
-* Physically based principled BSDF material system.
+* Physically-based principled BSDF material system.
 * A compositor for post-processing.
     * Gaussian blur.
     * Convolution with customized kernels.
+    * Edge detection.
+    * Bloom.
 * File IO.
     * Importing wavefront OBJ model file.
     * Exporting PPM & BMP image file.
+
+## Features
+* Unique project structure, unlike any other open source ray tracers.
+* High abstraction.
+* Extensive adoption of compile-time code like SFINAE etc.
+* Provides a variety of interfaces for secondary development.
 
 ## Our plan:
 * Procedural texture and mesh module.

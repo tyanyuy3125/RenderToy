@@ -21,6 +21,13 @@ namespace RenderToy
     struct SizeN;
     struct PointN;
 
+    enum class Orientation
+    {
+        X = 0,
+        Y = 1,
+        All = 2
+    };
+
     template <typename _Tp, std::size_t _Dm>
     struct Vector;
     template <typename _Tp, std::size_t _Dm>
@@ -93,6 +100,17 @@ namespace RenderToy
                 }
             }
             return true;
+        }
+
+        inline static const Vector
+        Abs(const Vector &vec)
+        {
+            Vector ret;
+            for (int i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] = std::abs(vec.arr[i]);
+            }
+            return ret;
         }
 
         /// @brief
@@ -216,6 +234,16 @@ namespace RenderToy
             for (size_t i = 0; i < _Dm; ++i)
             {
                 ret.arr[i] = arr[i] / a;
+            }
+            return ret;
+        }
+        inline const Vector
+        operator/(const Vector &a) const
+        {
+            Vector<_Tp, _Dm> ret(*this);
+            for (size_t i = 0; i < _Dm; ++i)
+            {
+                ret.arr[i] /= a.arr[i];
             }
             return ret;
         }
@@ -783,10 +811,23 @@ namespace RenderToy
     struct GeneralizedVector
     {
         const std::size_t column;
+
         GeneralizedVector(const std::size_t column_, _Tp default_val_ = _Tp(0))
             : column(column_), data(column_, default_val_)
         {
         }
+
+        template <typename... Args>
+        explicit GeneralizedVector(Args &&...data_)
+            : column(sizeof...(data_)), data{std::forward<Args>(data_)...}
+        {
+        }
+
+        GeneralizedVector(std::initializer_list<_Tp> data_)
+            : column(data_.size()), data{data_}
+        {
+        }
+
         inline const _Tp &operator[](const std::size_t c) const
         {
             return data[c];
@@ -807,14 +848,16 @@ namespace RenderToy
         const std::size_t row, column;
 
         GeneralizedMatrix(std::size_t row_ = 2, std::size_t column_ = 2, _Tp default_val_ = _Tp(0))
-            : row(row_), column(column_), data(row_, GeneralizedVector<_Tp>(column_, default_val_))
-        {
-        }
+            : row(row_), column(column_), data(row_, GeneralizedVector<_Tp>(column_, default_val_)) {}
+
+        GeneralizedMatrix(std::initializer_list<GeneralizedVector<_Tp>> data_)
+            : row(data_.size()), column(data_.begin()->column), data{data_} {}
 
         inline const GeneralizedVector<_Tp> &operator[](const std::size_t r) const
         {
             return data[r];
         }
+
         inline GeneralizedVector<_Tp> &operator[](const std::size_t r)
         {
             return data[r];
@@ -828,17 +871,18 @@ namespace RenderToy
     {
         IConvolutionKernel() = default;
         IConvolutionKernel(std::size_t r, std::size_t c)
-            : kernel_mat(r, c)
-        {
-        }
+            : kernel_mat(r, c) {}
+        IConvolutionKernel(const GeneralizedMatrix<_Tp> &kernel_mat_)
+            : kernel_mat(kernel_mat_) {}
         GeneralizedMatrix<_Tp> kernel_mat;
     };
 
-    template <typename _Tp>
+    template <typename _Tp, Orientation _O = Orientation::All>
     struct UnitizedGaussianKernel : public IConvolutionKernel<_Tp>
     {
-        UnitizedGaussianKernel(std::size_t size, _Tp sigma)
-            : IConvolutionKernel<_Tp>(size,size)
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::All), bool> = true>
+        UnitizedGaussianKernel(const std::size_t size, const _Tp sigma)
+            : IConvolutionKernel<_Tp>(size, size)
         {
             _Tp orig = _Tp(size >> 1);
             _Tp x2, y2;
@@ -863,6 +907,72 @@ namespace RenderToy
                 }
             }
         }
+
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::X), bool> = true>
+        UnitizedGaussianKernel(const std::size_t size, const _Tp sigma)
+            : IConvolutionKernel<_Tp>(1, size)
+        {
+            _Tp orig = _Tp(size >> 1);
+            _Tp x2;
+            _Tp sum = _Tp(0);
+            for (std::size_t j = 0; j < size; ++j)
+            {
+                x2 = std::pow(_Tp(j) - orig, _Tp(2));
+                _Tp g = std::exp(-(x2) / (_Tp(2) * sigma * sigma));
+                sum += g;
+                IConvolutionKernel<_Tp>::kernel_mat[0][j] = g;
+            }
+
+            for (std::size_t j = 0; j < size; ++j)
+            {
+                IConvolutionKernel<_Tp>::kernel_mat[0][j] /= sum;
+            }
+        }
+
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::Y), bool> = true>
+        UnitizedGaussianKernel(const std::size_t size, const _Tp sigma)
+            : IConvolutionKernel<_Tp>(size, 1)
+        {
+            _Tp orig = _Tp(size >> 1);
+            _Tp y2;
+            _Tp sum = _Tp(0);
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                y2 = std::pow(_Tp(i) - orig, _Tp(2));
+                _Tp g = std::exp(-(y2) / (_Tp(2) * sigma * sigma));
+                sum += g;
+                IConvolutionKernel<_Tp>::kernel_mat[i][0] = g;
+            }
+
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                IConvolutionKernel<_Tp>::kernel_mat[i][0] /= sum;
+            }
+        }
+    };
+
+    template <typename _Tp, Orientation _Ortn>
+    struct PrewittKernel : public IConvolutionKernel<_Tp>
+    {
+        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::X), bool> = true>
+        PrewittKernel()
+            : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-1), _Tp(0), _Tp(1)}})) {}
+
+        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::Y), bool> = true>
+        PrewittKernel()
+            : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(1), _Tp(1), _Tp(1)}, {_Tp(0), _Tp(0), _Tp(0)}, {_Tp(-1), _Tp(-1), _Tp(-1)}})) {}
+    };
+
+    template <typename _Tp, Orientation _Ortn>
+    struct SobelKernel : public IConvolutionKernel<_Tp>
+    {
+        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::X), bool> = true>
+        SobelKernel()
+            : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-2), _Tp(0), _Tp(2)}, {_Tp(-1), _Tp(0), _Tp(1)}})) {}
+
+        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::Y), bool> = true>
+        SobelKernel()
+            : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(1), _Tp(2), _Tp(1)}, {_Tp(0), _Tp(0), _Tp(0)}, {_Tp(-1), _Tp(-2), _Tp(-1)}})) {}
     };
 
     namespace Convert
@@ -882,17 +992,34 @@ namespace RenderToy
         const Vector3f BlackBody(const float t);
         const Vector3f XYZToSRGB(const Vector3f &x);
 
-        constexpr inline const float
-        RGBToLuminance(const Vector3f &vec)
+        enum class ColorStandard
         {
-            // Separating components keeps constexpr.
-            return 0.212671f * vec.x() + 0.715160f * vec.y() + 0.072169f * vec.z();
+            /// @brief ITU-R BT.709 http://www.itu.int/rec/R-REC-BT.709
+            kITURBT709 = 0,
+            /// @brief ITU-R BT.601 http://www.itu.int/rec/R-REC-BT.601
+            kITURBT601 = 1
+        };
+
+        template <ColorStandard _CS = ColorStandard::kITURBT709>
+        constexpr inline const float
+        Luma(const Vector3f &vec)
+        {
+            if constexpr (_CS == ColorStandard::kITURBT709)
+            {
+                // Separating components keeps constexpr.
+                return 0.2126f * vec.x() + 0.7152f * vec.y() + 0.0722f * vec.z();
+            }
+            else if constexpr (_CS == ColorStandard::kITURBT601)
+            {
+                return 0.299f * vec.x() + 0.587f * vec.y() + 0.114f * vec.z();
+            }
         }
 
+        template <ColorStandard _CS = ColorStandard::kITURBT709>
         inline const Vector3f
         Tonemap(const Vector3f &vec, const float limit)
         {
-            return vec * 1.0f / (1.0f + RGBToLuminance(vec) / limit);
+            return vec * 1.0f / (1.0f + Luma<_CS>(vec) / limit);
         }
     };
 
