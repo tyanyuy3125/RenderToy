@@ -78,17 +78,4 @@ namespace RenderToy
     };
 }
 
-namespace RenderToy::ProceduralTexture
-{
-    struct PerlinNoiseTexture : public ITexture
-    {
-        virtual void Sample(const float u, const float v) const override final;
-    };
-
-    struct CheckboardTexture : public ITexture
-    {
-        virtual void Sample(const float u, const float v) const override final;
-    };
-}
-
 #endif // MATERIAL_H

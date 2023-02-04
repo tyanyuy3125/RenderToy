@@ -205,3 +205,16 @@ TEST_CASE("Converter constexpr test.")
     STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - M_PIf32)<EPS);
     STATIC_REQUIRE(std::abs(Convert::RGBToLuminance({1.0f, 1.0f, 1.0f}) - (0.212671f+0.715160f+0.072169f)) < EPS);
 }
+
+TEST_CASE("GeneralizedMatrix")
+{
+    GeneralizedMatrix<int> gmat(10,10);
+    gmat[5][5]=16;
+    REQUIRE(gmat[5][5] == 16);
+}
+
+TEST_CASE("UnitizedGaussianKernel")
+{
+    UnitizedGaussianKernel<double> knl(3, 0.8);
+    REQUIRE(std::abs(knl.kernel_mat[1][1]-0.2725)<0.0001);
+}

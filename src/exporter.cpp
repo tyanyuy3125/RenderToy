@@ -1,4 +1,4 @@
-#define BUFFER(x, y, width) render_context->buffer[y * width + x]
+#define BUFFER(x, y, width) image.buffer[y * width + x]
 
 #include <algorithm>
 
@@ -9,8 +9,8 @@ namespace RenderToy
 {
     void PPMExporter::Export(std::ostream &os)
     {
-        int nx = render_context->format_settings.resolution.width;
-        int ny = render_context->format_settings.resolution.height;
+        int nx = image.resolution.width;
+        int ny = image.resolution.height;
         os << "P3" << std::endl
            << nx << ' ' << ny << std::endl
            << "255" << std::endl;
@@ -32,8 +32,8 @@ namespace RenderToy
         }
     }
 
-    PPMExporter::PPMExporter(RenderContext *render_context_)
-        : IExporter(render_context_)
+    PPMExporter::PPMExporter(const Image &image_)
+        : IExporter(image_)
     {
     }
 
@@ -71,21 +71,21 @@ namespace RenderToy
         } pixel;
 #pragma pack(pop)
 
-        int padding_len = 4 - (render_context->format_settings.resolution.width % 4);
+        int padding_len = 4 - (image.resolution.width % 4);
         padding_len %= 4;
 
-        bmpHeader.sizeOfBitmapFile = 54 + render_context->format_settings.resolution.Area() * 3;
-        bmpInfoHeader.width = render_context->format_settings.resolution.width;
-        bmpInfoHeader.height = render_context->format_settings.resolution.height;
+        bmpHeader.sizeOfBitmapFile = 54 + image.resolution.Area() * 3;
+        bmpInfoHeader.width = image.resolution.width;
+        bmpInfoHeader.height = image.resolution.height;
 
         os.write((char *)&bmpHeader, 14);
         os.write((char *)&bmpInfoHeader, 40);
 
-        for (int i = 0; i < render_context->format_settings.resolution.height; ++i)
+        for (int i = 0; i < image.resolution.height; ++i)
         {
-            for (int j = 0; j < render_context->format_settings.resolution.width; ++j)
+            for (int j = 0; j < image.resolution.width; ++j)
             {
-                auto real_color = BUFFER(j, i, render_context->format_settings.resolution.width);
+                auto real_color = BUFFER(j, i, image.resolution.width);
                 // TODO: 把下面的几个函数封装到Posteffects类中。
                 real_color = Convert::Tonemap(real_color, 1.5f);
                 real_color = Vector3f::Pow(real_color, 0.4545f);
@@ -101,13 +101,13 @@ namespace RenderToy
         }
     }
 
-    BMPExporter::BMPExporter(RenderContext *render_context_)
-        : IExporter(render_context_)
+    BMPExporter::BMPExporter(const Image &image_)
+        : IExporter(image_)
     {
     }
-
-    IExporter::IExporter(RenderContext *render_context_)
-        : render_context(render_context_)
+    
+    IExporter::IExporter(const Image &image_)
+        : image(image_)
     {
     }
 }

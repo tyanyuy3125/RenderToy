@@ -50,7 +50,7 @@ namespace RenderToy
         }
     }
 
-    TestRenderer::TestRenderer(const Size &resolution_)
+    TestRenderer::TestRenderer(const SizeN &resolution_)
         : IRenderer(new RenderContext(nullptr, FormatSettings(resolution_, Vector2f::O)))
     {
     }
@@ -66,7 +66,7 @@ namespace RenderToy
         }
     }
 
-    FormatSettings::FormatSettings(Size resolution_, Vector2f aspect_)
+    FormatSettings::FormatSettings(SizeN resolution_, Vector2f aspect_)
         : resolution(resolution_), aspect(aspect_)
     {
     }

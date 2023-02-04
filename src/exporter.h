@@ -3,6 +3,7 @@
 
 #include "rtmath.h"
 #include "renderer.h"
+#include "compositor.h"
 
 #include <ostream>
 
@@ -11,10 +12,10 @@ namespace RenderToy
     /// @brief Interface for all exporters.
     struct IExporter
     {
-        RenderContext *render_context;
+        const Image &image;
         virtual void Export(std::ostream &os) = 0;
 
-        IExporter(RenderContext *render_context_);
+        IExporter(const Image &image_);
     };
 
     /// @brief Exports image as .ppm file.
@@ -22,7 +23,7 @@ namespace RenderToy
     {
         virtual void Export(std::ostream &os) override final;
 
-        PPMExporter(RenderContext *render_context_);
+        PPMExporter(const Image &image_);
     };
 
     /// @brief Exports image as .bmp file.
@@ -30,7 +31,7 @@ namespace RenderToy
     {
         virtual void Export(std::ostream &os) override final;
 
-        BMPExporter(RenderContext *render_context_);
+        BMPExporter(const Image &image_);
     };
 }
 

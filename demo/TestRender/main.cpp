@@ -5,7 +5,7 @@
 
 int main(){
     RenderToy::Vector3f *buffer;
-    RenderToy::TestRenderer tr(RenderToy::Size(1920, 1080));
+    RenderToy::TestRenderer tr(RenderToy::SizeN(1920, 1080));
     tr.Render();
     RenderToy::BMPExporter exporter(tr.render_context);
 

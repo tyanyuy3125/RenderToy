@@ -65,52 +65,52 @@ namespace RenderToy
         return matrix * x;
     }
 
-    Point::Point()
+    PointN::PointN()
         : x(0), y(0)
     {
     }
 
-    Point::Point(int x_, int y_)
+    PointN::PointN(int x_, int y_)
         : x(x_), y(y_)
     {
     }
 
-    Point::Point(const Vector2f &vec)
+    PointN::PointN(const Vector2f &vec)
         : x(int(vec.x())), y(int(vec.y()))
     {
     }
 
-    Point::Point(const std::array<int, 2> &tuple)
+    PointN::PointN(const std::array<int, 2> &tuple)
         : x(tuple[0]), y(tuple[1])
     {
     }
 
-    Size::Size()
+    SizeN::SizeN()
         : width(0), height(0)
     {
     }
 
-    Size::Size(std::size_t x_, std::size_t y_)
+    SizeN::SizeN(std::size_t x_, std::size_t y_)
         : width(x_), height(y_)
     {
     }
 
-    Size::Size(const Vector2f &vec)
+    SizeN::SizeN(const Vector2f &vec)
         : width(std::size_t(vec.x())), height(std::size_t(vec.y()))
     {
     }
 
-    Size::Size(const std::array<std::size_t, 2> &tuple)
+    SizeN::SizeN(const std::array<std::size_t, 2> &tuple)
         : width(tuple[0]), height(tuple[1])
     {
     }
 
-    const std::size_t Size::Area() const
+    const std::size_t SizeN::Area() const
     {
         return width * height;
     }
 
-    const float Size::AspectRatio() const
+    const float SizeN::AspectRatio() const
     {
         return float(width) / float(height);
     }

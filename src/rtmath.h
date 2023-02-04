@@ -18,8 +18,8 @@ namespace RenderToy
 {
     // Forward declarations.
 
-    struct Size;
-    struct Point;
+    struct SizeN;
+    struct PointN;
 
     template <typename _Tp, std::size_t _Dm>
     struct Vector;
@@ -779,6 +779,92 @@ namespace RenderToy
                                                    {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
     };
 
+    template <typename _Tp>
+    struct GeneralizedVector
+    {
+        const std::size_t column;
+        GeneralizedVector(const std::size_t column_, _Tp default_val_ = _Tp(0))
+            : column(column_), data(column_, default_val_)
+        {
+        }
+        inline const _Tp &operator[](const std::size_t c) const
+        {
+            return data[c];
+        }
+        inline _Tp &operator[](const std::size_t c)
+        {
+            return data[c];
+        }
+
+    private:
+        std::vector<_Tp> data;
+    };
+
+    template <typename _Tp>
+    struct GeneralizedMatrix
+    {
+    public:
+        const std::size_t row, column;
+
+        GeneralizedMatrix(std::size_t row_ = 2, std::size_t column_ = 2, _Tp default_val_ = _Tp(0))
+            : row(row_), column(column_), data(row_, GeneralizedVector<_Tp>(column_, default_val_))
+        {
+        }
+
+        inline const GeneralizedVector<_Tp> &operator[](const std::size_t r) const
+        {
+            return data[r];
+        }
+        inline GeneralizedVector<_Tp> &operator[](const std::size_t r)
+        {
+            return data[r];
+        }
+
+        std::vector<GeneralizedVector<_Tp>> data;
+    };
+
+    template <typename _Tp>
+    struct IConvolutionKernel
+    {
+        IConvolutionKernel() = default;
+        IConvolutionKernel(std::size_t r, std::size_t c)
+            : kernel_mat(r, c)
+        {
+        }
+        GeneralizedMatrix<_Tp> kernel_mat;
+    };
+
+    template <typename _Tp>
+    struct UnitizedGaussianKernel : public IConvolutionKernel<_Tp>
+    {
+        UnitizedGaussianKernel(std::size_t size, _Tp sigma)
+            : IConvolutionKernel<_Tp>(size,size)
+        {
+            _Tp orig = _Tp(size >> 1);
+            _Tp x2, y2;
+            _Tp sum = _Tp(0);
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                y2 = std::pow(_Tp(i) - orig, _Tp(2));
+                for (std::size_t j = 0; j < size; ++j)
+                {
+                    x2 = std::pow(_Tp(j) - orig, _Tp(2));
+                    _Tp g = std::exp(-(x2 + y2) / (_Tp(2) * sigma * sigma));
+                    sum += g;
+                    IConvolutionKernel<_Tp>::kernel_mat[i][j] = g;
+                }
+            }
+
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                for (std::size_t j = 0; j < size; ++j)
+                {
+                    IConvolutionKernel<_Tp>::kernel_mat[i][j] /= sum;
+                }
+            }
+        }
+    };
+
     namespace Convert
     {
         constexpr inline const float
@@ -811,24 +897,24 @@ namespace RenderToy
     };
 
 #pragma region Drawing Math
-    struct Point
+    struct PointN
     {
         int x, y;
 
-        Point();
-        Point(int x_, int y_);
-        Point(const Vector2f &vec);
-        Point(const std::array<int, 2> &tuple);
+        PointN();
+        PointN(int x_, int y_);
+        PointN(const Vector2f &vec);
+        PointN(const std::array<int, 2> &tuple);
     };
 
-    struct Size
+    struct SizeN
     {
         std::size_t width, height;
 
-        Size();
-        Size(std::size_t width_, std::size_t height_);
-        Size(const Vector2f &vec);
-        Size(const std::array<std::size_t, 2> &tuple);
+        SizeN();
+        SizeN(std::size_t width_, std::size_t height_);
+        SizeN(const Vector2f &vec);
+        SizeN(const std::array<std::size_t, 2> &tuple);
 
         const std::size_t Area() const;
         const float AspectRatio() const;
