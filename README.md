@@ -18,6 +18,10 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 * Triangulated mesh system.
     * Bounding Volume Hierarchy (BVH) acceleration structure.
 * Physically-based perspective camera.
+    * Presets:
+        * Academy Format.
+        * IMAX HD.
+        * Maxivision.
 * Multi-pass ray-casting renderer, including normal pass, albedo pass & depth pass.
     * Can be linked with denoising library such as OIDN & Nvidia OptiX.
 * Physically-based principled BSDF material system.

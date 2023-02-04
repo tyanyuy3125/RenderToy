@@ -17,6 +17,7 @@ namespace RenderToy
 {
     class Mesh;
 
+    /// @brief Fundamental geometry class. Storages the position and rotation information of objects in the world.
     class Geometry
     {
     protected:
@@ -46,6 +47,7 @@ namespace RenderToy
         const Ray W2OTransform(const Ray &ray) const;
     };
 
+    /// @brief Physically based camera.
     class Camera : public Geometry
     {
     public:
@@ -61,7 +63,12 @@ namespace RenderToy
                float far_clipping_plane_);
     };
 
-    static const Camera academy_camera = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.825f, 0.446f), 0.1f, 1000.0f);
+    /// @brief Academy Format by AMPAS.
+    static const Camera academy_format = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.868f, 0.631f), 0.1f, 1000.0f);
+    /// @brief IMAX HD by IMAX Corporation.
+    static const Camera imax_hd = Camera(Matrix4x4f::I, 65.0f, Vector2f(2.772f, 2.072f), 0.1f, 1000.0f);
+    /// @brief Maxivision by Dean Goodhill.
+    static const Camera maxivision = Camera(Matrix4x4f::I, 35.0f, Vector2f(0.980f, 0.546f), 0.1f, 1000.0f);
 
     /// @brief Triangle is the basic discrete element of every mesh in the scene. It directly composites BVH.
     class Triangle
