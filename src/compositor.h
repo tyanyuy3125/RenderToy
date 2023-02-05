@@ -9,13 +9,7 @@ namespace RenderToy
     /// @brief Image class. Provides a variety of operations on images.
     class Image
     {
-        /// @brief Decides which mode should be picked when image processing meets edges.
-        enum class EdgeMode
-        {
-            kReflect = 0,
-            kBlackPadding = 1,
-            kWhitePadding = 2
-        };
+        enum class EdgeMode;
 
         /// @brief Get pixel info at point p.
         /// @tparam _EM Edge Mode.
@@ -62,6 +56,21 @@ namespace RenderToy
         }
 
     public:
+        /// @brief Decides which mode should be picked when image processing meets edges.
+        enum class EdgeMode
+        {
+            kReflect = 0,
+            kBlackPadding = 1,
+            kWhitePadding = 2
+        };
+
+        /// @brief Sample mode for sampling and resizing.
+        enum class SampleMode
+        {
+            kNearestNeighbor = 0,
+            kBilinearInterpolation = 1
+        };
+
         const SizeN resolution;
         Vector3f *buffer;
 
@@ -225,11 +234,42 @@ namespace RenderToy
         [[nodiscard]] const Image Extract(const std::function<bool(const Vector3f &)> &pixel_filter, const Vector3f &default_color = Vector3f::O);
 
         /// @brief Generates bloom on pixels that satisfy brightness threshold.
-        /// @param size 
-        /// @param sigma 
-        /// @param threshold 
-        /// @return 
+        /// @param size
+        /// @param sigma
+        /// @param threshold
+        /// @return
         Image &Bloom(const std::size_t size, const float sigma, const float threshold);
+
+        /// @brief Sample image at given coordinate.
+        /// @tparam _SM Sampling mode.
+        /// @param coord Coordinate.
+        /// @return Color.
+        template <SampleMode _SM = SampleMode::kNearestNeighbor>
+        const Vector3f Sample(const Vector2f &coord) const
+        {
+            if constexpr (_SM == SampleMode::kNearestNeighbor)
+            {
+                return BufferGetWrapper<EdgeMode::kBlackPadding>(PointN(std::round(coord.x), std::round(coord.y)));
+            }
+            else if constexpr (_SM == SampleMode::kBilinearInterpolation)
+            {
+                auto lbx = int(coord.x);
+                auto lby = int(coord.y);
+                auto ltc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx, lby});
+                auto rtc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx + 1, lby});
+                auto lbc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx, lby + 1});
+                auto rbc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx + 1, lby + 1});
+                auto tc = Lerp(ltc, rtc, coord.x - floor(coord.x));
+                auto bc = Lerp(lbc, rbc, coord.x - floor(coord.x));
+                return Lerp(tc, bc, coord.y - floor(coord.y));
+            }
+        }
+
+        template <SampleMode _SM = SampleMode::kNearestNeighbor>
+        const Image Resize(const SizeN &new_size) const
+        {
+
+        }
 
         ~Image();
     };

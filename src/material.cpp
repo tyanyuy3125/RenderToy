@@ -36,7 +36,7 @@ namespace RenderToy
     {
         float metallic_fresnel = SchlickFresnel(VDotH);
         float dielectric_fresnel = DielectricFresnel(VDotH, eta);
-        return Mix(dielectric_fresnel, metallic_fresnel, metallic);
+        return Lerp(dielectric_fresnel, metallic_fresnel, metallic);
     }
 
     const Vector3f PrincipledBSDF::EvalDiffuse(const Vector3f Csheen, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
@@ -50,18 +50,18 @@ namespace RenderToy
         float FV = SchlickFresnel(V.z());
         float FH = SchlickFresnel(Vector3f::Dot(L, H));
         float Fd90 = 0.5f + 2.0f * Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
-        float Fd = Mix(1.0f, Fd90, FL) * Mix(1.0f, Fd90, FV);
+        float Fd = Lerp(1.0f, Fd90, FL) * Lerp(1.0f, Fd90, FV);
 
         // Fake Subsurface TODO: Replace with volumetric scattering
         float Fss90 = Vector3f::Dot(L, H) * Vector3f::Dot(L, H) * roughness;
-        float Fss = Mix(1.0f, Fss90, FL) * Mix(1.0f, Fss90, FV);
+        float Fss = Lerp(1.0f, Fss90, FL) * Lerp(1.0f, Fss90, FV);
         float ss = 1.25f * (Fss * (1.0f / (L.z() + V.z()) - 0.5f) + 0.5f);
 
         // Sheen
         Vector3f Fsheen = FH * sheen * Csheen;
 
         pdf = L.z() * (1.0f / kPi<float>);
-        return ((1.0f / kPi<float>) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
+        return ((1.0f / kPi<float>) * Lerp(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
     }
 
     const Vector3f PrincipledBSDF::EvalSpecReflection(const float eta, const Vector3f specCol, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
@@ -71,7 +71,7 @@ namespace RenderToy
             return Vector3f(0.0f);
 
         float FM = FresnelMix(eta, Vector3f::Dot(L, H));
-        Vector3f F = Mix(specCol, Vector3f(1.0f), Vector3f(FM));
+        Vector3f F = Lerp(specCol, Vector3f(1.0f), Vector3f(FM));
         float D = GTR2(H.z(), roughness);
         float G1 = SmithG(std::abs(V.z()), roughness);
         float G2 = G1 * SmithG(std::abs(L.z()), roughness);
@@ -108,7 +108,7 @@ namespace RenderToy
             return Vector3f::O;
 
         float FH = DielectricFresnel(Vector3f::Dot(V, H), 1.0f / 1.5f);
-        float F = Mix(0.04f, 1.0f, FH);
+        float F = Lerp(0.04f, 1.0f, FH);
         float D = GTR1(H.z(), clearcoat_roughness);
         float G = SmithG(L.z(), 0.25f) * SmithG(V.z(), 0.25f);
         float jacobian = 1.0f / (4.0f * Vector3f::Dot(V, H));
@@ -122,14 +122,14 @@ namespace RenderToy
         float lum = Convert::Luma(base_color);
         Vector3f ctint = lum > 0.0f ? base_color / lum : Vector3f(1.0f);
         float F0 = (1.0f - eta) / (1.0f + eta);
-        specCol = Mix(F0 * F0 * Mix(Vector3f::White, ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
-        sheenCol = Mix(Vector3f::White, Vector3f(ctint), Vector3f(sheen_tint));
+        specCol = Lerp(F0 * F0 * Lerp(Vector3f::White, ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
+        sheenCol = Lerp(Vector3f::White, Vector3f(ctint), Vector3f(sheen_tint));
     }
 
     void PrincipledBSDF::GetLobeProbabilities(const float eta, const Vector3f specCol, const float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
     {
         diffuseWt = Convert::Luma(base_color) * (1.0f - metallic) * (1.0f - spec_trans);
-        specReflectWt = Convert::Luma(Mix(specCol, Vector3f::White, Vector3f(approxFresnel)));
+        specReflectWt = Convert::Luma(Lerp(specCol, Vector3f::White, Vector3f(approxFresnel)));
         specRefractWt = (1.0f - approxFresnel) * (1.0f - metallic) * spec_trans * Convert::Luma(base_color);
         clearcoatWt = clearcoat * (1.0f - metallic);
         float totalWt = diffuseWt + specReflectWt + specRefractWt + clearcoatWt;

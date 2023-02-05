@@ -1154,10 +1154,10 @@ namespace RenderToy
     const Vector3f Refract(const Vector3f &incident_vec, const Vector3f &normal, float eta);
     const Vector3f Reflect(const Vector3f &incident_vec, const Vector3f &normal);
 
-    template <typename _Tp>
-    const _Tp Mix(const _Tp x, const _Tp y, const _Tp a)
+    template <typename _Tp, typename _TpCoeff>
+    inline const _Tp Lerp(const _Tp x, const _Tp y, const _TpCoeff a)
     {
-        return x * (_Tp(1) - a) + y * a;
+        return x * (_TpCoeff(1) - a) + y * a;
     }
 
 };

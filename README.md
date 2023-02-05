@@ -37,6 +37,22 @@ RenderToy is an experimental path tracing rendering library for academic purpose
     * Importing wavefront OBJ model file.
     * Exporting PPM & BMP image file.
 
+## Getting Started
+Pre-requirements:
+* CMake 3.10+
+* GNU G++ 9.4.0+ or Clang++ 10.0.0+
+> Currently Clang++ could not compile RenderToy, since Clang++ provides about 20% speed improvement, this is not intended, we are looking into this issue.
+
+Meanwhile we recommend you use VSCode as it is well integrated with CMake. After opening the project directory in VSCode, press Ctrl+Shift+P then enter CMake: Configure - VSCode will do everything you need.
+
+## Launch Targets
+* Tests - Unit test module for the project.
+* CornellBox - A demo rendering the famous Cornell Box scene.
+* WithOIDN - (WIP) A demonstration of Intel® Open Image Denoise integration.
+* ProceduralTexture - A demo rasterizing procedural textures supported by RenderToy.
+* Interactive - (WIP) Live preview demo on X11.
+* TestRenderer - Just a test.
+
 ## Features
 * Unique project structure, unlike any other open source ray tracers.
 * High abstraction.
@@ -50,3 +66,15 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 * Exporting HDR image.
 * Physical sky.
 * Code optimization.
+
+## License
+MIT.
+
+## Reference
+* GLSL Path Tracer by knightcrawler25 (https://github.com/knightcrawler25/GLSL-PathTracer) and its simplified port on ShaderToy by Asif Ali (https://www.shadertoy.com/view/sltXRl). Their designs were referenced for the Disney PBR portion of this project.
+* Color standards from ITU-R (http://www.itu.int/rec/) and Andreas Paul from Dept of Informatics,  Technical University of Munich (https://www5.in.tum.de/lehre/vorlesungen/graphik/info/csc/COL_33.htm).
+* Minilight: A minimal global illumination renderer by HXA7241 (https://www.hxa.name/minilight/). It had an important impact on the structural design of this project.
+* Smallpt: Global Illumination in 99 lines of C++ (https://www.kevinbeason.com/smallpt/). Excellent demo for learning path tracing.
+* Blender (http://blender.org/). The demo model for this project was created using Blender. And many designs, such as the compositor and PCG part, draw inspiration from Blender.
+* Blackbody converter from Christopher J. Howard (https://www.shadertoy.com/view/tsKczy). MIT License. Copyright (c) 2020 Christopher J. Howard.
+* RGB/XYZ Matrices by Bruce Justin Lindbloom (http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html).
