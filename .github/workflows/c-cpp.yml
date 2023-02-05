@@ -13,11 +13,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: Build CMake
+      # You may pin to the exact commit or the version.
+      # uses: ashutoshvarma/action-cmake-build@0fbeeac8b1f9c8aef99e9eae9d78529ed3b0364b
+      uses: ashutoshvarma/action-cmake-build@v1
+      with:
+        # CMake build type (Release, Debug, MinSizeRel, RelWithDebInfo)
+        build-type: Release
+        # C Compiler for toolchain
+        cc: gcc
+        # C++ Compiler for toolchain
+        cxx: g++
+        # CMake build target
+        target: all
+        # Number of concurrent jobs for build and test
+        parallel: 4
+        # Run CTest or not
+        run-test: true
