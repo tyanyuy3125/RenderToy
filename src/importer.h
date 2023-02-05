@@ -9,6 +9,7 @@
 
 namespace RenderToy
 {
+    /// @brief Import Wavefront OBJ Model.
     class OBJModelImporter
     {
     public:

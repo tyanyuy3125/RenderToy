@@ -267,7 +267,7 @@ namespace RenderToy
     {
 #ifdef DISABLE_BVH
         const Triangle *intersected = nullptr;
-        t = INF;
+        t = kFloatInfinity;
         for (auto tri : (*models))
         {
             float it, iu, iv;
@@ -284,9 +284,9 @@ namespace RenderToy
         }
         return intersected;
 #else
-        t = INF;
+        t = kFloatInfinity;
         const Triangle *intersected = nullptr;
-        float t_min, t_max = INF;
+        float t_min, t_max = kFloatInfinity;
         bool intersected_test = octree->root->bbox.Intersect(ray, t_min, t_max);
         if (!intersected_test || t_max < 0.0f)
         {

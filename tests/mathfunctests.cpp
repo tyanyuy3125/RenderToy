@@ -54,9 +54,11 @@ TEST_CASE("Vector")
     {
         Vector3f a = initializer;
         a.Normalize();
-        REQUIRE(std::abs(a.Length() - 1.0f) < EPS);
+        // REQUIRE(std::abs(a.Length() - 1.0f) < kFloatEpsilon);
+        REQUIRE(a.Length() == 1.0f);
         Vector3f b = a.Normalized();
-        REQUIRE(std::abs((a - b).Length()) < EPS);
+        // REQUIRE(std::abs((a - b).Length()) < kFloatEpsilon);
+        REQUIRE((a - b).Length() == 0.0f);
     }
 
     SECTION("Equal")
@@ -91,8 +93,10 @@ TEST_CASE("Vector")
         Vector3f a = {0.2f, 0.3f, 0.4f};
         Vector3f b = {0.5f, 0.7f, 0.1f};
         auto c = Vector3f::Cross(a, b);
-        REQUIRE(std::abs(Vector3f::Dot(a, c)) < EPS);
-        REQUIRE(std::abs(Vector3f::Dot(b, c)) < EPS);
+        REQUIRE(std::abs(Vector3f::Dot(a, c)) < kFloatEpsilon);
+        REQUIRE(std::abs(Vector3f::Dot(b, c)) < kFloatEpsilon);
+        // REQUIRE(Vector3f::Dot(a, c) == 0.0f);
+        // REQUIRE(Vector3f::Dot(b, c) == 0.0f);
     }
 
     Vector3f ret = Vector3f::O + Vector3f::X + Vector3f::Y + Vector3f::Z;
@@ -136,12 +140,14 @@ TEST_CASE("Matrix")
         float det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
                                                          {4.0f, 5.0f, 6.0f},
                                                          {7.0f, 8.0f, 9.0f}});
-        REQUIRE(std::abs(det - 0.0f) < EPS);
+        // REQUIRE(std::abs(det - 0.0f) < kFloatEpsilon);
+        REQUIRE(det == 0.0f);
 
         det = Matrix3x3f::Determinant((Matrix3x3f){{1.0f, 2.0f, 3.0f},
                                                    {4.0f, 5.0f, 6.0f},
                                                    {15.0f, 8.0f, 9.0f}});
-        REQUIRE(std::abs(det + 24.0f) < EPS);
+        // REQUIRE(std::abs(det + 24.0f) < kFloatEpsilon);
+        REQUIRE(det == -24.0f);
     }
 
     SECTION("ComplementMinor")
@@ -181,7 +187,8 @@ TEST_CASE("Vector constexpr")
     constexpr Vector4d vec_h = Vector4d::O;
     REQUIRE(Vector3d::X + Vector3d::Y + Vector3d::Z == Vector3d::White);
     REQUIRE(vec_c == vec_d);
-    REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < EPS);
+    // REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < kFloatEpsilon);
+    REQUIRE(vec_a.Normalized().Length() == 1.0);
 }
 
 TEST_CASE("Matrix constexpr")
@@ -196,9 +203,12 @@ TEST_CASE("Matrix constexpr")
 
 TEST_CASE("Converter")
 {
-    STATIC_REQUIRE(std::abs(Convert::InchToMM(1.0f) - 25.4f) < EPS);
-    STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - M_PIf32) < EPS);
-    STATIC_REQUIRE(std::abs(Convert::Luma({1.0f, 1.0f, 1.0f}) - (0.212671f + 0.715160f + 0.072169f)) < EPS);
+    // STATIC_REQUIRE(std::abs(Convert::InchToMM(1.0f) - 25.4f) < kFloatEpsilon);
+    STATIC_REQUIRE(Convert::InchToMM(1.0f) == 25.4f);
+    // STATIC_REQUIRE(std::abs(Convert::DegreeToRadians(180.0f) - kPi<float>) < kFloatEpsilon);
+    STATIC_REQUIRE(Convert::DegreeToRadians(180.0f) == kPi<float>);
+    // STATIC_REQUIRE(std::abs(Convert::Luma({1.0f, 1.0f, 1.0f}) - (0.212671f + 0.715160f + 0.072169f)) < kFloatEpsilon);
+    STATIC_REQUIRE(Convert::Luma({1.0f, 1.0f, 1.0f}) == (0.212671f + 0.715160f + 0.072169f));
 }
 
 TEST_CASE("GeneralizedVector")

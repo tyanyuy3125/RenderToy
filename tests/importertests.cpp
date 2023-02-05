@@ -28,9 +28,9 @@ TEST_CASE("SStream Feature Test")
         float x, y, z;
         str_iss >> x >> y >> z;
         REQUIRE(identifier == "v");
-        REQUIRE(std::abs(x - 1.0f) < EPS);
-        REQUIRE(std::abs(y - 1.0f) < EPS);
-        REQUIRE(std::abs(z + 1.0f) < EPS);
+        REQUIRE(std::abs(x - 1.0f) < kFloatEpsilon);
+        REQUIRE(std::abs(y - 1.0f) < kFloatEpsilon);
+        REQUIRE(std::abs(z + 1.0f) < kFloatEpsilon);
     }
     SECTION("Face definition")
     {

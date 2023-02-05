@@ -60,8 +60,8 @@ namespace RenderToy
         // Sheen
         Vector3f Fsheen = FH * sheen * Csheen;
 
-        pdf = L.z() * (1.0f / M_PIf32);
-        return ((1.0f / M_PIf32) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
+        pdf = L.z() * (1.0f / kPi<float>);
+        return ((1.0f / kPi<float>) * Mix(Fd, ss, subsurface) * base_color + Fsheen) * (1.0f - metallic) * (1.0f - spec_trans);
     }
 
     const Vector3f PrincipledBSDF::EvalSpecReflection(const float eta, const Vector3f specCol, const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
@@ -149,7 +149,7 @@ namespace RenderToy
 
         Vector3f T, B;
         Onb(N, T, B);
-        V = ToLocal(T, B, N, V); // NDotL = L.z(); NDotV = V.z(); NDotH = H.z()
+        V = ToLocal(T, B, N, V); // NDotL = L.z(); N_dot_V = V.z(); N_dot_H = H.z()
         L = ToLocal(T, B, N, L);
 
         Vector3f H;
@@ -216,7 +216,7 @@ namespace RenderToy
 
         Vector3f T, B;
         Onb(N, T, B);
-        V = ToLocal(T, B, N, V); // NDotL = L.z(); NDotV = V.z(); NDotH = H.z()
+        V = ToLocal(T, B, N, V); // NDotL = L.z(); N_dot_V = V.z(); N_dot_H = H.z()
 
         // Specular and sheen color
         Vector3f specCol, sheenCol;

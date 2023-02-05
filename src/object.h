@@ -40,10 +40,21 @@ namespace RenderToy
         /// @return
         const Matrix4x4f &GetW2O() const;
 
+        /// @brief Transforms a vector by O2W matrix.
+        /// @param vec 
+        /// @return 
         const Vector3f O2WTransform(const Vector3f &vec) const;
+        /// @brief Transforms a vector by W2O matrix.
+        /// @param vec 
+        /// @return 
         const Vector3f W2OTransform(const Vector3f &vec) const;
-
+        /// @brief Transforms a ray by O2W matrix.
+        /// @param ray 
+        /// @return 
         const Ray O2WTransform(const Ray &ray) const;
+        /// @brief Transforms a ray by W2O matrix.
+        /// @param ray 
+        /// @return 
         const Ray W2OTransform(const Ray &ray) const;
     };
 
@@ -56,6 +67,12 @@ namespace RenderToy
         float near_clipping_plane;
         float far_clipping_plane;
 
+        /// @brief Constructs Camera class.
+        /// @param object_to_world_ O2W matrix.
+        /// @param focal_length_ Focal length.
+        /// @param gate_dimension_ Gate dimension.
+        /// @param near_clipping_plane_ Near clipping plane, used for rasterizer (WIP) and Z-buffer.
+        /// @param far_clipping_plane_ Far clipping plane, used for rasterizer (WIP) and Z-buffer.
         Camera(Matrix4x4f object_to_world_,
                float focal_length_,
                Vector2f gate_dimension_,
@@ -108,8 +125,14 @@ namespace RenderToy
         Mesh *parent;
 
     private:
+        /// @brief Calculate tangent.
+        /// @return 
         const Vector3f Tangent() const;
+        /// @brief Calculate normal.
+        /// @return 
         const Vector3f Normal() const;
+        /// @brief Calculate area.
+        /// @return 
         const float Area() const;
 
         Vector3f v0v1_w;
@@ -121,6 +144,7 @@ namespace RenderToy
         Vector3f tangent;
     };
 
+    /// @brief Polygon class. Used by PCG Mesh & Importer. Provides a function to convert to triangles.
     struct Polygon
     {
         std::size_t V;
@@ -129,12 +153,14 @@ namespace RenderToy
         std::vector<Vector2f> uv;
 
         Mesh *parent;
-
         Polygon(const std::size_t V_, const std::vector<Vector3f> &vert_, const std::vector<Vector3f> &norm_, const std::vector<Vector2f> &uv_, Mesh *parent_);
 
+        /// @brief Convert polygon to triangles.
+        /// @return 
         std::vector<Triangle *> ConvertToTriangle() const;
     };
 
+    /// @brief Mesh class. Represents a set of triangles.
     class Mesh : public Geometry
     {
     public:

@@ -5,6 +5,7 @@
 #include "compositor.h"
 
 #include <type_traits>
+#include <cmath>
 
 namespace RenderToy::ProceduralMesh
 {
@@ -20,7 +21,14 @@ namespace RenderToy::ProceduralTexture
     struct IPCGT
     {
         IPCGT() = default;
+        /// @brief Get texture information at given coordinate.
+        /// @param p 
+        /// @return 
         virtual inline const _TpRet Sample(const Vector<_TpCoord, 2> &p) const = 0;
+        
+        /// @brief Generate rasterized image of texture.
+        /// @param size 
+        /// @return 
         [[nodiscard]] const Image Rasterize(const std::size_t size) const
         {
             Image ret(SizeN(size, size));
@@ -36,6 +44,9 @@ namespace RenderToy::ProceduralTexture
         }
     };
 
+    /// @brief Checkerboard shader.
+    /// @tparam _TpRet Should be floating point value.
+    /// @tparam _TpCoord 
     template <typename _TpRet, typename _TpCoord, std::enable_if_t<std::is_floating_point_v<_TpRet>, bool> = true>
     struct CheckerBoard : public IPCGT<_TpRet, _TpCoord>
     {
@@ -54,6 +65,9 @@ namespace RenderToy::ProceduralTexture
         }
     };
 
+    /// @brief Sine wave shader.
+    /// @tparam _TpRet Should be floating point value.
+    /// @tparam _TpCoord 
     template <typename _TpRet, typename _TpCoord, std::enable_if_t<std::is_floating_point_v<_TpRet>, bool> = true>
     struct Wave : public IPCGT<_TpRet, _TpCoord>
     {
@@ -64,7 +78,7 @@ namespace RenderToy::ProceduralTexture
         virtual inline const _TpRet
         Sample(const Vector<_TpCoord, 2> &p) const override final
         {
-            return (_TpRet(std::sin(_TpCoord(2 * M_PIf32 * period) * p.x())) + _TpRet(1))/_TpRet(2);
+            return (_TpRet(std::sin(_TpCoord(2) * kPi<_TpCoord> * period * p.x())) + _TpRet(1))/_TpRet(2);
         }
     };
 

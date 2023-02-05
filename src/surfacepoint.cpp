@@ -25,7 +25,7 @@ namespace RenderToy
         const Vector3f ray(to_pos - position);
         const float distance2 = ray.Dot(ray);
         const float cos_area = out_dir.Dot(triangle->NormalC()) * triangle->AreaC();
-        const float solid_angle = is_solid_angle ? cos_area / (distance2 >= EPS ? distance2 : EPS) : 1.0f / (distance2 >= EPS ? distance2 : EPS);
+        const float solid_angle = is_solid_angle ? cos_area / (distance2 >= kFloatEpsilon ? distance2 : kFloatEpsilon) : 1.0f / (distance2 >= kFloatEpsilon ? distance2 : kFloatEpsilon);
         pdf = std::abs(1.0f / solid_angle); // TODO: Optimize. abs for culling.
         return triangle->parent->tex->emission;
     }

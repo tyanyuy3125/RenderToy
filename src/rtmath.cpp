@@ -150,13 +150,13 @@ namespace RenderToy
         return Z * Y * X;
     }
 
-    const float GTR1(const float NDotH, const float a)
+    const float GTR1(const float N_dot_H, const float a)
     {
         if (a >= 1.0f)
-            return (1.0f / M_PIf32);
+            return (1.0f / kPi<float>);
         float a2 = a * a;
-        float t = 1.0f + (a2 - 1.0f) * NDotH * NDotH;
-        return (a2 - 1.0f) / (M_PIf32 * std::log(a2) * t);
+        float t = 1.0f + (a2 - 1.0f) * N_dot_H * N_dot_H;
+        return (a2 - 1.0f) / (kPi<float> * std::log(a2) * t);
     }
 
     const Vector3f SampleGTR1(const float rgh, const float r1, const float r2)
@@ -164,35 +164,35 @@ namespace RenderToy
         float a = std::max(0.001f, rgh);
         float a2 = a * a;
 
-        float phi = r1 * 2.0f * M_PIf32;
+        float phi = r1 * 2.0f * kPi<float>;
 
-        float cosTheta = std::sqrt((1.0f - std::pow(a2, 1.0f - r1)) / (1.0f - a2));
-        float sinTheta = std::clamp(std::sqrt(1.0f - (cosTheta * cosTheta)), 0.0f, 1.0f);
-        float sinPhi = std::sin(phi);
-        float cosPhi = std::cos(phi);
+        float cos_theta = std::sqrt((1.0f - std::pow(a2, 1.0f - r1)) / (1.0f - a2));
+        float sin_theta = std::clamp(std::sqrt(1.0f - (cos_theta * cos_theta)), 0.0f, 1.0f);
+        float sin_phi = std::sin(phi);
+        float cos_phi = std::cos(phi);
 
-        return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
+        return Vector3f(sin_theta * cos_phi, sin_theta * sin_phi, cos_theta);
     }
 
-    const float GTR2(const float NDotH, const float a)
+    const float GTR2(const float N_dot_H, const float a)
     {
         float a2 = a * a;
-        float t = 1.0f + (a2 - 1.0f) * NDotH * NDotH;
-        return a2 / (M_PIf32 * t * t);
+        float t = 1.0f + (a2 - 1.0f) * N_dot_H * N_dot_H;
+        return a2 / (kPi<float> * t * t);
     }
 
     const Vector3f SampleGTR2(const float rgh, const float r1, const float r2)
     {
         float a = std::max(0.001f, rgh);
 
-        float phi = r1 * 2.0f * M_PIf32;
+        float phi = r1 * 2.0f * kPi<float>;
 
-        float cosTheta = std::sqrt((1.0f - r2) / (1.0f + (a * a - 1.0f) * r2));
-        float sinTheta = std::clamp(std::sqrt(1.0f - (cosTheta * cosTheta)), 0.0f, 1.0f);
-        float sinPhi = std::sin(phi);
-        float cosPhi = std::cos(phi);
+        float cos_theta = std::sqrt((1.0f - r2) / (1.0f + (a * a - 1.0f) * r2));
+        float sin_theta = std::clamp(std::sqrt(1.0f - (cos_theta * cos_theta)), 0.0f, 1.0f);
+        float sin_phi = std::sin(phi);
+        float cos_phi = std::cos(phi);
 
-        return Vector3f(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta);
+        return Vector3f(sin_theta * cos_phi, sin_theta * sin_phi, cos_theta);
     }
 
     const Vector3f SampleGGXVNDF(const Vector3f V, const float rgh, const float r1, const float r2)
@@ -204,7 +204,7 @@ namespace RenderToy
         Vector3f T2 = Vector3f::Cross(Vh, T1);
 
         float r = sqrt(r1);
-        float phi = 2.0f * M_PIf32 * r2;
+        float phi = 2.0f * kPi<float> * r2;
         float t1 = r * std::cos(phi);
         float t2 = r * std::sin(phi);
         float s = 0.5f * (1.0f + Vh.z());
@@ -215,38 +215,38 @@ namespace RenderToy
         return Vector3f(rgh * Nh.x(), rgh * Nh.y(), std::max(0.0f, Nh.z())).Normalized();
     }
 
-    const float GTR2Aniso(const float NDotH, const float HDotX, const float HDotY, const float ax, const float ay)
+    const float GTR2Aniso(const float N_dot_H, const float H_dot_X, const float H_dot_Y, const float ax, const float ay)
     {
-        float a = HDotX / ax;
-        float b = HDotY / ay;
-        float c = a * a + b * b + NDotH * NDotH;
-        return 1.0f / (M_PIf32 * ax * ay * c * c);
+        float a = H_dot_X / ax;
+        float b = H_dot_Y / ay;
+        float c = a * a + b * b + N_dot_H * N_dot_H;
+        return 1.0f / (kPi<float> * ax * ay * c * c);
     }
 
     const Vector3f SampleGTR2Aniso(const float ax, const float ay, const float r1, const float r2)
     {
-        float phi = r1 * 2.0f * M_PIf32;
+        float phi = r1 * 2.0f * kPi<float>;
 
-        float sinPhi = ay * std::sin(phi);
-        float cosPhi = ax * std::cos(phi);
-        float tanTheta = std::sqrt(r2 / (1.0f - r2));
+        float sin_phi = ay * std::sin(phi);
+        float cos_phi = ax * std::cos(phi);
+        float tan_theta = std::sqrt(r2 / (1.0f - r2));
 
-        return Vector3f(tanTheta * cosPhi, tanTheta * sinPhi, 1.0f);
+        return Vector3f(tan_theta * cos_phi, tan_theta * sin_phi, 1.0f);
     }
 
-    const float SmithG(const float NDotV, const float alphaG)
+    const float SmithG(const float N_dot_V, const float alpha_g)
     {
-        float a = alphaG * alphaG;
-        float b = NDotV * NDotV;
-        return (2.0f * NDotV) / (NDotV + std::sqrt(a + b - a * b));
+        float a = alpha_g * alpha_g;
+        float b = N_dot_V * N_dot_V;
+        return (2.0f * N_dot_V) / (N_dot_V + std::sqrt(a + b - a * b));
     }
 
-    const float SmithGAniso(const float NDotV, const float VDotX, const float VDotY, const float ax, const float ay)
+    const float SmithGAniso(const float N_dot_V, const float V_dot_X, const float V_dot_Y, const float ax, const float ay)
     {
-        float a = VDotX * ax;
-        float b = VDotY * ay;
-        float c = NDotV;
-        return 1.0f / (NDotV + std::sqrt(a * a + b * b + c * c));
+        float a = V_dot_X * ax;
+        float b = V_dot_Y * ay;
+        float c = N_dot_V;
+        return 1.0f / (N_dot_V + std::sqrt(a * a + b * b + c * c));
     }
 
     const float SchlickFresnel(const float u)
@@ -256,18 +256,18 @@ namespace RenderToy
         return m2 * m2 * m;
     }
 
-    const float DielectricFresnel(const float cosThetaI, const float eta)
+    const float DielectricFresnel(const float cos_theta_i, const float eta)
     {
-        float sinThetaTSq = eta * eta * (1.0f - cosThetaI * cosThetaI);
+        float sin_theta_t_sq = eta * eta * (1.0f - cos_theta_i * cos_theta_i);
 
         // Total internal reflection
-        if (sinThetaTSq > 1.0f)
+        if (sin_theta_t_sq > 1.0f)
             return 1.0f;
 
-        float cosThetaT = std::sqrt(std::max(1.0f - sinThetaTSq, 0.0f));
+        float cos_theta_t = std::sqrt(std::max(1.0f - sin_theta_t_sq, 0.0f));
 
-        float rs = (eta * cosThetaT - cosThetaI) / (eta * cosThetaT + cosThetaI);
-        float rp = (eta * cosThetaI - cosThetaT) / (eta * cosThetaI + cosThetaT);
+        float rs = (eta * cos_theta_t - cos_theta_i) / (eta * cos_theta_t + cos_theta_i);
+        float rp = (eta * cos_theta_i - cos_theta_t) / (eta * cos_theta_i + cos_theta_t);
 
         return 0.5f * (rs * rs + rp * rp);
     }
@@ -276,7 +276,7 @@ namespace RenderToy
     {
         Vector3f dir;
         float r = std::sqrt(r1);
-        float phi = 2.0f * M_PIf32 * r2;
+        float phi = 2.0f * kPi<float> * r2;
         dir.x() = r * std::cos(phi);
         dir.y() = r * std::sin(phi);
         dir.z() = std::sqrt(std::max(0.0f, 1.0f - dir.x() * dir.x() - dir.y() * dir.y()));
@@ -286,7 +286,7 @@ namespace RenderToy
     const Vector3f UniformSampleHemisphere(const float r1, const float r2)
     {
         float r = std::sqrt(std::max(0.0f, 1.0f - r1 * r1));
-        float phi = 2.0f * M_PIf32 * r2;
+        float phi = 2.0f * kPi<float> * r2;
         return Vector3f(r * std::cos(phi), r * std::sin(phi), r1);
     }
 
@@ -294,7 +294,7 @@ namespace RenderToy
     {
         float z = 1.0f - 2.0f * r1;
         float r = std::sqrt(std::max(0.0f, 1.0f - z * z));
-        float phi = 2.0f * M_PIf32 * r2;
+        float phi = 2.0f * kPi<float> * r2;
         return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
     }
 
@@ -321,18 +321,18 @@ namespace RenderToy
         return Vector3f(Vector3f::Dot(V, X), Vector3f::Dot(V, Y), Vector3f::Dot(V, Z));
     }
 
-    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal)
+    const Vector3f Reflect(const Vector3f &incident_vec, const Vector3f &normal)
     {
-        return incidentVec - 2.0f * Vector3f::Dot(incidentVec, normal) * normal;
+        return incident_vec - 2.0f * Vector3f::Dot(incident_vec, normal) * normal;
     }
 
-    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta)
+    const Vector3f Refract(const Vector3f &incident_vec, const Vector3f &normal, float eta)
     {
-        float N_dot_I = Vector3f::Dot(normal, incidentVec);
+        float N_dot_I = Vector3f::Dot(normal, incident_vec);
         float k = 1.f - eta * eta * (1.f - N_dot_I * N_dot_I);
         if (k < 0.f)
             return Vector3f(0.f, 0.f, 0.f);
         else
-            return eta * incidentVec - (eta * N_dot_I + sqrtf(k)) * normal;
+            return eta * incident_vec - (eta * N_dot_I + sqrtf(k)) * normal;
     }
 }

@@ -5,6 +5,7 @@
 
 namespace RenderToy
 {
+    /// @brief Ray class.
     struct Ray
     {
         Ray() = delete;

@@ -20,8 +20,8 @@ add_library(RenderToy
             surfacepoint.h surfacepoint.cpp
             compositor.h compositor.cpp)
 
-set_property(TARGET RenderToy PROPERTY CXX_STANDARD 20)
-target_compile_features(RenderToy PRIVATE cxx_std_20)
+set_property(TARGET RenderToy PROPERTY CXX_STANDARD 17)
+target_compile_features(RenderToy PRIVATE cxx_std_17)
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)

@@ -38,5 +38,5 @@ TEST_CASE("Triangle")
     std::array<Vector3f, 3> norm = {Vector3f::O,Vector3f::O,Vector3f::O};
     std::array<Vector2f, 3> uv = {Vector2f::O,Vector2f::O};
     Triangle triangle(vert, norm, uv, nullptr);
-    REQUIRE(std::abs(triangle.NormalC().Cross({0.0f, 1.0f, 0.0f}).Length())<EPS);
+    REQUIRE(std::abs(triangle.NormalC().Cross({0.0f, 1.0f, 0.0f}).Length())<kFloatEpsilon);
 }

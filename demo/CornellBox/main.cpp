@@ -12,11 +12,7 @@ int main()
     std::cout << "Begin importing...\n";
 
     World world;
-    // OBJModelImporter::Import(world, "./cornellbox_rot.obj");
-    OBJModelImporter::Import(world, "./cornellbox_fixed.obj");
-    // OBJModelImporter::Import(world, "./cornellbox2l.obj");
-    // OBJModelImporter::Import(world, "./sphereonaplane.obj");
-
+    OBJModelImporter::Import(world, "./cornellbox.obj");
     Vector3f light_color = Convert::BlackBody(6000) * 5.0f;
 
     PrincipledBSDF mat_red(Vector3f::X);
@@ -26,35 +22,12 @@ int main()
     PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.05f, 1.0f, 0.0f, 1.45f, 1.0f);
     PrincipledBSDF mat_glass(2.0f * Vector3f::White, Vector3f::O, 0.0f, 0.0f, 1.0f, 1.33f);
 
-    // mat.base_color = Vector3f(0.93, 0.89, 0.85);
-    // mat.roughness = 1.0f;
-    // mat.subsurface = 1.0f;
-
-    // world.meshes[0]->tex = &mat_white;
-    // world.meshes[3]->tex = &mat_red;
-    // world.meshes[5]->tex = &mat_green;
-    // world.meshes[1]->tex = &mat_silver;
-    // world.meshes[2]->tex = &mat_silver;
-    // world.meshes[4]->tex = &mat_light;
-
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
     world.meshes[4]->tex = &mat_green;
     world.meshes[1]->tex = &mat_white;
     world.meshes[2]->tex = &mat_white;
     world.meshes[5]->tex = &mat_light;
-
-    // world.meshes[0]->tex = &mat_white;
-    // world.meshes[3]->tex = &mat_red;
-    // world.meshes[5]->tex = &mat_green;
-    // world.meshes[1]->tex = &mat_silver;
-    // world.meshes[2]->tex = &mat_silver;
-    // world.meshes[4]->tex = &mat_light;
-    // world.meshes[6]->tex = &mat_light;
-
-    // world.meshes[0]->tex = &mat_silver;
-    // world.meshes[1]->tex = &mat_light;
-
     world.PrepareDirectLightSampling();
 
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and " << world.meshes.size() << " mesh(es).\n";
@@ -79,15 +52,14 @@ int main()
     std::cout << "Exporting...\n";
 
     std::ofstream os;
-    // os.open("./cornellbox.bmp");
-    os.open("./comp.bmp");
+    os.open("./cornellbox.bmp");
 
     Image img(renderer.render_context);
     // img.GreyScale<Convert::ColorStandard::kITURBT709>();
     // img.EdgeDetection<Orientation::All>();
     // auto newimg = img.Extract([](const Vector3f &_) -> bool
     //                           { return Convert::Luma(_) > 1.0f; });
-    img.Bloom(500, 50.0f, 1.0f);
+    // img.Bloom(500, 50.0f, 1.0f);
     // img.GaussianBlur(200, 20.0f);
     BMPExporter exporter(img);
 

@@ -6,19 +6,25 @@
 
 namespace RenderToy
 {
+    /// @brief Image class. Provides a variety of operations on images.
     class Image
     {
-        enum class IndexWrapperType
+        /// @brief Decides which mode should be picked when image processing meets edges.
+        enum class EdgeMode
         {
             kReflect = 0,
             kBlackPadding = 1,
             kWhitePadding = 2
         };
 
-        template <IndexWrapperType _IWT>
+        /// @brief Get pixel info at point p.
+        /// @tparam _EM Edge Mode.
+        /// @param p Point p.
+        /// @return RGB Color.
+        template <EdgeMode _EM>
         inline const Vector3f &BufferGetWrapper(PointN p) const
         {
-            if constexpr (_IWT == IndexWrapperType::kReflect)
+            if constexpr (_EM == EdgeMode::kReflect)
             {
                 if (p.x < 0)
                     p.x = -p.x;
@@ -30,7 +36,7 @@ namespace RenderToy
                     p.x = 2 * resolution.height - p.x;
                 return buffer[p.x * resolution.width + p.y];
             }
-            else if constexpr (_IWT == IndexWrapperType::kBlackPadding)
+            else if constexpr (_EM == EdgeMode::kBlackPadding)
             {
                 if (p.x < 0)
                     return Vector3f::O;
@@ -41,7 +47,7 @@ namespace RenderToy
                 if (p.x >= resolution.height)
                     return Vector3f::O;
             }
-            else if constexpr (_IWT == IndexWrapperType::kWhitePadding)
+            else if constexpr (_EM == EdgeMode::kWhitePadding)
             {
                 if (p.x < 0)
                     return Vector3f::White;
@@ -63,6 +69,12 @@ namespace RenderToy
         Image(const RenderContext *const render_context_);
         Image(const Image &image);
 
+        /// @brief Run convolution on the image.
+        /// @tparam _Normalize If set true, all pixels will be normalized after convolution.
+        /// @tparam _Length If set true, all pixels will be converted to single brightness signal by its original length after convolution.
+        /// @tparam _Abs If set true, the components of every pixel color will be set positive.
+        /// @param k Convolution kernel.
+        /// @return Reference to self.
         template <bool _Normalize = false, bool _Length = false, bool _Abs = false>
         Image &Convolute(const IConvolutionKernel<float> &k)
         {
@@ -80,7 +92,7 @@ namespace RenderToy
                     {
                         for (int jj = 0; jj < k.kernel_mat.column; ++jj)
                         {
-                            buffer[i * resolution.width + j] += tmp.BufferGetWrapper<IndexWrapperType::kReflect>(PointN(i - row_2 + ii, j - column_2 + jj)) * k.kernel_mat[ii][jj];
+                            buffer[i * resolution.width + j] += tmp.BufferGetWrapper<EdgeMode::kReflect>(PointN(i - row_2 + ii, j - column_2 + jj)) * k.kernel_mat[ii][jj];
                         }
                     }
                     if constexpr (_Abs == true)
@@ -100,8 +112,15 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Run Gaussian Blur.
+        /// @param size Gaussian kernel size.
+        /// @param sigma Gaussian kernel sigma.
+        /// @return Reference to self.
         Image &GaussianBlur(const std::size_t size, const float sigma);
 
+        /// @brief Run Edge Detection.
+        /// @tparam _O Orientation of differential operator.
+        /// @return Reference to self.
         template <Orientation _O>
         Image &EdgeDetection()
         {
@@ -129,6 +148,9 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Run Gray Scale.
+        /// @tparam _CS Color standards. It decides which Luma function will be used.
+        /// @return Reference to self.
         template <Convert::ColorStandard _CS>
         Image &GreyScale()
         {
@@ -202,6 +224,11 @@ namespace RenderToy
         /// @return
         [[nodiscard]] const Image Extract(const std::function<bool(const Vector3f &)> &pixel_filter, const Vector3f &default_color = Vector3f::O);
 
+        /// @brief Generates bloom on pixels that satisfy brightness threshold.
+        /// @param size 
+        /// @param sigma 
+        /// @param threshold 
+        /// @return 
         Image &Bloom(const std::size_t size, const float sigma, const float threshold);
 
         ~Image();

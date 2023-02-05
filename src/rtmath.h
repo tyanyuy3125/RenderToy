@@ -1,9 +1,6 @@
 #ifndef RTMATH_H
 #define RTMATH_H
 
-#define EPS 1e-7
-#define INF 1e7
-
 #include <array>
 #include <istream>
 #include <stack>
@@ -16,6 +13,12 @@
 
 namespace RenderToy
 {
+    template <typename T = float>
+    inline constexpr T kPi = T(3.14159265358979323846L);
+
+    inline constexpr float kFloatEpsilon = 1e-7f;
+    inline constexpr float kFloatInfinity = 1e7f;
+
     // Forward declarations.
 
     struct SizeN;
@@ -94,7 +97,7 @@ namespace RenderToy
         {
             for (_Tp a : arr)
             {
-                if (std::abs(a) > EPS)
+                if (std::abs(a) > kFloatEpsilon)
                 {
                     return false;
                 }
@@ -291,7 +294,7 @@ namespace RenderToy
             // return arr == a.arr;
             for (int i = 0; i < _Dm; ++i)
             {
-                if (std::abs(arr[i] - a.arr[i]) > EPS)
+                if (std::abs(arr[i] - a.arr[i]) > kFloatEpsilon)
                 {
                     return false;
                 }
@@ -496,7 +499,8 @@ namespace RenderToy
 
         inline const Vector Floor() const
         {
-            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::floor(_)); });
+            return TransformEach([](_Tp _) -> _Tp
+                                 { return _Tp(std::floor(_)); });
         }
 
         inline const Vector Fract() const
@@ -507,12 +511,14 @@ namespace RenderToy
 
         inline const Vector Sin() const
         {
-            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::sin(_)); });
+            return TransformEach([](_Tp _) -> _Tp
+                                 { return _Tp(std::sin(_)); });
         }
 
         inline const Vector Cos() const
         {
-            return TransformEach([](_Tp _) -> _Tp { return _Tp(std::cos(_)); });
+            return TransformEach([](_Tp _) -> _Tp
+                                 { return _Tp(std::cos(_)); });
         }
 
         friend Matrix<_Tp, _Dm>;
@@ -522,6 +528,9 @@ namespace RenderToy
         // _Tp arr[d] = {};
     };
 
+    /// @brief Storages constants of k-dimensional vector space by specialization.
+    /// @tparam _Tp Component type.
+    /// @tparam _Dm Dimension.
     template <typename _Tp, size_t _Dm>
     struct VectorConstants
     {
@@ -838,6 +847,8 @@ namespace RenderToy
                                                    {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
     };
 
+    /// @brief GeneralizedVectors are vectors with run-time initialized dimensions.
+    /// @tparam _Tp Component type.
     template <typename _Tp>
     struct GeneralizedVector
     {
@@ -872,6 +883,8 @@ namespace RenderToy
         std::vector<_Tp> data;
     };
 
+    /// @brief GeneralizedMatrixs are matrices with run-time initialized dimensions.
+    /// @tparam _Tp Component type.
     template <typename _Tp>
     struct GeneralizedMatrix
     {
@@ -897,6 +910,8 @@ namespace RenderToy
         std::vector<GeneralizedVector<_Tp>> data;
     };
 
+    /// @brief Interface for convolution kernels.
+    /// @tparam _Tp Component type.
     template <typename _Tp>
     struct IConvolutionKernel
     {
@@ -908,6 +923,9 @@ namespace RenderToy
         GeneralizedMatrix<_Tp> kernel_mat;
     };
 
+    /// @brief Unitized gaussian distribution kernel.
+    /// @tparam _Tp Component type.
+    /// @tparam _O Decide whether to generate the entire distribution or its two-dimensional components.
     template <typename _Tp, Orientation _O = Orientation::All>
     struct UnitizedGaussianKernel : public IConvolutionKernel<_Tp>
     {
@@ -982,42 +1000,50 @@ namespace RenderToy
         }
     };
 
-    template <typename _Tp, Orientation _Ortn>
+    /// @brief Prewitt differential kernel.
+    /// @tparam _Tp Component type.
+    /// @tparam _O Orientation.
+    template <typename _Tp, Orientation _O>
     struct PrewittKernel : public IConvolutionKernel<_Tp>
     {
-        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::X), bool> = true>
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::X), bool> = true>
         PrewittKernel()
             : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-1), _Tp(0), _Tp(1)}})) {}
 
-        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::Y), bool> = true>
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::Y), bool> = true>
         PrewittKernel()
             : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(1), _Tp(1), _Tp(1)}, {_Tp(0), _Tp(0), _Tp(0)}, {_Tp(-1), _Tp(-1), _Tp(-1)}})) {}
     };
 
-    template <typename _Tp, Orientation _Ortn>
+    /// @brief Sobel differential kernel.
+    /// @tparam _Tp Component type.
+    /// @tparam _O Orientation.
+    template <typename _Tp, Orientation _O>
     struct SobelKernel : public IConvolutionKernel<_Tp>
     {
-        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::X), bool> = true>
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::X), bool> = true>
         SobelKernel()
             : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(-1), _Tp(0), _Tp(1)}, {_Tp(-2), _Tp(0), _Tp(2)}, {_Tp(-1), _Tp(0), _Tp(1)}})) {}
 
-        template <int..., Orientation I = _Ortn, std::enable_if_t<(I == Orientation::Y), bool> = true>
+        template <int..., Orientation I = _O, std::enable_if_t<(I == Orientation::Y), bool> = true>
         SobelKernel()
             : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(1), _Tp(2), _Tp(1)}, {_Tp(0), _Tp(0), _Tp(0)}, {_Tp(-1), _Tp(-2), _Tp(-1)}})) {}
     };
 
     namespace Convert
     {
-        constexpr inline const float
-        InchToMM(const float inch)
+        template <typename _TParam = float, typename _TRet = float>
+        constexpr inline const _TRet
+        InchToMM(const _TParam inch)
         {
-            return inch * 25.4f;
+            return _TRet(inch) * _TRet(25.4);
         }
 
-        constexpr inline const float
-        DegreeToRadians(const float deg)
+        template <typename _TParam = int, typename _TRet = float>
+        constexpr inline const _TRet
+        DegreeToRadians(const _TParam deg)
         {
-            return deg * (M_PIf32 / 180.0f);
+            return _TRet(deg) * kPi<_TRet> / _TRet(180);
         }
 
         const Vector3f BlackBody(const float t);
@@ -1104,17 +1130,17 @@ namespace RenderToy
 
     const float SSE_InvSqrt(const float number);
 
-    const float GTR1(const float NDotH, const float a);
+    const float GTR1(const float N_dot_H, const float a);
     const Vector3f SampleGTR1(const float rgh, const float r1, const float r2);
-    const float GTR2(const float NDotH, const float a);
+    const float GTR2(const float N_dot_H, const float a);
     const Vector3f SampleGTR2(const float rgh, const float r1, const float r2);
     const Vector3f SampleGGXVNDF(const Vector3f V, const float rgh, const float r1, const float r2);
-    const float GTR2Aniso(const float NDotH, const float HDotX, const float HDotY, const float ax, const float ay);
+    const float GTR2Aniso(const float N_dot_H, const float H_dot_X, const float H_dot_Y, const float ax, const float ay);
     const Vector3f SampleGTR2Aniso(const float ax, const float ay, const float r1, const float r2);
-    const float SmithG(const float NDotV, const float alphaG);
-    const float SmithGAniso(const float NDotV, const float VDotX, const float VDotY, const float ax, const float ay);
+    const float SmithG(const float N_dot_V, const float alpha_g);
+    const float SmithGAniso(const float N_dot_V, const float V_dot_X, const float V_dot_Y, const float ax, const float ay);
     const float SchlickFresnel(const float u);
-    const float DielectricFresnel(const float cosThetaI, const float eta);
+    const float DielectricFresnel(const float cos_theta_i, const float eta);
 
     const Vector3f CosineSampleHemisphere(const float r1, const float r2);
     const Vector3f UniformSampleHemisphere(const float r1, const float r2);
@@ -1125,8 +1151,8 @@ namespace RenderToy
 
     const Vector3f ToWorld(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
     const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
-    const Vector3f Refract(const Vector3f &incidentVec, const Vector3f &normal, float eta);
-    const Vector3f Reflect(const Vector3f &incidentVec, const Vector3f &normal);
+    const Vector3f Refract(const Vector3f &incident_vec, const Vector3f &normal, float eta);
+    const Vector3f Reflect(const Vector3f &incident_vec, const Vector3f &normal);
 
     template <typename _Tp>
     const _Tp Mix(const _Tp x, const _Tp y, const _Tp a)
