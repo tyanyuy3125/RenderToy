@@ -20,10 +20,6 @@ jobs:
       with:
         # CMake build type (Release, Debug, MinSizeRel, RelWithDebInfo)
         build-type: Release
-        # C Compiler for toolchain
-        cc: gcc
-        # C++ Compiler for toolchain
-        cxx: g++
         # CMake build target
         target: all
         # Number of concurrent jobs for build and test
