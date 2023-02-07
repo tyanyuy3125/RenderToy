@@ -25,7 +25,10 @@ namespace RenderToy
     {
         World *world;
         BVH *bvh;
+
         Vector3f *buffer;
+        Vector3f *albedo_buffer;
+        Vector3f *normal_buffer;
 
         FormatSettings format_settings;
         int camera_id = 0;
