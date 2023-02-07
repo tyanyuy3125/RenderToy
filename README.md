@@ -41,6 +41,8 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 Pre-requirements:
 * CMake 3.10+
 * GNU G++ 9.4.0+ or Clang++ 10.0.0+
+* Catch2 3.2.1+ (for unit tests)
+* libx11-dev 1.6.9+
 > Currently Clang++ could not compile RenderToy, since Clang++ provides about 20% speed improvement, this is not intended, we are looking into this issue.
 
 Meanwhile we recommend you use VSCode as it is well integrated with CMake. After opening the project directory in VSCode, press Ctrl+Shift+P then enter CMake: Configure - VSCode will do everything you need.
@@ -78,3 +80,4 @@ MIT.
 * Blender (http://blender.org/). The demo model for this project was created using Blender. And many designs, such as the compositor and PCG part, draw inspiration from Blender.
 * Blackbody converter from Christopher J. Howard (https://www.shadertoy.com/view/tsKczy). MIT License. Copyright (c) 2020 Christopher J. Howard.
 * RGB/XYZ Matrices by Bruce Justin Lindbloom (http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html).
+* Scratchapixel: A free educational site that progressively introduces you to the world of computer graphics. (https://www.scratchapixel.com/)

@@ -6,10 +6,17 @@
 
 namespace RenderToy
 {
+    /// @brief Decides which mode should be picked when image processing meets edges.
+    enum class EdgeMode
+    {
+        kReflect = 0,
+        kBlackPadding = 1,
+        kWhitePadding = 2
+    };
+
     /// @brief Image class. Provides a variety of operations on images.
     class Image
     {
-        enum class EdgeMode;
 
         /// @brief Get pixel info at point p.
         /// @tparam _EM Edge Mode.
@@ -56,14 +63,6 @@ namespace RenderToy
         }
 
     public:
-        /// @brief Decides which mode should be picked when image processing meets edges.
-        enum class EdgeMode
-        {
-            kReflect = 0,
-            kBlackPadding = 1,
-            kWhitePadding = 2
-        };
-
         /// @brief Sample mode for sampling and resizing.
         enum class SampleMode
         {
@@ -249,27 +248,26 @@ namespace RenderToy
         {
             if constexpr (_SM == SampleMode::kNearestNeighbor)
             {
-                return BufferGetWrapper<EdgeMode::kBlackPadding>(PointN(std::round(coord.x), std::round(coord.y)));
+                return BufferGetWrapper<EdgeMode::kBlackPadding>(PointN(std::round(coord.x()), std::round(coord.y())));
             }
             else if constexpr (_SM == SampleMode::kBilinearInterpolation)
             {
-                auto lbx = int(coord.x);
-                auto lby = int(coord.y);
+                auto lbx = int(coord.x());
+                auto lby = int(coord.y());
                 auto ltc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx, lby});
                 auto rtc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx + 1, lby});
                 auto lbc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx, lby + 1});
                 auto rbc = BufferGetWrapper<EdgeMode::kBlackPadding>({lbx + 1, lby + 1});
-                auto tc = Lerp(ltc, rtc, coord.x - floor(coord.x));
-                auto bc = Lerp(lbc, rbc, coord.x - floor(coord.x));
-                return Lerp(tc, bc, coord.y - floor(coord.y));
+                auto tc = Lerp(ltc, rtc, coord.x() - std::floor(coord.x()));
+                auto bc = Lerp(lbc, rbc, coord.x() - std::floor(coord.x()));
+                return Lerp(tc, bc, coord.y() - std::floor(coord.y()));
             }
         }
 
-        template <SampleMode _SM = SampleMode::kNearestNeighbor>
-        const Image Resize(const SizeN &new_size) const
-        {
-
-        }
+        // template <SampleMode _SM = SampleMode::kNearestNeighbor>
+        // const Image Resize(const SizeN &new_size) const
+        // {
+        // }
 
         ~Image();
     };
