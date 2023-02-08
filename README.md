@@ -1,8 +1,6 @@
 # RenderToy
 RenderToy is an experimental path tracing rendering library for academic purposes.
 
-![comparison](./docs/comparison.png)
-
 ## We implement:
 * Highly abstracted mathematics module.
 * Modern color system with multiple color standards.
@@ -54,6 +52,12 @@ Meanwhile we recommend you use VSCode as it is well integrated with CMake. After
 * ProceduralTexture - A demo rasterizing procedural textures supported by RenderToy.
 * Interactive - (WIP) Live preview demo on X11.
 * TestRenderer - Just a test.
+
+## Render Results & Comparison
+
+![comparison](./docs/comparison.png)
+
+![oidn](./docs/oidn.png)
 
 ## Features
 * Unique project structure, unlike any other open source ray tracers.
