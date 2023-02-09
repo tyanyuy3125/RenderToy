@@ -33,6 +33,15 @@ namespace RenderToy
 
         BMPExporter(const Image &image_);
     };
+
+    /// @brief Naive ASCII Art exporter.
+    struct ASCIIExporter : public IExporter
+    {
+        virtual void Export(std::ostream &os) override final;
+
+        ASCIIExporter(const Image &image_);
+
+    };
 }
 
 #endif // EXPORTER_H

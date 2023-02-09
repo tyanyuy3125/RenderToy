@@ -105,9 +105,31 @@ namespace RenderToy
         : IExporter(image_)
     {
     }
-    
+
     IExporter::IExporter(const Image &image_)
         : image(image_)
+    {
+    }
+
+    static const std::string ascii_characters_by_surface = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+
+    void ASCIIExporter::Export(std::ostream &os)
+    {
+        std::size_t ch_count = ascii_characters_by_surface.length();
+        for (int i = image.resolution.height - 1; i >= 0; --i)
+        {
+            for (int j = 0; j < image.resolution.width; ++j)
+            {
+                auto current = BUFFER(j, i, image.resolution.width);
+                auto luma = Convert::Luma<Convert::ColorStandard::kITURBT2020>(current);
+                os << ascii_characters_by_surface[std::clamp(std::size_t(std::clamp(luma, 0.0f, 1.0f) * float(ch_count - 1)), std::size_t(0), ch_count)];
+            }
+            os << '\n';
+        }
+    }
+
+    ASCIIExporter::ASCIIExporter(const Image &image_)
+        : IExporter(image_)
     {
     }
 }
