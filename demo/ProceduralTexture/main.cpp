@@ -6,7 +6,7 @@ using namespace RenderToy;
 
 auto main() -> int
 {
-    ProceduralTexture::CheckerBoard<float, float> cb(8);
+    ProceduralTexture::CheckerBoard cb(8);
     auto img = cb.Rasterize(800);
     
     std::ofstream os;
@@ -15,11 +15,18 @@ auto main() -> int
     exporter.Export(os);
     os.close();
 
-    ProceduralTexture::Wave<float, float> wave(8);
+    ProceduralTexture::Wave wave(8);
     img = wave.Rasterize(800);
     os.open("./wave.bmp");
     BMPExporter exporter2(img);
     exporter2.Export(os);
+    os.close();
+
+    ProceduralTexture::PerlinNoise pn(114514);
+    img = pn.Rasterize(800);
+    os.open("./pn.bmp");
+    BMPExporter exporter3(img);
+    exporter3.Export(os);
     os.close();
 
     return 0;

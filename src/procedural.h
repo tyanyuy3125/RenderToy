@@ -6,6 +6,7 @@
 
 #include <type_traits>
 #include <cmath>
+#include <PerlinNoise/PerlinNoise.hpp>
 
 namespace RenderToy::ProceduralMesh
 {
@@ -17,27 +18,27 @@ namespace RenderToy::ProceduralTexture
     /// @brief Interface for procedural generated texture.
     /// @tparam _TpRet Return type.
     /// @tparam _TpCoord Sampling coord type.
-    template <typename _TpRet, typename _TpCoord>
+    template <typename _TpRet>
     struct IPCGT
     {
         IPCGT() = default;
         /// @brief Get texture information at given coordinate.
-        /// @param p 
-        /// @return 
-        virtual inline const _TpRet Sample(const Vector<_TpCoord, 2> &p) const = 0;
-        
+        /// @param p
+        /// @return
+        virtual inline const _TpRet Sample(const Vector2f &p) const = 0;
+
         /// @brief Generate rasterized image of texture.
-        /// @param size 
-        /// @return 
+        /// @param size
+        /// @return
         [[nodiscard]] const Image Rasterize(const std::size_t size) const
         {
             Image ret(SizeN(size, size));
-            _TpCoord ratio = _TpCoord(1) / _TpCoord(size);
+            float ratio = 1.0f / float(size);
             for (std::size_t i = 0; i < size; ++i)
             {
                 for (std::size_t j = 0; j < size; ++j)
                 {
-                    ret.buffer[i * size + j] = Sample(Vector<_TpCoord, 2>(j * ratio, i * ratio));
+                    ret.buffer[i * size + j] = Sample(Vector2f(j * ratio, i * ratio));
                 }
             }
             return ret;
@@ -45,46 +46,47 @@ namespace RenderToy::ProceduralTexture
     };
 
     /// @brief Checkerboard shader.
-    /// @tparam _TpRet Should be floating point value.
-    /// @tparam _TpCoord 
-    template <typename _TpRet, typename _TpCoord, std::enable_if_t<std::is_floating_point_v<_TpRet>, bool> = true>
-    struct CheckerBoard : public IPCGT<_TpRet, _TpCoord>
+    struct CheckerBoard : public IPCGT<float>
     {
         int scale;
-        CheckerBoard(int scale_)
-            : scale(scale_) {}
+        CheckerBoard(int scale_);
 
-        virtual inline const _TpRet
-        Sample(const Vector<_TpCoord, 2> &p) const override final
-        {
-            if ((int(p.x() * int(scale)) & 1) ^ (int(p.y() * int(scale)) & 1) == 1)
-            {
-                return _TpRet(1);
-            }
-            return _TpRet(0);
-        }
+        virtual const float Sample(const Vector2f &p) const override final;
     };
 
     /// @brief Sine wave shader.
-    /// @tparam _TpRet Should be floating point value.
-    /// @tparam _TpCoord 
-    template <typename _TpRet, typename _TpCoord, std::enable_if_t<std::is_floating_point_v<_TpRet>, bool> = true>
-    struct Wave : public IPCGT<_TpRet, _TpCoord>
+    struct Wave : public IPCGT<float>
     {
-        _TpCoord period;
-        Wave(_TpCoord period_)
-            : period(period_) {}
+        float period;
+        Wave(float period_);
 
-        virtual inline const _TpRet
-        Sample(const Vector<_TpCoord, 2> &p) const override final
-        {
-            return (_TpRet(std::sin(_TpCoord(2) * kPi<_TpCoord> * period * p.x())) + _TpRet(1))/_TpRet(2);
-        }
+        virtual const float Sample(const Vector2f &p) const override final;
     };
 
-    template <typename _TpRet, typename _TpCoord, std::enable_if_t<std::is_floating_point_v<_TpRet>, bool> = true>
-    struct PerlinNoise : public IPCGT<_TpRet, _TpCoord>
+    /// @brief Perlin noise shader.
+    struct PerlinNoise : public IPCGT<float>
     {
+        /// @brief Initialize Perlin Noise with given seed.
+        /// @param seed_ Seed for RNG.
+        PerlinNoise(siv::PerlinNoise::seed_type seed_);
+
+        float scale = 10.0f;
+        float time = 0.0f;
+        /// @brief Controls level of details.
+        int32_t octaves = 4;
+
+        /// @brief Return current seed.
+        /// @return Current seed.
+        const siv::PerlinNoise::seed_type &GetSeed() const;
+        /// @brief Safely set seed for RNG.
+        /// @param seed_ 
+        void SetSeed(const siv::PerlinNoise::seed_type seed_);
+
+        virtual const float Sample(const Vector2f &p) const override final;
+
+    private:
+        siv::BasicPerlinNoise<float> perlin_noise_generator;
+        siv::PerlinNoise::seed_type seed;
     };
 }
 
