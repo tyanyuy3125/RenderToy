@@ -25,7 +25,7 @@ const float RenderToy::ProceduralTexture::Wave::Sample(const Vector2f &p) const
 }
 
 RenderToy::ProceduralTexture::PerlinNoise::PerlinNoise(siv::PerlinNoise::seed_type seed_)
-    : scale(scale_), seed(seed_), perlin_noise_generator{seed_}, time(time_), octaves(octaves_)
+    : seed(seed_)
 {
 }
 

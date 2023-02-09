@@ -59,6 +59,8 @@ Meanwhile we recommend you use VSCode as it is well integrated with CMake. After
 
 ![oidn](./docs/oidn.png)
 
+![smooth](./docs/ss.png)
+
 ## Features
 * Unique project structure, unlike any other open source ray tracers.
 * High abstraction.

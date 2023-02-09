@@ -204,7 +204,19 @@ namespace RenderToy
         return tangent;
     }
 
-    const Vector3f Triangle::NormalC() const
+    const Vector3f Triangle::NormalC(const float u, const float v) const
+    {
+        if (parent->smooth)
+        {
+            return ((1-u-v) * norm[0] + u * norm[1] + v * norm[2]).Normalized();
+        }
+        else
+        {
+            return normal;
+        }
+    }
+
+    const Vector3f Triangle::GeometricalNormalC() const
     {
         return normal;
     }
@@ -233,7 +245,7 @@ namespace RenderToy
     void Mesh::SetO2W(const Matrix4x4f &object_to_world_)
     {
         Geometry::SetO2W(object_to_world_);
-        for (auto tri : faces)
+        for (auto tri : tris)
         {
             tri->UpdateCache();
         }

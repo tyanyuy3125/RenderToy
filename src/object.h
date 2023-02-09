@@ -112,13 +112,16 @@ namespace RenderToy
         /// @brief Get cached area.
         /// @return
         const float AreaC() const;
-        /// @brief Get cached tangent.
-        /// @return
-        const Vector3f TangentC() const;
+        /// @brief (Deprecated) Get cached tangent.
+        /// @return Returns geometrical tangent. Deprecated for not supporting gourand interpolation.
+        [[deprecated]] const Vector3f TangentC() const;
         /// @brief Get cached normal.
         /// @return
-        const Vector3f NormalC() const;
-
+        const Vector3f NormalC(const float u, const float v) const;
+        /// @brief Get geometrical normal.
+        /// @return 
+        const Vector3f GeometricalNormalC() const;
+        
         /// @brief Update cache. Should be evaluated after O2W matrix having been changed.
         void UpdateCache();
 
@@ -164,7 +167,7 @@ namespace RenderToy
     class Mesh : public Geometry
     {
     public:
-        std::vector<Triangle *> faces;
+        std::vector<Triangle *> tris;
         PrincipledBSDF *tex;
         bool smooth{false};
 

@@ -36,7 +36,8 @@ namespace RenderToy
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
-                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
+                Vector3f placeholder;
+                auto intersected = render_context->bvh->Intersect(cast_ray, placeholder, t, u, v, nullptr);
 
                 if (intersected != nullptr)
                 {
@@ -145,7 +146,8 @@ namespace RenderToy
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
-                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
+                Vector3f placeholder;
+                auto intersected = render_context->bvh->Intersect(cast_ray, placeholder, t, u, v, nullptr);
 
                 if (intersected != nullptr)
                 {
@@ -191,26 +193,20 @@ namespace RenderToy
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
-#ifdef USE_PREDEFINED_NORMAL
-                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
-#else
                 Vector3f position;
-                auto intersected = render_context->bvh->Intersect(cast_ray, position, nullptr);
-                SurfacePoint sp(intersected, position);
-#endif
+                auto intersected = render_context->bvh->Intersect(cast_ray, position, t, u, v, nullptr);
+                SurfacePoint sp(intersected, position, u, v);
 
                 if (intersected != nullptr)
                 {
-#ifdef USE_PREDEFINED_NORMAL
-                    BUFFER(x, y, render_context->format_settings.resolution.width) = (((1 - u - v) * intersected->norm[0] + u * intersected->norm[1] + v * intersected->norm[2]) + Vector3f::White) / 2.0f;
-#else
                     auto normal = sp.GetNormal();
-                    if (Vector3f::Dot(normal, -cast_ray.direction) < 0.0f)
+                    // TODO: 把这一个修复扩展到其他部分。
+                    auto geo_norm = sp.GetGeometricalNormal();
+                    if (Vector3f::Dot(geo_norm, -cast_ray.direction) < 0.0f)
                     {
                         normal = -normal;
                     }
                     BUFFER(x, y, render_context->format_settings.resolution.width) = (normal + Vector3f::White) / 2.0f;
-#endif
                 }
                 else
                 {
@@ -263,12 +259,13 @@ namespace RenderToy
         // intersect ray with scene
         const Triangle *hit_obj = nullptr;
         Vector3f hitPosition;
-        hit_obj = render_context->bvh->Intersect(cast_ray, hitPosition, last_hit);
+        float t, u, v;
+        hit_obj = render_context->bvh->Intersect(cast_ray, hitPosition,t, u, v, last_hit);
 
         Vector3f radiance;
         if (hit_obj != nullptr)
         {
-            SurfacePoint surface_point(hit_obj, hitPosition);
+            SurfacePoint surface_point(hit_obj, hitPosition, u, v);
             state.ffnormal = surface_point.GetNormal();
             if (Vector3f::Dot(cast_ray.direction, state.ffnormal) > 0.0f)
             {
@@ -332,13 +329,14 @@ namespace RenderToy
 
             const Triangle *test_triangle = nullptr;
             Vector3f test_triangle_hit;
-            test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, tri);
+            float t, u, v;
+            test_triangle = render_context->bvh->Intersect(Ray(surface_point.GetPosition(), dir_to_emitter), test_triangle_hit, t, u, v, tri);
 
             if ((test_triangle == nullptr) | (test_triangle == emit_triangle))
             {
 
                 float lightpdf;
-                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true, lightpdf);
+                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos, u, v).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true, lightpdf);
 
                 /*
                 -original_ray_dir     dir_to_emitter
@@ -394,7 +392,8 @@ namespace RenderToy
                 cast_ray = cam->O2WTransform(cast_ray);
 
                 float t, u, v;
-                auto intersected = render_context->bvh->Intersect(cast_ray, t, u, v, nullptr);
+                Vector3f placeholder;
+                auto intersected = render_context->bvh->Intersect(cast_ray, placeholder, t, u, v, nullptr);
 
                 if (intersected != nullptr)
                 {

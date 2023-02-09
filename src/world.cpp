@@ -28,7 +28,7 @@ void RenderToy::World::PrepareDirectLightSampling()
     {
         if(m->tex->emission!=Vector3f::O)
         {
-            for(auto t : m->faces)
+            for(auto t : m->tris)
             {
                 emissive_triangles.push_back(t);
             }

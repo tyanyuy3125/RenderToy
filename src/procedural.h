@@ -3,14 +3,22 @@
 
 #include "rtmath.h"
 #include "compositor.h"
+#include "object.h"
 
 #include <type_traits>
 #include <cmath>
+#include <vector>
 #include <PerlinNoise/PerlinNoise.hpp>
 
 namespace RenderToy::ProceduralMesh
 {
-
+    /// @brief Interface for procedural generated mesh.
+    struct IPCGM
+    {
+        IPCGM() = default;
+        std::vector<Polygon *> polygons;
+        [[nodiscard]] const Mesh * Triangularize();
+    };
 }
 
 namespace RenderToy::ProceduralTexture

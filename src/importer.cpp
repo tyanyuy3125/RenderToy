@@ -93,7 +93,7 @@ namespace RenderToy
                 //     g >> slash >> h >> slash >> i;
 
                 // world.triangles.push_back(new Triangle({vert[a], vert[d], vert[g]}, {norm[c], norm[f], norm[i]}, {uv[b], uv[e], uv[h]}, current_mesh));
-                // current_mesh->faces.push_back(world.triangles.back());
+                // current_mesh->tris.push_back(world.triangles.back());
                 std::string face_def_str;
                 std::getline(fs, face_def_str);
                 face_def_str = std::regex_replace(face_def_str, std::regex("^ +| +$|( ) +"), "$1");
@@ -123,14 +123,14 @@ namespace RenderToy
                                                         return {};
                                                     } });
                                   poly_vert.push_back(unslashed_num[0].has_value() ? vert[unslashed_num[0].value()] : Vector3f::O);
-                                  poly_norm.push_back(unslashed_num[1].has_value() ? norm[unslashed_num[1].value()] : Vector3f::O);
-                                  poly_uv.push_back(unslashed_num[2].has_value() ? uv[unslashed_num[2].value()] : Vector2f::O);
+                                  poly_norm.push_back(unslashed_num[2].has_value() ? norm[unslashed_num[2].value()] : Vector3f::O);
+                                  poly_uv.push_back(unslashed_num[1].has_value() ? uv[unslashed_num[1].value()] : Vector2f::O);
                               });
 
                 Polygon poly(poly_vert.size(), poly_vert, poly_norm, poly_uv, current_mesh);
                 auto tris = poly.ConvertToTriangle();
                 world.triangles.insert(world.triangles.end(), tris.begin(), tris.end());
-                current_mesh->faces.insert(current_mesh->faces.begin(), tris.begin(), tris.end());
+                current_mesh->tris.insert(current_mesh->tris.begin(), tris.begin(), tris.end());
                 continue;
             }
 
