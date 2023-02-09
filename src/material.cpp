@@ -140,7 +140,7 @@ namespace RenderToy
         clearcoatWt /= totalWt;
     }
 
-    const Vector3f PrincipledBSDF::DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const
+    const Vector3f PrincipledBSDF::Eval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const
     {
         float eta = state.eta;
 
@@ -203,7 +203,7 @@ namespace RenderToy
         return f * std::abs(L.z());
     }
 
-    const bool PrincipledBSDF::DisneySample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const
+    const bool PrincipledBSDF::Sample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const
     {
         pdf = 0.0f;
         Vector3f f(0.0f);

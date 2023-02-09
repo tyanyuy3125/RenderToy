@@ -3,6 +3,7 @@
 
 #include "object.h"
 #include "rtmath.h"
+#include "material.h"
 
 #include <vector>
 
@@ -13,6 +14,7 @@ namespace RenderToy
         std::vector<Mesh *> meshes;
         std::vector<Triangle *> triangles;
         std::vector<Camera> cameras;
+        std::vector<PrincipledBSDF *> materials;
 
         /// @brief Randomly chooses a emissive triangle in the scene. Used by source sampling.
         /// @param random

@@ -295,7 +295,7 @@ namespace RenderToy
             Vector3f nextDirection;
             Vector3f color;
             float bsdfpdf;
-            if (surface_point.GetMaterial()->DisneySample(-cast_ray.direction, nextDirection, color, bsdfpdf, state))
+            if (surface_point.GetMaterial()->Sample(-cast_ray.direction, nextDirection, color, bsdfpdf, state))
             {
                 state.absorption = -Vector3f::Log(surface_point.GetMaterial()->extinction) / surface_point.GetMaterial()->at_distance;
 
@@ -349,7 +349,7 @@ namespace RenderToy
                           surface_point
                 */
                 float bsdfpdf;
-                auto f = surface_point.GetMaterial()->DisneyEval(state, -original_ray_dir, state.ffnormal, dir_to_emitter, bsdfpdf);
+                auto f = surface_point.GetMaterial()->Eval(state, -original_ray_dir, state.ffnormal, dir_to_emitter, bsdfpdf);
 
                 float weight = 1.0f;
                 weight = PowerHeuristic(lightpdf, bsdfpdf);

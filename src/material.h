@@ -4,11 +4,15 @@
 #include "rtmath.h"
 #include "ray.h"
 
+#include <string>
+
 namespace RenderToy
 {
     /// @brief Disney Principled BSDF
     struct PrincipledBSDF
     {
+        std::string name = "unnamed";
+
         Vector3f base_color = Vector3f::White;
         Vector3f emission = Vector3f::O;
         float roughness = 0.5f;
@@ -59,8 +63,8 @@ namespace RenderToy
                        const float at_distance_ = 1.0f,
                        const Vector3f &extinction_ = Vector3f::White);
 
-        const Vector3f DisneyEval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const;
-        const bool DisneySample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const;
+        const Vector3f Eval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const;
+        const bool Sample(const Vector3f &in_dir, Vector3f &out_dir, Vector3f &color_o, float &pdf, RayState &state) const;
 
     private:
         const float FresnelMix(const float eta, const float VDotH) const;

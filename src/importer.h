@@ -1,6 +1,8 @@
 #ifndef IMPORTER_H
 #define IMPORTER_H
 
+// TODO: refactor
+
 #include "object.h"
 #include "world.h"
 
@@ -16,6 +18,14 @@ namespace RenderToy
         OBJModelImporter() = delete;
         OBJModelImporter(const OBJModelImporter &) = delete;
         OBJModelImporter(const OBJModelImporter &&) = delete;
+
+        static void Import(World &world, const std::string &path);
+    };
+
+    class MTLImporter
+    {
+    public:
+        MTLImporter() = delete;
 
         static void Import(World &world, const std::string &path);
     };

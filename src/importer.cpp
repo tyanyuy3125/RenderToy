@@ -1,6 +1,7 @@
 #include "importer.h"
 #include "object.h"
 #include "rtmath.h"
+#include "material.h"
 
 #include <fstream>
 #include <string>
@@ -29,6 +30,7 @@ namespace RenderToy
     {
         Mesh *current_mesh = nullptr;
 
+        // TODO: exception.
         std::ifstream fs;
         fs.open(path);
 
@@ -44,7 +46,7 @@ namespace RenderToy
         norm.push_back(Vector3f::O);
         uv.push_back(Vector2f::O);
 
-        int a, b, c, d, e, f, g, h, i;
+        // int a, b, c, d, e, f, g, h, i;
         while (fs >> identifier)
         {
             if (identifier == "o")
@@ -87,7 +89,8 @@ namespace RenderToy
 
             if (identifier == "f")
             {
-                // f vert/uv/norm
+                // f vert/uv/norm <- however blender does not use this convension.
+                // TODO: add a detector.
                 // fs >> a >> slash >> b >> slash >> c >>
                 //     d >> slash >> e >> slash >> f >>
                 //     g >> slash >> h >> slash >> i;
@@ -136,6 +139,92 @@ namespace RenderToy
 
             fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        world.meshes.push_back(current_mesh);
+        if (current_mesh != nullptr)
+        {
+            world.meshes.push_back(current_mesh);
+        }
+    }
+
+    void MTLImporter::Import(World &world, const std::string &path)
+    {
+        // TODO: exception.
+        std::ifstream fs;
+        fs.open(path);
+
+        std::string identifier;
+        PrincipledBSDF *current_material = nullptr;
+        while (fs >> identifier)
+        {
+            if (identifier == "newmtl")
+            {
+                if (current_material != nullptr)
+                {
+                    world.materials.push_back(current_material);
+                }
+                current_material = new PrincipledBSDF();
+                fs >> current_material->name;
+            }
+
+            // Some parameters of phong lighting model are omitted.
+
+            if (identifier == "Kd")
+            {
+                fs >> current_material->base_color;
+            }
+
+            if (identifier == "Ni")
+            {
+                fs >> current_material->ior;
+            }
+
+            // PBR extension
+
+            if (identifier == "Ke")
+            {
+                fs >> current_material->emission;
+            }
+
+            if (identifier == "Pr")
+            {
+                fs >> current_material->roughness;
+            }
+
+            if (identifier == "Pm")
+            {
+                fs >> current_material->metallic;
+            }
+
+            if (identifier == "Ps")
+            {
+                fs >> current_material->sheen;
+            }
+
+            if (identifier == "Pc")
+            {
+                fs >> current_material->clearcoat;
+            }
+
+            if (identifier == "Pcr")
+            {
+                fs >> current_material->clearcoat_roughness;
+            }
+
+            if (identifier == "aniso")
+            {
+                fs >> current_material->anisotropic;
+            }
+
+            // TODO: add support for normal map.
+            // if(identifier == "norm")
+            // {
+
+            // }
+
+            fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        if(current_material != nullptr)
+        {
+            world.materials.push_back(current_material);
+        }
     }
 };
