@@ -172,59 +172,11 @@ namespace RenderToy
             return (*this);
         }
 
-        inline const Image operator+(const Image &img)
-        {
-            // TODO: exception.
-            Image ret(resolution);
-            for (int i = 0; i < resolution.Area(); ++i)
-            {
-                ret.buffer[i] = buffer[i] + img.buffer[i];
-            }
-            return ret;
-        }
-
-        inline const Image operator-(const Image &img)
-        {
-            // TODO: exception.
-            Image ret(resolution);
-            for (int i = 0; i < resolution.Area(); ++i)
-            {
-                ret.buffer[i] = buffer[i] - img.buffer[i];
-            }
-            return ret;
-        }
-
-        inline const Image operator*(const Image &img)
-        {
-            // TODO: exception.
-            Image ret(resolution);
-            for (int i = 0; i < resolution.Area(); ++i)
-            {
-                ret.buffer[i] = buffer[i] * img.buffer[i];
-            }
-            return ret;
-        }
-
-        inline const Image operator/(const Image &img)
-        {
-            // TODO: exception.
-            Image ret(resolution);
-            for (int i = 0; i < resolution.Area(); ++i)
-            {
-                ret.buffer[i] = buffer[i] / img.buffer[i];
-            }
-            return ret;
-        }
-
-        inline const void operator=(const Image &img)
-        {
-            // resolution = img.resolution;
-            // TODO: exception
-            for (int i = 0; i < resolution.Area(); ++i)
-            {
-                buffer[i] = img.buffer[i];
-            }
-        }
+        const Image operator+(const Image &img);
+        const Image operator-(const Image &img);
+        const Image operator*(const Image &img);
+        const Image operator/(const Image &img);
+        const void operator=(const Image &img);
 
         /// @brief Extract pixels that satisfies pixel_filter.
         /// @param pixel_filter
@@ -263,6 +215,18 @@ namespace RenderToy
                 return Lerp(tc, bc, coord.y() - std::floor(coord.y()));
             }
         }
+
+        /// @brief Draw a line from p1 to p2.
+        /// @param p1
+        /// @param p2
+        /// @param color
+        void DrawLine(PointN p1, PointN p2, const Vector3f &color = Vector3f::White);
+
+        /// @brief Fill a rectangular area defined by p1 & p2.
+        /// @param p1 
+        /// @param p2 
+        /// @param color 
+        void Fill(PointN p1, PointN p2, const Vector3f &color = Vector3f::White);
 
         // template <SampleMode _SM = SampleMode::kNearestNeighbor>
         // const Image Resize(const SizeN &new_size) const

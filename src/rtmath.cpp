@@ -85,6 +85,17 @@ namespace RenderToy
     {
     }
 
+    const PointN PointN::operator+(const PointN &p) const
+    {
+        return PointN(x+p.x, y+p.y);
+    }
+
+    void PointN::SizeClamp(const SizeN &size)
+    {
+        x = std::clamp(x, 0, static_cast<int>(size.width));
+        y = std::clamp(y, 0, static_cast<int>(size.height));
+    }
+
     SizeN::SizeN()
         : width(0), height(0)
     {
@@ -113,6 +124,11 @@ namespace RenderToy
     const float SizeN::AspectRatio() const
     {
         return float(width) / float(height);
+    }
+
+    const PointN SizeN::Center() const
+    {
+        return PointN(static_cast<int>(width) >> 1, static_cast<int>(height) >> 1);
     }
 
     const Matrix4x4f AffineTransformation::Translation(const Vector3f &origin)

@@ -13,13 +13,12 @@
 
 namespace RenderToy
 {
+#pragma region ForwardDeclaration
     template <typename T = float>
     inline constexpr T kPi = T(3.14159265358979323846L);
 
     inline constexpr float kFloatEpsilon = 1e-7f;
     inline constexpr float kFloatInfinity = 1e7f;
-
-    // Forward declarations.
 
     struct SizeN;
     struct PointN;
@@ -62,6 +61,9 @@ namespace RenderToy
     using Matrix2x2d = Matrix<double, 2>;
     using Matrix3x3d = Matrix<double, 3>;
     using Matrix4x4d = Matrix<double, 4>;
+#pragma endregion ForwardDeclaration
+
+#pragma region Vector
 
     /// @brief Generalized Vector definition.
     /// @tparam _Tp Numerical type.
@@ -593,6 +595,9 @@ namespace RenderToy
     template <typename _Tp>
     constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
 
+#pragma endregion Vector
+
+#pragma region Matrix
     /// @brief Generalized Matrix definition.
     /// @tparam _Tp Value type.
     /// @tparam _Dm Dimension.
@@ -891,6 +896,9 @@ namespace RenderToy
                                                            {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
                                                            {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
 
+#pragma endregion Matrix
+
+#pragma region GeneralizedVector
     /// @brief GeneralizedVectors are vectors with run-time initialized dimensions.
     /// @tparam _Tp Component type.
     template <typename _Tp>
@@ -926,7 +934,9 @@ namespace RenderToy
     private:
         std::vector<_Tp> data;
     };
+#pragma endregion GeneralizedVector
 
+#pragma region GeneralizedMatrix
     /// @brief GeneralizedMatrixs are matrices with run-time initialized dimensions.
     /// @tparam _Tp Component type.
     template <typename _Tp>
@@ -953,7 +963,9 @@ namespace RenderToy
 
         std::vector<GeneralizedVector<_Tp>> data;
     };
+#pragma endregion GeneralizedMatrix
 
+#pragma region Convolution
     /// @brief Interface for convolution kernels.
     /// @tparam _Tp Component type.
     template <typename _Tp>
@@ -1074,6 +1086,9 @@ namespace RenderToy
             : IConvolutionKernel<_Tp>(GeneralizedMatrix<_Tp>({{_Tp(1), _Tp(2), _Tp(1)}, {_Tp(0), _Tp(0), _Tp(0)}, {_Tp(-1), _Tp(-2), _Tp(-1)}})) {}
     };
 
+#pragma endregion Convolution
+
+#pragma region Convert
     namespace Convert
     {
         template <typename _TParam = float, typename _TRet = float>
@@ -1140,8 +1155,9 @@ namespace RenderToy
             return vec * 1.0f / (1.0f + Luma<_CS>(vec) / limit);
         }
     };
+#pragma endregion Convert
 
-#pragma region Drawing Math
+#pragma region Drawing
     struct PointN
     {
         int x, y;
@@ -1150,6 +1166,9 @@ namespace RenderToy
         PointN(int x_, int y_);
         PointN(const Vector2f &vec);
         PointN(const std::array<int, 2> &tuple);
+
+        const PointN operator+(const PointN &p) const;
+        void SizeClamp(const SizeN &size);
     };
 
     struct SizeN
@@ -1163,10 +1182,13 @@ namespace RenderToy
 
         const std::size_t Area() const;
         const float AspectRatio() const;
+
+        const PointN Center() const;
     };
 
-#pragma endregion
+#pragma endregion Drawing
 
+#pragma region AffineTransformation
     namespace AffineTransformation
     {
         const Matrix4x4f Translation(const Vector3f &origin);
@@ -1176,9 +1198,9 @@ namespace RenderToy
         /// @return
         const Matrix4x4f RotationEulerXYZ(const Vector3f &euler_xyz);
     };
+#pragma endregion AffineTransformation
 
-    const float SSE_InvSqrt(const float number);
-
+#pragma region PBR
     const float GTR1(const float N_dot_H, const float a);
     const Vector3f SampleGTR1(const float rgh, const float r1, const float r2);
     const float GTR2(const float N_dot_H, const float a);
@@ -1203,11 +1225,17 @@ namespace RenderToy
     const Vector3f Refract(const Vector3f &incident_vec, const Vector3f &normal, float eta);
     const Vector3f Reflect(const Vector3f &incident_vec, const Vector3f &normal);
 
+#pragma endregion PBR
+
+#pragma region Misc
+    const float SSE_InvSqrt(const float number);
+
     template <typename _Tp, typename _TpCoeff>
     inline const _Tp Lerp(const _Tp x, const _Tp y, const _TpCoeff a)
     {
         return x * (_TpCoeff(1) - a) + y * a;
     }
+#pragma endregion Misc
 
 };
 #endif // RTMATH_H
