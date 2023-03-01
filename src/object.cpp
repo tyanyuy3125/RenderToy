@@ -208,7 +208,7 @@ namespace RenderToy
     {
         if (parent->smooth)
         {
-            return ((1-u-v) * norm[0] + u * norm[1] + v * norm[2]).Normalized();
+            return ((1 - u - v) * norm[0] + u * norm[1] + v * norm[2]).Normalized();
         }
         else
         {
@@ -242,12 +242,86 @@ namespace RenderToy
         normal = Normal();
     }
 
+    const std::vector<float> Triangle::GetVBO(const std::vector<GLAttributeObject> &attrib_list) const
+    {
+        std::vector<float> ret;
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            for (auto attrib : attrib_list)
+            {
+                switch (attrib)
+                {
+                case GLAttributeObject::kVert:
+                    ret.push_back(vert[i][0]);
+                    ret.push_back(vert[i][1]);
+                    ret.push_back(vert[i][2]);
+                    break;
+                case GLAttributeObject::kNorm:
+                    ret.push_back(norm[i][0]);
+                    ret.push_back(norm[i][1]);
+                    ret.push_back(norm[i][2]);
+                    break;
+                case GLAttributeObject::kUV:
+                    ret.push_back(uv[i][0]);
+                    ret.push_back(uv[i][1]);
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    const void Triangle::AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const
+    {
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            for (auto attrib : attrib_list)
+            {
+                switch (attrib)
+                {
+                case GLAttributeObject::kVert:
+                    target.push_back(vert[i][0]);
+                    target.push_back(vert[i][1]);
+                    target.push_back(vert[i][2]);
+                    break;
+                case GLAttributeObject::kNorm:
+                    target.push_back(norm[i][0]);
+                    target.push_back(norm[i][1]);
+                    target.push_back(norm[i][2]);
+                    break;
+                case GLAttributeObject::kUV:
+                    target.push_back(uv[i][0]);
+                    target.push_back(uv[i][1]);
+                    break;
+                }
+            }
+        }
+    }
+
     void Mesh::SetO2W(const Matrix4x4f &object_to_world_)
     {
         Geometry::SetO2W(object_to_world_);
         for (auto tri : tris)
         {
             tri->UpdateCache();
+        }
+    }
+
+    const std::vector<float> Mesh::GetVBO(const std::vector<GLAttributeObject> &attrib_list) const
+    {
+        std::vector<float> ret;
+        for(auto tri : tris)
+        {
+            tri->AppendVBO(ret, attrib_list);
+        }
+        return ret;
+    }
+
+    const void Mesh::AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const
+    {
+        for(auto tri : tris)
+        {
+            tri->AppendVBO(target, attrib_list);
         }
     }
 

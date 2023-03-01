@@ -279,7 +279,7 @@ namespace RenderToy
             }
 
             float self_emission_pdf;
-            auto self_emission = surface_point.GetEmission(cast_ray.src, -cast_ray.direction, true, self_emission_pdf);
+            auto self_emission = surface_point.GetEmission<true>(cast_ray.src, -cast_ray.direction, self_emission_pdf);
             if (depth == 0)
             {
                 radiance += self_emission;
@@ -336,7 +336,7 @@ namespace RenderToy
             {
 
                 float lightpdf;
-                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos, u, v).GetEmission(surface_point.GetPosition(), -dir_to_emitter, true, lightpdf);
+                Vector3f emission_in = SurfacePoint(emit_triangle, emit_pos, u, v).GetEmission<true>(surface_point.GetPosition(), -dir_to_emitter, lightpdf);
 
                 /*
                 -original_ray_dir     dir_to_emitter

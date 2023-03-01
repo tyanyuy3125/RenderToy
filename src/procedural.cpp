@@ -7,7 +7,7 @@ RenderToy::ProceduralTexture::CheckerBoard::CheckerBoard(int scale_)
 
 const float RenderToy::ProceduralTexture::CheckerBoard::Sample(const Vector2f &p) const
 {
-    if ((int(p.x() * int(scale)) & 1) ^ (int(p.y() * int(scale)) & 1) == 1)
+    if (((int(p.x() * int(scale)) & 1) ^ (int(p.y() * int(scale))) & 1) == 1)
     {
         return 1.0f;
     }

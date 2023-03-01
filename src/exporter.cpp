@@ -33,7 +33,7 @@ namespace RenderToy
     }
 
     PPMExporter::PPMExporter(const Image &image_)
-        : IExporter(image_)
+        : IImageExporter(image_)
     {
     }
 
@@ -102,11 +102,11 @@ namespace RenderToy
     }
 
     BMPExporter::BMPExporter(const Image &image_)
-        : IExporter(image_)
+        : IImageExporter(image_)
     {
     }
 
-    IExporter::IExporter(const Image &image_)
+    IImageExporter::IImageExporter(const Image &image_)
         : image(image_)
     {
     }
@@ -129,7 +129,7 @@ namespace RenderToy
     }
 
     ASCIIExporter::ASCIIExporter(const Image &image_)
-        : IExporter(image_)
+        : IImageExporter(image_)
     {
     }
 }

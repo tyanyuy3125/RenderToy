@@ -6,20 +6,21 @@
 #include "compositor.h"
 
 #include <ostream>
+#include <vector>
 
 namespace RenderToy
 {
     /// @brief Interface for all exporters.
-    struct IExporter
+    struct IImageExporter
     {
         const Image &image;
         virtual void Export(std::ostream &os) = 0;
 
-        IExporter(const Image &image_);
+        IImageExporter(const Image &image_);
     };
 
     /// @brief Exports image as .ppm file.
-    struct PPMExporter : public IExporter
+    struct PPMExporter : public IImageExporter
     {
         virtual void Export(std::ostream &os) override final;
 
@@ -27,7 +28,7 @@ namespace RenderToy
     };
 
     /// @brief Exports image as .bmp file.
-    struct BMPExporter : public IExporter
+    struct BMPExporter : public IImageExporter
     {
         virtual void Export(std::ostream &os) override final;
 
@@ -35,7 +36,7 @@ namespace RenderToy
     };
 
     /// @brief Naive ASCII Art exporter.
-    struct ASCIIExporter : public IExporter
+    struct ASCIIExporter : public IImageExporter
     {
         virtual void Export(std::ostream &os) override final;
 

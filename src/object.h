@@ -17,6 +17,13 @@ namespace RenderToy
 {
     class Mesh;
 
+    enum class GLAttributeObject
+    {
+        kVert = 0,
+        kNorm = 1,
+        kUV = 2
+    };
+
     /// @brief Fundamental geometry class. Storages the position and rotation information of objects in the world.
     class Geometry
     {
@@ -41,20 +48,20 @@ namespace RenderToy
         const Matrix4x4f &GetW2O() const;
 
         /// @brief Transforms a vector by O2W matrix.
-        /// @param vec 
-        /// @return 
+        /// @param vec
+        /// @return
         const Vector3f O2WTransform(const Vector3f &vec) const;
         /// @brief Transforms a vector by W2O matrix.
-        /// @param vec 
-        /// @return 
+        /// @param vec
+        /// @return
         const Vector3f W2OTransform(const Vector3f &vec) const;
         /// @brief Transforms a ray by O2W matrix.
-        /// @param ray 
-        /// @return 
+        /// @param ray
+        /// @return
         const Ray O2WTransform(const Ray &ray) const;
         /// @brief Transforms a ray by W2O matrix.
-        /// @param ray 
-        /// @return 
+        /// @param ray
+        /// @return
         const Ray W2OTransform(const Ray &ray) const;
     };
 
@@ -119,23 +126,26 @@ namespace RenderToy
         /// @return
         const Vector3f NormalC(const float u, const float v) const;
         /// @brief Get geometrical normal.
-        /// @return 
+        /// @return
         const Vector3f GeometricalNormalC() const;
-        
+
         /// @brief Update cache. Should be evaluated after O2W matrix having been changed.
         void UpdateCache();
+
+        const std::vector<float> GetVBO(const std::vector<GLAttributeObject> &attrib_list) const;
+        const void AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const;
 
         Mesh *parent;
 
     private:
         /// @brief Calculate tangent.
-        /// @return 
+        /// @return
         const Vector3f Tangent() const;
         /// @brief Calculate normal.
-        /// @return 
+        /// @return
         const Vector3f Normal() const;
         /// @brief Calculate area.
-        /// @return 
+        /// @return
         const float Area() const;
 
         Vector3f v0v1_w;
@@ -159,7 +169,7 @@ namespace RenderToy
         Polygon(const std::size_t V_, const std::vector<Vector3f> &vert_, const std::vector<Vector3f> &norm_, const std::vector<Vector2f> &uv_, Mesh *parent_);
 
         /// @brief Convert polygon to triangles.
-        /// @return 
+        /// @return
         std::vector<Triangle *> ConvertToTriangle() const;
     };
 
@@ -174,6 +184,9 @@ namespace RenderToy
         /// @brief Set object to world matrix.
         /// @param object_to_world O2W Matrix, should be an AFFINE matrix.
         virtual void SetO2W(const Matrix4x4f &object_to_world_) override;
+
+        const std::vector<float> GetVBO(const std::vector<GLAttributeObject> &attrib_list) const;
+        const void AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const;
     };
 };
 
