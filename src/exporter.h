@@ -10,6 +10,7 @@
 
 namespace RenderToy
 {
+
     /// @brief Interface for all exporters.
     struct IImageExporter
     {

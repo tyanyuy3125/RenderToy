@@ -539,30 +539,59 @@ namespace RenderToy
     template <typename _Tp>
     struct VectorConstants<_Tp, 2>
     {
-        constexpr static Vector<_Tp, 2> O = Vector<_Tp, 2>(_Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 2> X = Vector<_Tp, 2>(_Tp(1), _Tp(0));
-        constexpr static Vector<_Tp, 2> Y = Vector<_Tp, 2>(_Tp(0), _Tp(1));
+        const static Vector<_Tp, 2> O;
+        const static Vector<_Tp, 2> X;
+        const static Vector<_Tp, 2> Y;
     };
+
+    template <typename _Tp>
+    constexpr Vector<_Tp, 2> VectorConstants<_Tp, 2>::O = Vector<_Tp, 2>(_Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 2> VectorConstants<_Tp, 2>::X = Vector<_Tp, 2>(_Tp(1), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 2> VectorConstants<_Tp, 2>::Y = Vector<_Tp, 2>(_Tp(0), _Tp(1));
 
     template <typename _Tp>
     struct VectorConstants<_Tp, 3>
     {
-        constexpr static Vector<_Tp, 3> O = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 3> X = Vector<_Tp, 3>(_Tp(1), _Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 3> Y = Vector<_Tp, 3>(_Tp(0), _Tp(1), _Tp(0));
-        constexpr static Vector<_Tp, 3> Z = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(1));
-        constexpr static Vector<_Tp, 3> White = Vector<_Tp, 3>(_Tp(1), _Tp(1), _Tp(1));
+        const static Vector<_Tp, 3> O;
+        const static Vector<_Tp, 3> X;
+        const static Vector<_Tp, 3> Y;
+        const static Vector<_Tp, 3> Z;
+        const static Vector<_Tp, 3> White;
     };
+
+    template <typename _Tp>
+    constexpr Vector<_Tp, 3> VectorConstants<_Tp, 3>::O = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 3> VectorConstants<_Tp, 3>::X = Vector<_Tp, 3>(_Tp(1), _Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 3> VectorConstants<_Tp, 3>::Y = Vector<_Tp, 3>(_Tp(0), _Tp(1), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 3> VectorConstants<_Tp, 3>::Z = Vector<_Tp, 3>(_Tp(0), _Tp(0), _Tp(1));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 3> VectorConstants<_Tp, 3>::White = Vector<_Tp, 3>(_Tp(1), _Tp(1), _Tp(1));
 
     template <typename _Tp>
     struct VectorConstants<_Tp, 4>
     {
-        constexpr static Vector<_Tp, 4> O = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 4> X = Vector<_Tp, 4>(_Tp(1), _Tp(0), _Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 4> Y = Vector<_Tp, 4>(_Tp(0), _Tp(1), _Tp(0), _Tp(0));
-        constexpr static Vector<_Tp, 4> Z = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(1), _Tp(0));
-        constexpr static Vector<_Tp, 4> W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
+        const static Vector<_Tp, 4> O;
+        const static Vector<_Tp, 4> X;
+        const static Vector<_Tp, 4> Y;
+        const static Vector<_Tp, 4> Z;
+        const static Vector<_Tp, 4> W;
     };
+
+    template <typename _Tp>
+    constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::O = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::X = Vector<_Tp, 4>(_Tp(1), _Tp(0), _Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::Y = Vector<_Tp, 4>(_Tp(0), _Tp(1), _Tp(0), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::Z = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(1), _Tp(0));
+    template <typename _Tp>
+    constexpr Vector<_Tp, 4> VectorConstants<_Tp, 4>::W = Vector<_Tp, 4>(_Tp(0), _Tp(0), _Tp(0), _Tp(1));
 
     /// @brief Generalized Matrix definition.
     /// @tparam _Tp Value type.
@@ -817,35 +846,50 @@ namespace RenderToy
     template <typename _Tp>
     struct MatrixConstants<_Tp, 2>
     {
-        constexpr const static Matrix<_Tp, 2> I = {{_Tp(1), _Tp(0)},
-                                                   {_Tp(0), _Tp(1)}};
-        constexpr const static Matrix<_Tp, 2> O = {{_Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0)}};
+        const static Matrix<_Tp, 2> I;
+        const static Matrix<_Tp, 2> O;
     };
+
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 2> MatrixConstants<_Tp, 2>::I = {{_Tp(1), _Tp(0)},
+                                                           {_Tp(0), _Tp(1)}};
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 2> MatrixConstants<_Tp, 2>::O = {{_Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0)}};
 
     template <typename _Tp>
     struct MatrixConstants<_Tp, 3>
     {
-        constexpr const static Matrix<_Tp, 3> I = {{_Tp(1), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(1), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(1)}};
-        constexpr const static Matrix<_Tp, 3> O = {{_Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0)}};
+        const static Matrix<_Tp, 3> I;
+        const static Matrix<_Tp, 3> O;
     };
+
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 3> MatrixConstants<_Tp, 3>::I = {{_Tp(1), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(1), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(1)}};
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 3> MatrixConstants<_Tp, 3>::O = {{_Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0)}};
 
     template <typename _Tp>
     struct MatrixConstants<_Tp, 4>
     {
-        constexpr const static Matrix<_Tp, 4> I = {{_Tp(1), _Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(1), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(1), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(1)}};
-        constexpr const static Matrix<_Tp, 4> O = {{_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
-                                                   {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
+        const static Matrix<_Tp, 4> I;
+        const static Matrix<_Tp, 4> O;
     };
+
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 4> MatrixConstants<_Tp, 4>::I = {{_Tp(1), _Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(1), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(1), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0), _Tp(1)}};
+    template <typename _Tp>
+    constexpr Matrix<_Tp, 4> MatrixConstants<_Tp, 4>::O = {{_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0), _Tp(0)},
+                                                           {_Tp(0), _Tp(0), _Tp(0), _Tp(0)}};
 
     /// @brief GeneralizedVectors are vectors with run-time initialized dimensions.
     /// @tparam _Tp Component type.

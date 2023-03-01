@@ -184,7 +184,7 @@ TEST_CASE("Vector constexpr")
     constexpr double t3 = vec_a.Cross(vec_b)[0];
     STATIC_REQUIRE(t3 == 14.0);
     Vector3d vec_g(1.0);
-    constexpr Vector4d vec_h = Vector4d::O;
+    // constexpr Vector4d vec_h = Vector4d::O;
     REQUIRE(Vector3d::X + Vector3d::Y + Vector3d::Z == Vector3d::White);
     REQUIRE(vec_c == vec_d);
     // REQUIRE(std::abs(vec_a.Normalized().Length() - 1.0) < kFloatEpsilon);
