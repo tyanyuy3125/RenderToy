@@ -1149,7 +1149,7 @@ namespace RenderToy
         }
 
         template <ColorStandard _CS = ColorStandard::kITURBT709>
-        inline const Vector3f
+        [[nodiscard]] const Vector3f
         Tonemap(const Vector3f &vec, const float limit)
         {
             return vec * 1.0f / (1.0f + Luma<_CS>(vec) / limit);
@@ -1231,11 +1231,24 @@ namespace RenderToy
     const float SSE_InvSqrt(const float number);
 
     template <typename _Tp, typename _TpCoeff>
-    inline const _Tp Lerp(const _Tp x, const _Tp y, const _TpCoeff a)
+    const _Tp Lerp(const _Tp x, const _Tp y, const _TpCoeff a)
     {
         return x * (_TpCoeff(1) - a) + y * a;
     }
 #pragma endregion Misc
+
+#pragma region Interpolation
+
+    namespace Interpolation
+    {
+        struct Polynomial2D
+        {
+            std::vector<float> t;
+            Polynomial2D(const std::vector<Vector2f> &p);
+        };
+    }
+
+#pragma endregion Interpolation
 
 };
 #endif // RTMATH_H

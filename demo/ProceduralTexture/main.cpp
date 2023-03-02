@@ -24,6 +24,7 @@ auto main() -> int
 
     ProceduralTexture::PerlinNoise pn(114514);
     img = pn.Rasterize(800);
+    img.Binarize<Convert::ColorStandard::kITURBT709>(0.5f);
     os.open("./pn.bmp");
     BMPExporter exporter3(img);
     exporter3.Export(os);

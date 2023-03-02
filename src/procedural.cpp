@@ -11,7 +11,7 @@ const float RenderToy::ProceduralTexture::CheckerBoard::Sample(const Vector2f &p
     {
         return 1.0f;
     }
-    return 1.0f;
+    return 0.0f;
 }
 
 RenderToy::ProceduralTexture::Wave::Wave(float period_)

@@ -76,6 +76,26 @@ namespace RenderToy
         void GetLobeProbabilities(const float eta, const Vector3f specCol, const float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const;
     };
 
+    struct EmissiveBSDF : public PrincipledBSDF
+    {
+        EmissiveBSDF(const Vector3f &emission_, const float strength_ = 1.0f);
+    };
+
+    struct DiffuseBSDF : public PrincipledBSDF
+    {
+        DiffuseBSDF(const Vector3f &base_color_, const float roughness_ = 0.5f);
+    };
+
+    struct GlassBSDF : public PrincipledBSDF
+    {
+        GlassBSDF(const Vector3f &base_color_, const float roughness_ = 0.5f, const float ior_ = 1.45f);
+    };
+
+    struct GlossyBSDF : public PrincipledBSDF
+    {
+        GlossyBSDF(const Vector3f &base_color_, const float roughness_ = 0.5f);
+    };
+
     struct ITexture
     {
         virtual void Sample(const float u, const float v) const = 0;

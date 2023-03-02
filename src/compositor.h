@@ -77,6 +77,20 @@ namespace RenderToy
         Image(const RenderContext *const render_context_);
         Image(const Image &image);
 
+        Vector3f &operator()(const std::size_t x, const std::size_t y);
+        const Vector3f &operator()(const std::size_t x, const std::size_t y) const;
+
+        /// @brief Extract pixels that satisfies pixel_filter.
+        /// @param pixel_filter
+        /// @param default_color
+        /// @return
+        [[nodiscard]] const Image Extract(const std::function<bool(const Vector3f &)> &pixel_filter, const Vector3f &default_color = Vector3f::O);
+
+        /// @brief Transform pixels with customized function.
+        /// @param pixel_processor
+        /// @return
+        const void Transform(const std::function<void(Vector3f &)> &pixel_processor);
+
         /// @brief Run convolution on the image.
         /// @tparam _Normalize If set true, all pixels will be normalized after convolution.
         /// @tparam _Length If set true, all pixels will be converted to single brightness signal by its original length after convolution.
@@ -89,7 +103,7 @@ namespace RenderToy
             Image tmp(*this);
             size_t row_2 = k.kernel_mat.row >> 1;
             size_t column_2 = k.kernel_mat.column >> 1;
-#pragma omp parallel
+#pragma omp parallel for
             for (int i = 0; i < resolution.height; ++i)
             {
                 for (int j = 0; j < resolution.width; ++j)
@@ -162,27 +176,47 @@ namespace RenderToy
         template <Convert::ColorStandard _CS>
         Image &GreyScale()
         {
-            for (int i = 0; i < resolution.height; ++i)
-            {
-                for (int j = 0; j < resolution.width; ++j)
-                {
-                    buffer[i * resolution.width + j] = Convert::Luma<_CS>(buffer[i * resolution.width + j]);
-                }
-            }
+            // for (int i = 0; i < resolution.height; ++i)
+            // {
+            //     for (int j = 0; j < resolution.width; ++j)
+            //     {
+            //         buffer[i * resolution.width + j] = Convert::Luma<_CS>(buffer[i * resolution.width + j]);
+            //     }
+            // }
+            Transform([](Vector3f _) -> void
+                      { _ = Convert::Luma<_CS>(_); });
             return (*this);
         }
+
+        template <Convert::ColorStandard _CS>
+        Image &Binarize(const float threshold)
+        {
+            Transform([&threshold](Vector3f &_) -> void
+                      {
+                if(Convert::Luma<_CS>(_) > threshold){
+                    _ = 1.0f;
+                    return;
+                }
+                _ = 0.0f;
+                return; });
+            return (*this);
+        }
+
+        template <Convert::ColorStandard _CS = Convert::ColorStandard::kITURBT709>
+        Image &Tonemap(const float limit = 1.5f)
+        {
+            Transform([&limit](Vector3f &_) -> void
+                      { _ = Convert::Tonemap<_CS>(_, limit); });
+            return (*this);
+        }
+
+        Image &GammaCorrection(const float gamma = 2.2f);
 
         const Image operator+(const Image &img);
         const Image operator-(const Image &img);
         const Image operator*(const Image &img);
         const Image operator/(const Image &img);
         const void operator=(const Image &img);
-
-        /// @brief Extract pixels that satisfies pixel_filter.
-        /// @param pixel_filter
-        /// @param default_color
-        /// @return
-        [[nodiscard]] const Image Extract(const std::function<bool(const Vector3f &)> &pixel_filter, const Vector3f &default_color = Vector3f::O);
 
         /// @brief Generates bloom on pixels that satisfy brightness threshold.
         /// @param size
@@ -223,9 +257,9 @@ namespace RenderToy
         void DrawLine(PointN p1, PointN p2, const Vector3f &color = Vector3f::White);
 
         /// @brief Fill a rectangular area defined by p1 & p2.
-        /// @param p1 
-        /// @param p2 
-        /// @param color 
+        /// @param p1
+        /// @param p2
+        /// @param color
         void Fill(PointN p1, PointN p2, const Vector3f &color = Vector3f::White);
 
         // template <SampleMode _SM = SampleMode::kNearestNeighbor>

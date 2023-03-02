@@ -46,7 +46,7 @@ namespace RenderToy::ProceduralTexture
             {
                 for (std::size_t j = 0; j < size; ++j)
                 {
-                    ret.buffer[i * size + j] = Sample(Vector2f(j * ratio, i * ratio));
+                    ret(j, i) = Sample(Vector2f(j * ratio, i * ratio));
                 }
             }
             return ret;

@@ -3,13 +3,10 @@
 
 namespace RenderToy
 {
-    class Random
+    namespace Random
     {
-    public:
-        Random() = delete;
-
-        static const int Int(int min, int max);
-        static const float Float();
+        const int Int(int min, int max);
+        const float Float();
     };
 }
 

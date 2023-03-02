@@ -97,8 +97,8 @@ namespace RenderToy
 
         pdf = G1 * std::max(0.0f, Vector3f::Dot(V, H)) * D * jacobian / V.z();
 
-        Vector3f specColor = Vector3f::Pow(base_color, Vector3f(0.5));
-        return specColor * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z()) * std::abs(V.z()));
+        Vector3f spec_color = Vector3f::Pow(base_color, Vector3f(0.5));
+        return spec_color * (1.0 - metallic) * spec_trans * (1.0 - F) * D * G2 * std::abs(Vector3f::Dot(V, H)) * std::abs(Vector3f::Dot(L, H)) * eta * eta / (denom * std::abs(L.z()) * std::abs(V.z()));
     }
 
     const Vector3f PrincipledBSDF::EvalClearcoat(const Vector3f V, const Vector3f L, const Vector3f H, float &pdf) const
@@ -117,27 +117,27 @@ namespace RenderToy
         return Vector3f(0.25f) * clearcoat * F * D * G / (4.0f * L.z() * V.z());
     }
 
-    void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &specCol, Vector3f &sheenCol) const
+    void PrincipledBSDF::GetSpecColor(const float eta, Vector3f &spec_col, Vector3f &sheen_col) const
     {
         float lum = Convert::Luma(base_color);
         Vector3f ctint = lum > 0.0f ? base_color / lum : Vector3f(1.0f);
         float F0 = (1.0f - eta) / (1.0f + eta);
-        specCol = Lerp(F0 * F0 * Lerp(Vector3f::White, ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
-        sheenCol = Lerp(Vector3f::White, Vector3f(ctint), Vector3f(sheen_tint));
+        spec_col = Lerp(F0 * F0 * Lerp(Vector3f::White, ctint, Vector3f(specular_tint)), Vector3f(base_color), Vector3f(metallic));
+        sheen_col = Lerp(Vector3f::White, Vector3f(ctint), Vector3f(sheen_tint));
     }
 
-    void PrincipledBSDF::GetLobeProbabilities(const float eta, const Vector3f specCol, const float approxFresnel, float &diffuseWt, float &specReflectWt, float &specRefractWt, float &clearcoatWt) const
+    void PrincipledBSDF::GetLobeProbabilities(const float eta, const Vector3f spec_col, const float approx_fresnel, float &diffuse_weight, float &spec_reflect_weight, float &spec_refract_weight, float &clearcoat_weight) const
     {
-        diffuseWt = Convert::Luma(base_color) * (1.0f - metallic) * (1.0f - spec_trans);
-        specReflectWt = Convert::Luma(Lerp(specCol, Vector3f::White, Vector3f(approxFresnel)));
-        specRefractWt = (1.0f - approxFresnel) * (1.0f - metallic) * spec_trans * Convert::Luma(base_color);
-        clearcoatWt = clearcoat * (1.0f - metallic);
-        float totalWt = diffuseWt + specReflectWt + specRefractWt + clearcoatWt;
+        diffuse_weight = Convert::Luma(base_color) * (1.0f - metallic) * (1.0f - spec_trans);
+        spec_reflect_weight = Convert::Luma(Lerp(spec_col, Vector3f::White, Vector3f(approx_fresnel)));
+        spec_refract_weight = (1.0f - approx_fresnel) * (1.0f - metallic) * spec_trans * Convert::Luma(base_color);
+        clearcoat_weight = clearcoat * (1.0f - metallic);
+        float total_weight = diffuse_weight + spec_reflect_weight + spec_refract_weight + clearcoat_weight;
 
-        diffuseWt /= totalWt;
-        specReflectWt /= totalWt;
-        specRefractWt /= totalWt;
-        clearcoatWt /= totalWt;
+        diffuse_weight /= total_weight;
+        spec_reflect_weight /= total_weight;
+        spec_refract_weight /= total_weight;
+        clearcoat_weight /= total_weight;
     }
 
     const Vector3f PrincipledBSDF::Eval(const RayState state, Vector3f V, Vector3f N, Vector3f L, float &bsdf_pdf) const

@@ -1,5 +1,3 @@
-#define BUFFER(x, y, width) image.buffer[y * width + x]
-
 #include <algorithm>
 
 #include "rtmath.h"
@@ -18,9 +16,7 @@ namespace RenderToy
         {
             for (int j = 0; j < nx; ++j)
             {
-                auto real_color = BUFFER(j, i, nx);
-                real_color = Convert::Tonemap<Convert::ColorStandard::kITURBT709>(real_color, 1.5f);
-                real_color = Vector3f::Pow(real_color, 0.4545f);
+                auto real_color = image(j, i);
                 float r = std::clamp(real_color.x(), 0.0f, 1.0f);
                 float g = std::clamp(real_color.y(), 0.0f, 1.0f);
                 float b = std::clamp(real_color.z(), 0.0f, 1.0f);
@@ -85,10 +81,7 @@ namespace RenderToy
         {
             for (int j = 0; j < image.resolution.width; ++j)
             {
-                auto real_color = BUFFER(j, i, image.resolution.width);
-                // TODO: 把下面的几个函数封装到Posteffects类中。
-                real_color = Convert::Tonemap<Convert::ColorStandard::kITURBT709>(real_color, 1.5f);
-                real_color = Vector3f::Pow(real_color, 0.4545f);
+                auto real_color = image(j, i);
                 float r = std::clamp(real_color.x(), 0.0f, 1.0f);
                 float g = std::clamp(real_color.y(), 0.0f, 1.0f);
                 float b = std::clamp(real_color.z(), 0.0f, 1.0f);
@@ -120,7 +113,7 @@ namespace RenderToy
         {
             for (int j = 0; j < image.resolution.width; ++j)
             {
-                auto current = BUFFER(j, i, image.resolution.width);
+                auto current = image(j, i);
                 auto luma = Convert::Luma<Convert::ColorStandard::kITURBT2020>(current);
                 os << ascii_characters_by_surface[std::clamp(std::size_t(std::clamp(luma, 0.0f, 1.0f) * float(ch_count - 1)), std::size_t(0), ch_count)];
             }

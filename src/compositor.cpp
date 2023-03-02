@@ -28,6 +28,16 @@ RenderToy::Image::Image(const Image &image)
     }
 }
 
+Vector3f &RenderToy::Image::operator()(const std::size_t x, const std::size_t y)
+{
+    return buffer[y * resolution.width + x];
+}
+
+const Vector3f &RenderToy::Image::operator()(const std::size_t x, const std::size_t y) const
+{
+    return buffer[y * resolution.width + x];
+}
+
 Image &RenderToy::Image::GaussianBlur(const std::size_t size, const float sigma)
 {
     // UnitizedGaussianKernel<float> gk(size, sigma);
@@ -47,6 +57,14 @@ const Image RenderToy::Image::Extract(const std::function<bool(const Vector3f &)
     return ret;
 }
 
+const void RenderToy::Image::Transform(const std::function<void(Vector3f &)> &pixel_processor)
+{
+    for (int i = 0; i < resolution.Area(); ++i)
+    {
+        pixel_processor(buffer[i]);
+    }
+}
+
 Image &RenderToy::Image::Bloom(const std::size_t size, const float sigma, const float threshold)
 {
     Image bloom_layer = Extract([&threshold](const Vector3f &_) -> bool
@@ -60,6 +78,14 @@ Image &RenderToy::Image::Bloom(const std::size_t size, const float sigma, const 
 RenderToy::Image::~Image()
 {
     delete[] buffer;
+}
+
+Image &RenderToy::Image::GammaCorrection(const float gamma)
+{
+    auto ratio = 1.0f / gamma;
+    Transform([&ratio](Vector3f &_) -> void
+              { _ = Vector3f::Pow(_, ratio); });
+    return (*this);
 }
 
 const Image Image::operator+(const Image &img)
