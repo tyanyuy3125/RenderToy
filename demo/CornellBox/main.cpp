@@ -42,7 +42,7 @@ int main()
     RenderContext rc(&world, FormatSettings(SizeN(1920, 1080), Vector2f(16.0f, 9.0f)));
     // RenderContext rc(&world, FormatSettings(SizeN(32*8, 18*8), Vector2f(16.0f, 9.0f)));
     // TestRenderer renderer(rc.format_settings.resolution);
-    PathTracingRenderer renderer(&rc, 32);
+    PathTracingRenderer renderer(&rc, 16);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
     // NormalRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();
@@ -63,6 +63,8 @@ int main()
     //                           { return Convert::Luma(_) > 1.0f; });
     // img.Bloom(500, 50.0f, 1.0f);
     // img.GaussianBlur(200, 20.0f);
+    img.Tonemap();
+    img.GammaCorrection();
 
     BMPExporter exporter(img);
     // ASCIIExporter exporter(img);

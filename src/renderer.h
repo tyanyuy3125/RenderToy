@@ -11,6 +11,23 @@
 
 namespace RenderToy
 {
+    enum class RenderTech
+    {
+        kTest = 0,
+        kIntersectTest,
+        kDepthBuffer,
+        kNormal,
+        kPathTracing,
+        kAlbedo,
+        kLineEdge
+    };
+
+    enum class ProjectionMode
+    {
+        kPerspective = 0,
+        kParallel
+    };
+
     // Use Blender conventions.
     struct FormatSettings
     {
@@ -27,14 +44,15 @@ namespace RenderToy
         BVH *bvh;
 
         Vector3f *buffer;
-        Vector3f *albedo_buffer;
-        Vector3f *normal_buffer;
 
         FormatSettings format_settings;
         int camera_id = 0;
 
         RenderContext(World *world_, FormatSettings format_settings_);
         ~RenderContext();
+
+        Vector3f &operator()(const std::size_t x, const std::size_t y);
+        const Vector3f &operator()(const std::size_t x, const std::size_t y) const;
     };
 
     class IRenderer

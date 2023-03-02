@@ -88,6 +88,16 @@ namespace RenderToy
         delete bvh;
     }
 
+    Vector3f &RenderContext::operator()(const std::size_t x, const std::size_t y)
+    {
+        return buffer[y * format_settings.resolution.width + x];
+    }
+
+    const Vector3f &RenderContext::operator()(const std::size_t x, const std::size_t y) const
+    {
+        return buffer[y * format_settings.resolution.width + x];
+    }
+
     void IRenderer::PrepareScreenSpace(Camera *cam, float &top, float &right)
     {
         top = (Convert::InchToMM(cam->gate_dimension.y()) / 2.0f) / cam->focal_length;

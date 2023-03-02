@@ -39,6 +39,8 @@ RenderToy is an experimental path tracing rendering library for academic purpose
     * Convolution with customized kernels.
     * Edge detection.
     * Bloom.
+* Basic 2D drawing support.
+* Mesh to OpenGL VBO converter.
 * File IO.
     * Importing wavefront OBJ model file.
     * Exporting PPM & BMP SDR image file.
@@ -46,14 +48,17 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 ## Getting Started
 Pre-requirements:
 * CMake 3.10+
-* GCC 9.4.0+ or Clang 10.0.0+
+* GCC 9.4.0+ or Clang 15.0.7+
 * OpenMP (Modern version of GCC & Clang have OpenMP builtin)
 * Catch2 3.2.1+ (for unit tests)
 * libx11-dev 1.6.9+ (for Interactive demo)
 
 > Intel® OIDN used by denoising demo has special hardware requirements. Please refer to https://www.openimagedenoise.org/ for more info. **This does not affect the compilation of RenderToy library itself.**
 
-LLVM Clang is recommended to compile the project.
+> LLVM Clang is recommended to compile the project.
+
+> **Important notice for LLVM Clang:**
+> Compiler optimizations of some Clang version prior to Clang 15.0.7 can cause sensible precision problems with RenderToy's floating-point calculations. Use the latest Clang version whenever possible.
 
 Meanwhile we recommend you use VSCode as it is well integrated with CMake. After opening the project directory in VSCode, press Ctrl+Shift+P then enter CMake: Configure - VSCode will do everything you need.
 
@@ -65,6 +70,7 @@ Meanwhile we recommend you use VSCode as it is well integrated with CMake. After
 * Interactive - (WIP) Live preview demo on X11.
 * TestRenderer - Just a test.
 * SmoothShading - A demonstration of smooth shading.
+* Drawing - 2D drawing demo.
 
 ## Render Results & Comparison
 
