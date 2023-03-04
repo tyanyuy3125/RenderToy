@@ -51,7 +51,9 @@ Pre-requirements:
 * GCC 9.4.0+ or Clang 15.0.7+
 * OpenMP (Modern version of GCC & Clang have OpenMP builtin)
 * Catch2 3.2.1+ (for unit tests)
+    * https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository
 * libx11-dev 1.6.9+ (for Interactive demo)
+    * Make use of the package manager of your system.
 
 > Intel® OIDN used by denoising demo has special hardware requirements. Please refer to https://www.openimagedenoise.org/ for more info. **This does not affect the compilation of RenderToy library itself.**
 
