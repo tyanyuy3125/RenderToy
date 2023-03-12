@@ -49,7 +49,7 @@ RenderToy is an experimental path tracing rendering library for academic purpose
 Pre-requirements:
 * CMake 3.10+
 * GCC 9.4.0+ or Clang 15.0.7+
-* OpenMP (Modern version of GCC & Clang have OpenMP builtin)
+* OpenMP 5+
 * Catch2 3.2.1+ (for unit tests)
     * https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository
 * libx11-dev 1.6.9+ (for Interactive demo)
