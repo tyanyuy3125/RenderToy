@@ -1,5 +1,5 @@
-#include "bvh.h"
-#include "object.h"
+#include <RenderToy/bvh.h>
+#include <RenderToy/object.h>
 
 #include <cstring>
 #include <queue>

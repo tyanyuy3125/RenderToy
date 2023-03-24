@@ -5,7 +5,6 @@
 #include "object.h"
 #include "ray.h"
 #include "bvh.h"
-#include "random.h"
 #include "material.h"
 
 #include <vector>

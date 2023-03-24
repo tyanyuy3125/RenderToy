@@ -7,9 +7,7 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
-#include "../src/rtmath.h"
-#include "../src/importer.h"
-#include "../src/object.h"
+#include <RenderToy/rendertoy.h>
 
 #include <sstream>
 #include <string>

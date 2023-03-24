@@ -1,7 +1,9 @@
 #include <cmath>
 #include <immintrin.h>
+#include <random>
 
-#include "rtmath.h"
+#include <RenderToy/rtmath.h>
+#include <RenderToy/pbr.h>
 
 /// @brief Multiply 4 floats by another 4 floats.
 /// @tparam offset Offset from the first float.
@@ -28,8 +30,6 @@ namespace RenderToy
         _mm_storeu_ps(array, _dstRegister);
         return array[0]; // The result at all the elements are the same
     }
-
-
 
     const Vector3f Convert::BlackBody(const float t)
     {
@@ -87,7 +87,7 @@ namespace RenderToy
 
     const PointN PointN::operator+(const PointN &p) const
     {
-        return PointN(x+p.x, y+p.y);
+        return PointN(x + p.x, y + p.y);
     }
 
     void PointN::SizeClamp(const SizeN &size)
@@ -350,5 +350,25 @@ namespace RenderToy
             return Vector3f(0.f, 0.f, 0.f);
         else
             return eta * incident_vec - (eta * N_dot_I + sqrtf(k)) * normal;
+    }
+
+    static std::mt19937 random_device;
+
+    /// @brief Generates an int between min and max.
+    /// @param min
+    /// @param max
+    /// @return
+    const int Random::Int(int min, int max)
+    {
+        std::uniform_int_distribution<> distrib(min, max);
+        return distrib(random_device);
+    }
+
+    /// @brief Generates a float between 0.0f and 1.0f.
+    /// @return
+    const float Random::Float()
+    {
+        std::uniform_real_distribution<float> distrib(0.0f, 1.0f);
+        return distrib(random_device);
     }
 }

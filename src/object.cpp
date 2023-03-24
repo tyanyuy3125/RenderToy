@@ -1,4 +1,4 @@
-#include "object.h"
+#include <RenderToy/object.h>
 
 #include <limits>
 #include <cmath>

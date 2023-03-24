@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "../../include/RenderToy/rendertoy.h"
+#include <RenderToy/rendertoy.h>
 
 using namespace std;
 using namespace RenderToy;

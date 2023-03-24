@@ -1,4 +1,4 @@
-#include "../../include/RenderToy/rendertoy.h"
+#include <RenderToy/rendertoy.h>
 
 #include <bits/stdc++.h>
 

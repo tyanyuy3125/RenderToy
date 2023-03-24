@@ -1,6 +1,6 @@
-#include "material.h"
-#include "rtmath.h"
-#include "random.h"
+#include <RenderToy/material.h>
+#include <RenderToy/pbr.h>
+#include <RenderToy/rtmath.h>
 
 #include <cmath>
 #include <algorithm>

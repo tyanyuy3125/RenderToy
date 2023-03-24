@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
-#include "../src/rtmath.h"
+#include <RenderToy/rendertoy.h>
 
 #include <array>
 #include <cmath>

@@ -1,5 +1,5 @@
-#include "surfacepoint.h"
-#include "object.h"
+#include <RenderToy/surfacepoint.h>
+#include <RenderToy/object.h>
 
 #include <cmath>
 

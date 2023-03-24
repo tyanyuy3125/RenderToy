@@ -1,4 +1,4 @@
-#include "ray.h"
+#include <RenderToy/ray.h>
 
 namespace RenderToy
 {

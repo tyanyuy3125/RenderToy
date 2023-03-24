@@ -1,4 +1,4 @@
-#include "compositor.h"
+#include <RenderToy/compositor.h>
 
 using namespace RenderToy;
 

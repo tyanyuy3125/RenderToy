@@ -1,4 +1,4 @@
-#include "procedural.h"
+#include <RenderToy/procedural.h>
 
 RenderToy::ProceduralTexture::CheckerBoard::CheckerBoard(int scale_)
     : scale(scale_)

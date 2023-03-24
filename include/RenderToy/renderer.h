@@ -7,7 +7,6 @@
 #include "rtmath.h"
 #include "bvh.h"
 #include "surfacepoint.h"
-#include "random.h"
 
 namespace RenderToy
 {
@@ -55,35 +54,35 @@ namespace RenderToy
         const Vector3f &operator()(const std::size_t x, const std::size_t y) const;
     };
 
-    class IRenderer
+    class Renderer
     {
     protected:
         void PrepareScreenSpace(Camera *cam, float &top, float &right);
 
     public:
         RenderContext *render_context;
-        IRenderer() = delete;
-        IRenderer(const IRenderer &) = delete;
-        IRenderer(const IRenderer &&) = delete;
-        IRenderer(RenderContext *render_context_);
+        Renderer() = delete;
+        Renderer(const Renderer &) = delete;
+        Renderer(const Renderer &&) = delete;
+        Renderer(RenderContext *render_context_);
         virtual void Render() = 0;
     };
 
-    class TestRenderer : public IRenderer
+    class TestRenderer : public Renderer
     {
     public:
         TestRenderer(const SizeN &resolution_);
         virtual void Render() override final;
     };
 
-    class IntersectTestRenderer : public IRenderer
+    class IntersectTestRenderer : public Renderer
     {
     public:
         IntersectTestRenderer(RenderContext *render_context_);
         virtual void Render() override final;
     };
 
-    class DepthBufferRenderer : public IRenderer
+    class DepthBufferRenderer : public Renderer
     {
     public:
         float near, far;
@@ -93,14 +92,14 @@ namespace RenderToy
         virtual void Render() override final;
     };
 
-    class NormalRenderer : public IRenderer
+    class NormalRenderer : public Renderer
     {
     public:
         NormalRenderer(RenderContext *render_context_);
         virtual void Render() override final;
     };
 
-    class PathTracingRenderer : public IRenderer
+    class PathTracingRenderer : public Renderer
     {
         int iteration_count;
 
@@ -113,7 +112,7 @@ namespace RenderToy
         const Vector3f DirectLight(const RayState state, const Vector3f &ray_dir, const SurfacePoint &surface_point) const;
     };
 
-    class AlbedoRenderer : public IRenderer
+    class AlbedoRenderer : public Renderer
     {
     public:
         AlbedoRenderer(RenderContext *render_context_);
