@@ -1,22 +1,24 @@
-#
-# CMakeLists.txt for ./src
-# File created on 2023/1/10
-# Last edited on 2023/1/21
-# Tianyu Huang <tianyu@illumiart.net>
-#
+add_library(RenderToy 
+            rtmath.cpp
+            object.cpp
+            importer.cpp
+            world.cpp
+            renderer.cpp
+            exporter.cpp
+            procedural.cpp
+            ray.cpp
+            bvh.cpp
+            material.cpp
+            surfacepoint.cpp 
+            compositor.cpp)
 
-add_library(OpenPT 
-            mathfunc.cpp mathfunc.h 
-            meshobj.cpp meshobj.h
-            importer.cpp importer.h 
-            world.cpp world.h 
-            geoobj.h geoobj.cpp
-            renderer.h renderer.cpp
-            exporter.h exporter.cpp
-            camera.h camera.cpp
-            procedural.h procedural.cpp
-            ray.h ray.cpp
-            bvh.h bvh.cpp
-            texture.h texture.cpp)
+set_property(TARGET RenderToy PROPERTY CXX_STANDARD 20)
+target_compile_features(RenderToy PRIVATE cxx_std_20)
 
-set_property(TARGET OpenPT PROPERTY CXX_STANDARD 17)
+target_include_directories(RenderToy PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(RenderToy PRIVATE OpenMP::OpenMP_CXX)
+endif()
+target_compile_options(RenderToy PRIVATE "-march=native")

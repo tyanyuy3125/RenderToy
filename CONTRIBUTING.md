@@ -2,7 +2,7 @@
 For the scale of this project is tiny so far, we will not give a detailed Contribution Guideline. Instead, we will gradually add to this documentation during development.
 
 ## File Structure
-* `include/OpenPT/` contains exported functions.
+* `include/RenderToy/` contains exported functions.
 * `lib/` contains 3rd-party libraries.
 * `src/` contains private code.
 * `tests/` is the Unit Test module.
@@ -40,7 +40,7 @@ You should also **avoid** long names.
 Every document should begin with a multi-line comment:
 ```cpp
 /*
- *  OpenPT - <Module Name>
+ *  RenderToy - <Module Name>
  *  File created on yyyy/MM/dd
  *  Last edited on yyyy/MM/dd (Editor name)
  *  Contributor name 1 <email1@example.com>
@@ -53,6 +53,6 @@ Commenting specifications for functions and classes are TBD.
 
 ## Object Oriented Programming Conventions
 * **Declaring / Defining multiple classes in the same file** is permitted but not recommended, unless the classes have extreme functional similarity, or are only coupled within the same file.
-* **Place everything in the same namespace called `OpenPT`**.
+* **Place everything in the same namespace called `RenderToy`**.
 * **Always avoid global variables / functions**.
 

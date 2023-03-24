@@ -5,5 +5,7 @@
 #
 
 add_subdirectory(CornellBox)
-add_subdirectory(Cube)
-add_subdirectory(TestRender)
+add_subdirectory(ProceduralTexture)
+add_subdirectory(WithOIDN)
+add_subdirectory(SmoothShading)
+add_subdirectory(Drawing)

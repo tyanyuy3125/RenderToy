@@ -49,5 +49,5 @@ build
 *.app
 
 # Examples
-!cube.obj
-!sphere.obj
+!ss.obj
+!cornellbox.obj

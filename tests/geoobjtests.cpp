@@ -1,20 +1,14 @@
-/*
- *  OpenPT - Importer Unit Test
- *  File created on 2023/1/11
- *  Last edited on 2023/1/11
- *  Tianyu Huang <tianyu@illumiart.net>
- */
 
 #define CATCH_CONFIG_MAIN
 
-#include "../include/OpenPT/openpt.h"
-#include "../lib/Catch2/catch.hpp"
+#include <RenderToy/rendertoy.h>
+#include <catch2/catch_all.hpp>
 
-using namespace OpenPT;
+using namespace RenderToy;
 
 TEST_CASE("SetO2W Test")
 {
-    GeoObj obj;
+    Geometry obj;
     REQUIRE(obj.GetO2W() == obj.GetW2O());
     REQUIRE(obj.GetW2O() == Matrix4x4f::I);
 
