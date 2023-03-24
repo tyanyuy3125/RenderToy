@@ -1,7 +1,7 @@
-#include "importer.h"
-#include "object.h"
-#include "rtmath.h"
-#include "material.h"
+#include <RenderToy/importer.h>
+#include <RenderToy/object.h>
+#include <RenderToy/rtmath.h>
+#include <RenderToy/material.h>
 
 #include <fstream>
 #include <string>

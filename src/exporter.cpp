@@ -1,7 +1,7 @@
 #include <algorithm>
 
-#include "rtmath.h"
-#include "exporter.h"
+#include <RenderToy/rtmath.h>
+#include <RenderToy/exporter.h>
 
 namespace RenderToy
 {

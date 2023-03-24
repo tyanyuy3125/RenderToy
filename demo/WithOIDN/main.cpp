@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <OpenImageDenoise/oidn.hpp>
-#include "../../include/RenderToy/rendertoy.h"
+#include <RenderToy/rendertoy.h>
 
 using namespace RenderToy;
 

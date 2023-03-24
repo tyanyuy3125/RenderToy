@@ -1,4 +1,4 @@
-#include "world.h"
+#include <RenderToy/world.h>
 
 #include <cmath>
 

@@ -1,9 +1,10 @@
 #define BUFFER(x, y, width) render_context->buffer[y * width + x]
 
-#include "renderer.h"
-#include "ray.h"
-#include "bvh.h"
-#include "surfacepoint.h"
+#include <RenderToy/renderer.h>
+#include <RenderToy/ray.h>
+#include <RenderToy/bvh.h>
+#include <RenderToy/surfacepoint.h>
+#include <RenderToy/pbr.h>
 
 #include <algorithm>
 #include <cmath>
@@ -11,7 +12,7 @@
 namespace RenderToy
 {
     IntersectTestRenderer::IntersectTestRenderer(RenderContext *render_context_)
-        : IRenderer(render_context_)
+        : Renderer(render_context_)
     {
     }
 
@@ -52,7 +53,7 @@ namespace RenderToy
     }
 
     TestRenderer::TestRenderer(const SizeN &resolution_)
-        : IRenderer(new RenderContext(nullptr, FormatSettings(resolution_, Vector2f::O)))
+        : Renderer(new RenderContext(nullptr, FormatSettings(resolution_, Vector2f::O)))
     {
     }
 
@@ -98,7 +99,7 @@ namespace RenderToy
         return buffer[y * format_settings.resolution.width + x];
     }
 
-    void IRenderer::PrepareScreenSpace(Camera *cam, float &top, float &right)
+    void Renderer::PrepareScreenSpace(Camera *cam, float &top, float &right)
     {
         top = (Convert::InchToMM(cam->gate_dimension.y()) / 2.0f) / cam->focal_length;
         right = (Convert::InchToMM(cam->gate_dimension.x()) / 2.0f) / cam->focal_length;
@@ -121,13 +122,13 @@ namespace RenderToy
         top *= yscale;
     }
 
-    IRenderer::IRenderer(RenderContext *render_context_)
+    Renderer::Renderer(RenderContext *render_context_)
         : render_context(render_context_)
     {
     }
 
     DepthBufferRenderer::DepthBufferRenderer(RenderContext *render_context_)
-        : IRenderer(render_context_)
+        : Renderer(render_context_)
     {
         near = render_context_->world->cameras[render_context_->camera_id].near_clipping_plane;
         far = render_context_->world->cameras[render_context_->camera_id].far_clipping_plane;
@@ -172,12 +173,12 @@ namespace RenderToy
     }
 
     DepthBufferRenderer::DepthBufferRenderer(RenderContext *render_context_, float near_, float far_)
-        : IRenderer(render_context_), near(near_), far(far_)
+        : Renderer(render_context_), near(near_), far(far_)
     {
     }
 
     NormalRenderer::NormalRenderer(RenderContext *render_context_)
-        : IRenderer(render_context_)
+        : Renderer(render_context_)
     {
     }
 
@@ -227,7 +228,7 @@ namespace RenderToy
     }
 
     PathTracingRenderer::PathTracingRenderer(RenderContext *render_context_, const int iteration_count_)
-        : IRenderer(render_context_), iteration_count(iteration_count_)
+        : Renderer(render_context_), iteration_count(iteration_count_)
     {
     }
 
@@ -375,7 +376,7 @@ namespace RenderToy
     }
 
     AlbedoRenderer::AlbedoRenderer(RenderContext *render_context_)
-        : IRenderer(render_context_)
+        : Renderer(render_context_)
     {
     }
 
