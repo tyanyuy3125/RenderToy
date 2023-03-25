@@ -9,6 +9,7 @@
 
 namespace RenderToy
 {
+    /// @brief Contains everything in the world space. Including meshes and cameras.
     struct World
     {
         std::vector<Mesh *> meshes;

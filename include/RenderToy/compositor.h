@@ -183,7 +183,7 @@ namespace RenderToy
             //         buffer[i * resolution.width + j] = Convert::Luma<_CS>(buffer[i * resolution.width + j]);
             //     }
             // }
-            Transform([](Vector3f _) -> void
+            Transform([](Vector3f &_) -> void
                       { _ = Convert::Luma<_CS>(_); });
             return (*this);
         }
@@ -202,6 +202,10 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Perform tone mapping function on self.
+        /// @tparam _CS 
+        /// @param limit 
+        /// @return 
         template <Convert::ColorStandard _CS = Convert::ColorStandard::kITURBT709>
         Image &Tonemap(const float limit = 1.5f)
         {
@@ -210,6 +214,9 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Perform gamma correction on self.
+        /// @param gamma 
+        /// @return 
         Image &GammaCorrection(const float gamma = 2.2f);
 
         const Image operator+(const Image &img);

@@ -10,6 +10,7 @@
 #include <vector>
 #include <PerlinNoise/PerlinNoise.hpp>
 
+/// @brief Procedural generated mesh.
 namespace RenderToy::ProceduralMesh
 {
     /// @brief Interface for procedural generated mesh.
@@ -21,6 +22,7 @@ namespace RenderToy::ProceduralMesh
     };
 }
 
+/// @brief Procedural generated texture.
 namespace RenderToy::ProceduralTexture
 {
     /// @brief Interface for procedural generated texture.

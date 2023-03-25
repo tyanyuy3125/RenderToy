@@ -16,12 +16,26 @@ int main()
     }
 
     img.Fill({20, 900}, {100, 100}, Vector3f::X);
+    img.Fill({100, 900}, {200, 100}, Vector3f::Y);
+    img.Fill({200, 900}, {300, 100}, Vector3f::Z);
+    img.Binarize<Convert::ColorStandard::kITURBT601>(0.5f);
+    // img.GaussianBlur(200, 20.0f);
+    // img.GreyScale<Convert::ColorStandard::kITURBT2020>();
+
+    // for(int i=0;i<1920;++i)
+    // {
+    //     for(int j=0;j<1080;++j)
+    //     {
+    //         img(i,j)=Convert::BlackBody((float(i)/1920.0f) * 15000.0f);
+    //     }
+    // }
 
     std::ofstream os;
     os.open("Drawing.bmp");
 
     BMPExporter exporter(img);
     exporter.Export(os);
+    os.close();
 
     return 0;
 }

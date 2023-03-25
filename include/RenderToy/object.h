@@ -16,6 +16,7 @@ namespace RenderToy
 {
     class Mesh;
 
+    /// @brief Parameter of OpenGL VAO for VBO exporting.
     enum class GLAttributeObject
     {
         kVert = 0,

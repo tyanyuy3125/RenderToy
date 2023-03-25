@@ -22,6 +22,7 @@ namespace RenderToy
         static void Import(World &world, const std::string &path);
     };
 
+    /// @brief Import Wavefront MTL Material. (With PBR extension support)
     class MTLImporter
     {
     public:
@@ -30,6 +31,7 @@ namespace RenderToy
         static void Import(World &world, const std::string &path);
     };
 
+    /// @brief (WIP) Import TARGA image file.
     class TARGAImporter
     {
     public:

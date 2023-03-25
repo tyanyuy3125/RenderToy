@@ -45,6 +45,8 @@ auto main() -> int
     os.open("./monkey_original.bmp");
 
     Image img(renderer.render_context);
+    img.Tonemap();
+    img.GammaCorrection();
     BMPExporter exporter(img);
     exporter.Export(os);
     os.close();
@@ -55,7 +57,7 @@ auto main() -> int
     Image oidn_output(SizeN(1280, 720));
 
     oidn::FilterRef filter = device.newFilter("RT");
-    filter.setImage("color", rc.buffer, oidn::Format::Float3, 1280, 720); // beauty
+    filter.setImage("color", img.buffer, oidn::Format::Float3, 1280, 720); // beauty
     // filter.setImage("albedo", albedoPtr, oidn::Format::Float3, width, height); // auxiliary
     // filter.setImage("normal", normalPtr, oidn::Format::Float3, width, height); // auxiliary
     filter.setImage("output", oidn_output.buffer, oidn::Format::Float3, 1280, 720); // denoised beauty

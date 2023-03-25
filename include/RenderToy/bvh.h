@@ -10,21 +10,30 @@ namespace RenderToy
 {
     class Triangle;
 
+    /// @brief Bounding Box of any renderable objects.
     struct BoundingBox
     {
         Vector3f vmin, vmax;
         BoundingBox();
         BoundingBox(const Vector3f &vmin_, const Vector3f &vmax_);
 
+        /// @brief Perform ray-bbox intersection.
+        /// @param ray 
+        /// @param t_min 
+        /// @param t_max 
+        /// @return 
         const bool Intersect(const Ray &ray, float &t_min, float &t_max);
         /// @brief Extends by another bbox.
         /// @param bbox
         void ExtendBy(const BoundingBox &bbox);
+        /// @brief Get center point of bbox.
+        /// @return 
         const Vector3f Centroid() const;
 
         const Triangle *object{nullptr};
     };
 
+    /// @brief Node of the Octree.
     struct OctreeNode
     {
         OctreeNode *child[8];
@@ -35,6 +44,7 @@ namespace RenderToy
         ~OctreeNode();
     };
 
+    /// @brief Octree geometry hierarchy.
     struct Octree
     {
         Octree(const BoundingBox &tree_bbox_);
@@ -60,6 +70,7 @@ namespace RenderToy
         void RecursiveDelete(OctreeNode *&node);
     };
 
+    /// @brief Bounding Volume Hierarchy acceleration structure.
     class BVH
     {
     public:

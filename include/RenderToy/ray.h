@@ -21,6 +21,7 @@ namespace RenderToy
         const Ray operator-(const Ray &ray);
     };
 
+    /// @brief Represents current status of ray in the scene.
     struct RayState
     {
         float eta;

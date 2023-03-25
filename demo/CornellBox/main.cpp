@@ -13,21 +13,21 @@ int main()
 
     World world;
     OBJModelImporter::Import(world, "./cornellbox.obj");
-    Vector3f light_color = Convert::BlackBody(6000) * 5.0f;
+    Vector3f light_color = Convert::BlackBody(6000) * 2.0f;
 
     PrincipledBSDF mat_red(Vector3f::X);
     PrincipledBSDF mat_green(Vector3f::Y);
     PrincipledBSDF mat_white(Vector3f::White);
     PrincipledBSDF mat_light(Vector3f::White, light_color);
     PrincipledBSDF mat_silver({0.9f, 0.9f, 0.9f}, Vector3f::O, 0.05f, 1.0f, 0.0f, 1.45f, 1.0f);
-    PrincipledBSDF mat_glass(2.0f * Vector3f::White, Vector3f::O, 0.0f, 0.0f, 1.0f, 1.33f);
+    PrincipledBSDF mat_glass(1.0f * Vector3f::White, Vector3f::O, 0.0f, 0.0f, 1.0f, 1.33f);
 
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
-    world.meshes[4]->tex = &mat_green;
+    world.meshes[4]->tex = &mat_light;
     world.meshes[1]->tex = &mat_white;
-    world.meshes[2]->tex = &mat_white;
-    world.meshes[5]->tex = &mat_light;
+    world.meshes[2]->tex = &mat_glass;
+    world.meshes[5]->tex = &mat_white;
     world.PrepareDirectLightSampling();
 
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and " << world.meshes.size() << " mesh(es).\n";
@@ -42,9 +42,9 @@ int main()
     RenderContext rc(&world, FormatSettings(SizeN(1920, 1080), Vector2f(16.0f, 9.0f)));
     // RenderContext rc(&world, FormatSettings(SizeN(32*8, 18*8), Vector2f(16.0f, 9.0f)));
     // TestRenderer renderer(rc.format_settings.resolution);
-    PathTracingRenderer renderer(&rc, 16);
+    PathTracingRenderer renderer(&rc, 64);
     // DepthBufferRenderer renderer(&rc, 5.0f, 15.0f);
-    // NormalRenderer renderer(&rc);
+    // AlbedoRenderer renderer(&rc);
     auto t1 = std::chrono::system_clock::now();
     renderer.Render();
     auto t2 = std::chrono::system_clock::now();
@@ -57,7 +57,6 @@ int main()
     // os.open("./cornellbox.txt");
 
     Image img(renderer.render_context);
-    // img.GreyScale<Convert::ColorStandard::kITURBT709>();
     // img.EdgeDetection<Orientation::All>();
     // auto newimg = img.Extract([](const Vector3f &_) -> bool
     //                           { return Convert::Luma(_) > 1.0f; });
@@ -65,6 +64,7 @@ int main()
     // img.GaussianBlur(200, 20.0f);
     img.Tonemap();
     img.GammaCorrection();
+    // img.GreyScale<Convert::ColorStandard::kAverage>();
 
     BMPExporter exporter(img);
     // ASCIIExporter exporter(img);

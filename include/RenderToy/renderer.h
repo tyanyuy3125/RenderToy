@@ -10,6 +10,7 @@
 
 namespace RenderToy
 {
+    /// @brief Render technology adapted.
     enum class RenderTech
     {
         kTest = 0,
@@ -21,6 +22,7 @@ namespace RenderToy
         kLineEdge
     };
 
+    /// @brief Projection mode adapted.
     enum class ProjectionMode
     {
         kPerspective = 0,
@@ -37,6 +39,7 @@ namespace RenderToy
         FormatSettings(SizeN resolution_, Vector2f aspect_);
     };
 
+    /// @brief Render context.
     struct RenderContext
     {
         World *world;
@@ -47,6 +50,9 @@ namespace RenderToy
         FormatSettings format_settings;
         int camera_id = 0;
 
+        /// @brief Initialize a render context with world pointer and format settings.
+        /// @param world_ 
+        /// @param format_settings_ 
         RenderContext(World *world_, FormatSettings format_settings_);
         ~RenderContext();
 
@@ -54,6 +60,7 @@ namespace RenderToy
         const Vector3f &operator()(const std::size_t x, const std::size_t y) const;
     };
 
+    /// @brief Base class of renderers.
     class Renderer
     {
     protected:
@@ -65,6 +72,7 @@ namespace RenderToy
         Renderer(const Renderer &) = delete;
         Renderer(const Renderer &&) = delete;
         Renderer(RenderContext *render_context_);
+        /// @brief Render an image.
         virtual void Render() = 0;
     };
 

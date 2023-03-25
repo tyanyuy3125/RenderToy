@@ -5,7 +5,8 @@
 #include "rtmath.h"
 
 namespace RenderToy
-{
+{   
+    /// @brief Intersected surface point.
     class SurfacePoint
     {
     public:

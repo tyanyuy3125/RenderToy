@@ -12,15 +12,20 @@
 namespace RenderToy
 {
 #pragma region ForwardDeclaration
+    /// @brief Pi.
+    /// @tparam T 
     template <typename T = float>
     inline constexpr T kPi = T(3.14159265358979323846L);
 
+    /// @brief Minimum available float in RenderToy.
     inline constexpr float kFloatEpsilon = 1e-7f;
+    /// @brief Maximum available float in RenderToy.
     inline constexpr float kFloatInfinity = 1e7f;
 
     struct SizeN;
     struct PointN;
 
+    /// @brief Represents an orientation in a 2D space.
     enum class Orientation
     {
         X = 0,
@@ -1087,6 +1092,7 @@ namespace RenderToy
 #pragma endregion Convolution
 
 #pragma region Convert
+    /// @brief Contains functions for unit/concept converting.
     namespace Convert
     {
         template <typename _TParam = float, typename _TRet = float>
@@ -1103,9 +1109,16 @@ namespace RenderToy
             return _TRet(deg) * kPi<_TRet> / _TRet(180);
         }
 
+        /// @brief Get black body color @ thermodynamic temperature T.
+        /// @param t T
+        /// @return 
         const Vector3f BlackBody(const float t);
+        /// @brief Convert XYZ color to RGB color.
+        /// @param x 
+        /// @return 
         const Vector3f XYZToSRGB(const Vector3f &x);
 
+        /// @brief Contains all color standards available in RenderToy.
         enum class ColorStandard
         {
             /// @brief ITU-R BT.709 http://www.itu.int/rec/R-REC-BT.709
@@ -1116,9 +1129,14 @@ namespace RenderToy
             kITURBT2020 = 2,
             /// @brief SMPTE 240M https://www5.in.tum.de/lehre/vorlesungen/graphik/info/csc/COL_33.htm
             kSMPTE240M = 3,
+            /// @brief Average. Take the average of the three brightnesses of RGB.
             kAverage = 4
         };
 
+        /// @brief Get the luminance of given color.
+        /// @tparam _CS 
+        /// @param vec 
+        /// @return 
         template <ColorStandard _CS = ColorStandard::kITURBT709>
         constexpr inline const float
         Luma(const Vector3f &vec)
@@ -1146,6 +1164,11 @@ namespace RenderToy
             }
         }
 
+        /// @brief Tone mapping function.
+        /// @tparam _CS 
+        /// @param vec 
+        /// @param limit 
+        /// @return 
         template <ColorStandard _CS = ColorStandard::kITURBT709>
         [[nodiscard]] const Vector3f
         Tonemap(const Vector3f &vec, const float limit)
@@ -1156,6 +1179,7 @@ namespace RenderToy
 #pragma endregion Convert
 
 #pragma region Drawing
+    /// @brief Represents a point in discrete raster space.
     struct PointN
     {
         int x, y;
@@ -1169,6 +1193,7 @@ namespace RenderToy
         void SizeClamp(const SizeN &size);
     };
 
+    /// @brief Represents a size of a rectangular area in discrete raster space.
     struct SizeN
     {
         std::size_t width, height;
@@ -1178,15 +1203,21 @@ namespace RenderToy
         SizeN(const Vector2f &vec);
         SizeN(const std::array<std::size_t, 2> &tuple);
 
+        /// @brief Get the area of the rectangular area.
+        /// @return 
         const std::size_t Area() const;
+        /// @brief Get the aspect ratio of the rectangular area.
+        /// @return 
         const float AspectRatio() const;
-
+        /// @brief Get the center coordinate of the rectangular area.
+        /// @return 
         const PointN Center() const;
     };
 
 #pragma endregion Drawing
 
 #pragma region AffineTransformation
+    /// @brief Affine space geometry helpers.
     namespace AffineTransformation
     {
         const Matrix4x4f Translation(const Vector3f &origin);
@@ -1201,6 +1232,13 @@ namespace RenderToy
 #pragma region Misc
     const float SSE_InvSqrt(const float number);
 
+    /// @brief Perform linear interpolation.
+    /// @tparam _Tp Type of variables.
+    /// @tparam _TpCoeff Type of coefficient.
+    /// @param x 
+    /// @param y 
+    /// @param a 
+    /// @return x * (1 - a) + y * a
     template <typename _Tp, typename _TpCoeff>
     const _Tp Lerp(const _Tp x, const _Tp y, const _TpCoeff a)
     {
@@ -1210,8 +1248,10 @@ namespace RenderToy
 
 #pragma region Interpolation
 
+    /// @brief Interpolation helpers.
     namespace Interpolation
     {
+        /// @brief Polynomial interpolation on 2D space.
         struct Polynomial2D
         {
             std::vector<float> t;
@@ -1222,6 +1262,7 @@ namespace RenderToy
 #pragma endregion Interpolation
 
 #pragma region Random
+    /// @brief Random helpers.
     namespace Random
     {
         const int Int(int min, int max);
