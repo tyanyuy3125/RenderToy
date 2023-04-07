@@ -25,3 +25,13 @@ TEST_CASE("SetO2W Test")
     REQUIRE(obj.GetO2W() == trm);
     REQUIRE(obj.GetW2O() == trm_inv);
 }
+
+TEST_CASE("Light Test")
+{
+    SECTION("Delta Light")
+    {
+        DeltaLight d_light;
+        d_light.SetO2W(AffineTransformation::Translation({11.0f,45.0f,14.0f}));
+        REQUIRE(d_light.GetSamplePoint() == Vector3f(11.0f, 45.0f, 14));
+    }
+}

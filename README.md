@@ -52,8 +52,6 @@ Pre-requirements:
 * OpenMP 5+
 * Catch2 3.2.1+ (for unit tests)
     * https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository
-* libx11-dev 1.6.9+ (for Interactive demo)
-    * Make use of the package manager of your system.
 
 > Intel® OIDN used by denoising demo has special hardware requirements. Please refer to https://www.openimagedenoise.org/ for more info. **This does not affect the compilation of RenderToy library itself.**
 
@@ -67,10 +65,8 @@ Meanwhile we recommend you use VSCode as it is well integrated with CMake. After
 ## Launch Targets
 * Tests - Unit test module for the project.
 * CornellBox - A demo rendering the famous Cornell Box scene.
-* WithOIDN - (WIP) A demonstration of Intel® Open Image Denoise integration.
+* WithOIDN - A demonstration of Intel® Open Image Denoise integration.
 * ProceduralTexture - A demo rasterizing procedural textures supported by RenderToy.
-* Interactive - (WIP) Live preview demo on X11.
-* TestRenderer - Just a test.
 * SmoothShading - A demonstration of smooth shading.
 * Drawing - 2D drawing demo.
 

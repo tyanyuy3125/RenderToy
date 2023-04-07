@@ -132,7 +132,15 @@ namespace RenderToy
         /// @brief Update cache. Should be evaluated after O2W matrix having been changed.
         void UpdateCache();
 
+        /// @brief [OpenGL Extension] Generate VBO of the mesh.
+        /// @param attrib_list OpenGL attribute list.
+        /// @return VBO.
         const std::vector<float> GetVBO(const std::vector<GLAttributeObject> &attrib_list) const;
+
+        /// @brief [OpenGL Extension] Generate and append VBO of the mesh into a existing list.
+        /// @param target Existing VBO.
+        /// @param attrib_list OpenGL attribute list.
+        /// @return No return.
         const void AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const;
 
         Mesh *parent;
@@ -166,11 +174,19 @@ namespace RenderToy
         std::vector<Vector2f> uv;
 
         Mesh *parent;
+
+        /// @brief Construct a polygon object.
+        /// @param V_ Count of vertices.
+        /// @param vert_ List of vertices.
+        /// @param norm_ List of normals.
+        /// @param uv_ List of UVs.
+        /// @param parent_ Parent object.
         Polygon(const std::size_t V_, const std::vector<Vector3f> &vert_, const std::vector<Vector3f> &norm_, const std::vector<Vector2f> &uv_, Mesh *parent_);
 
         /// @brief Convert polygon to triangles.
-        /// @return
-        std::vector<Triangle *> ConvertToTriangle() const;
+        /// @warning DO NOT DISCARD FOR POTENTIAL MEMORY LEAKAGE.
+        /// @return List of triangles.
+        [[nodiscard]] std::vector<Triangle *> ConvertToTriangle() const;
     };
 
     /// @brief Mesh class. Represents a set of triangles.
@@ -185,8 +201,53 @@ namespace RenderToy
         /// @param object_to_world O2W Matrix, should be an AFFINE matrix.
         virtual void SetO2W(const Matrix4x4f &object_to_world_) override;
 
-        const std::vector<float> GetVBO(const std::vector<GLAttributeObject> &attrib_list) const;
+        /// @brief [OpenGL Extension] Generate VBO of the mesh.
+        /// @param attrib_list OpenGL attribute list.
+        /// @return VBO.
+        [[nodiscard]] const std::vector<float> GetVBO(const std::vector<GLAttributeObject> &attrib_list) const;
+
+        /// @brief [OpenGL Extension] Generate and append VBO of the mesh into a existing list.
+        /// @param target Existing VBO.
+        /// @param attrib_list OpenGL attribute list.
+        /// @return No return.
         const void AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const;
+    };
+
+    /// @brief Interface for abstract lights.
+    struct Light : public Geometry
+    {
+        Vector3f color = Vector3f::White;
+        float intensity = 1.0f;
+
+        Light(Vector3f color_ = Vector3f::White, float intensity_ = 1.0f);
+
+        virtual const Vector3f GetSamplePoint() const = 0;
+    };
+
+    /// @brief Delta light.
+    struct DeltaLight : public Light
+    {
+        /// @brief Create a delta light.
+        /// @param color_ Base color of light.
+        /// @param intensity_ Intensity of light.
+        DeltaLight(Vector3f color_ = Vector3f::White, float intensity_ = 1.0f);
+
+        /// @brief Sampling the light.
+        /// @return
+        virtual const Vector3f GetSamplePoint() const override final;
+    };
+
+    /// @brief Directional light. Pointing at (0,0,-1) in object space.
+    struct DirectionalLight : public Light
+    {
+        /// @brief Create a directional light.
+        /// @param color_ Base color of light.
+        /// @param intensity_ Intensity of light.
+        DirectionalLight(Vector3f color_ = Vector3f::White, float intensity_ = 1.0f);
+
+        /// @brief Sampling the light.
+        /// @return
+        virtual const Vector3f GetSamplePoint() const override final;
     };
 };
 

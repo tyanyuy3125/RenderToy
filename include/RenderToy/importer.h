@@ -19,6 +19,9 @@ namespace RenderToy
         OBJModelImporter(const OBJModelImporter &) = delete;
         OBJModelImporter(const OBJModelImporter &&) = delete;
 
+        /// @brief Import OBJ file from path into world.
+        /// @param world 
+        /// @param path 
         static void Import(World &world, const std::string &path);
     };
 
@@ -28,6 +31,9 @@ namespace RenderToy
     public:
         MTLImporter() = delete;
 
+        /// @brief Import MTL file from path into world.
+        /// @param world 
+        /// @param path 
         static void Import(World &world, const std::string &path);
     };
 

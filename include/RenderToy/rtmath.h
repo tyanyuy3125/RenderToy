@@ -84,7 +84,7 @@ namespace RenderToy
         /// @warning You should be careful with the TYPE, or a warning may be generated.
         template <typename... Args, std::enable_if_t<(sizeof...(Args) == _Dm), bool> = true>
         constexpr Vector(Args &&...values)
-            : arr{std::forward<Args>(values)...} {}
+            : arr{static_cast<_Tp>(std::forward<Args>(values))...} {}
 
         /// @brief Construct a vector with all components the same value.
         /// @param value

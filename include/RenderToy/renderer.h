@@ -30,6 +30,7 @@ namespace RenderToy
     };
 
     // Use Blender conventions.
+    /// @brief Format settings for the renderer.
     struct FormatSettings
     {
         SizeN resolution = SizeN(1920, 1080);
@@ -76,6 +77,7 @@ namespace RenderToy
         virtual void Render() = 0;
     };
 
+    /// @brief Test renderer.
     class TestRenderer : public Renderer
     {
     public:
@@ -83,6 +85,7 @@ namespace RenderToy
         virtual void Render() override final;
     };
 
+    /// @brief Renderer for intersection algorithm test.
     class IntersectTestRenderer : public Renderer
     {
     public:
@@ -90,6 +93,7 @@ namespace RenderToy
         virtual void Render() override final;
     };
 
+    /// @brief Depth buffer renderer.
     class DepthBufferRenderer : public Renderer
     {
     public:
@@ -100,6 +104,7 @@ namespace RenderToy
         virtual void Render() override final;
     };
 
+    /// @brief Normal pass renderer.
     class NormalRenderer : public Renderer
     {
     public:
@@ -107,6 +112,7 @@ namespace RenderToy
         virtual void Render() override final;
     };
 
+    /// @brief Path tracing renderer.
     class PathTracingRenderer : public Renderer
     {
         int iteration_count;
@@ -120,6 +126,7 @@ namespace RenderToy
         const Vector3f DirectLight(const RayState state, const Vector3f &ray_dir, const SurfacePoint &surface_point) const;
     };
 
+    /// @brief Albedo pass renderer.
     class AlbedoRenderer : public Renderer
     {
     public:

@@ -16,6 +16,7 @@ namespace RenderToy
         std::vector<Triangle *> triangles;
         std::vector<Camera> cameras;
         std::vector<PrincipledBSDF *> materials;
+        std::vector<Light *> lights;
 
         /// @brief Randomly chooses a emissive triangle in the scene. Used by source sampling.
         /// @param random

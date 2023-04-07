@@ -188,6 +188,10 @@ namespace RenderToy
             return (*this);
         }
 
+        /// @brief Binarize the image.
+        /// @tparam _CS Color standard.
+        /// @param threshold Luminance threshold.
+        /// @return 
         template <Convert::ColorStandard _CS>
         Image &Binarize(const float threshold)
         {
@@ -226,10 +230,10 @@ namespace RenderToy
         const void operator=(const Image &img);
 
         /// @brief Generates bloom on pixels that satisfy brightness threshold.
-        /// @param size
-        /// @param sigma
-        /// @param threshold
-        /// @return
+        /// @param size Size of kernel.
+        /// @param sigma Sigma of gaussian kernel.
+        /// @param threshold Luminance threshold.
+        /// @return Reference to self.
         Image &Bloom(const std::size_t size, const float sigma, const float threshold);
 
         /// @brief Sample image at given coordinate.

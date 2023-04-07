@@ -310,7 +310,7 @@ namespace RenderToy
     const std::vector<float> Mesh::GetVBO(const std::vector<GLAttributeObject> &attrib_list) const
     {
         std::vector<float> ret;
-        for(auto tri : tris)
+        for (auto tri : tris)
         {
             tri->AppendVBO(ret, attrib_list);
         }
@@ -319,7 +319,7 @@ namespace RenderToy
 
     const void Mesh::AppendVBO(std::vector<float> &target, const std::vector<GLAttributeObject> &attrib_list) const
     {
-        for(auto tri : tris)
+        for (auto tri : tris)
         {
             tri->AppendVBO(target, attrib_list);
         }
@@ -339,5 +339,30 @@ namespace RenderToy
             ret.push_back(new Triangle({vert[index_a], vert[index_b], vert[index_c]}, {norm[index_a], norm[index_b], norm[index_c]}, {uv[index_a], uv[index_b], uv[index_c]}, parent));
         }
         return ret;
+    }
+
+    Light::Light(Vector3f color_, float intensity_)
+        : color(color_), intensity(intensity_)
+    {
+    }
+
+    DeltaLight::DeltaLight(Vector3f color_, float intensity_)
+        : Light(color_, intensity_)
+    {
+    }
+
+    const Vector3f DeltaLight::GetSamplePoint() const
+    {
+        return {object_to_world[0][3], object_to_world[1][3], object_to_world[2][3]};
+    }
+
+    DirectionalLight::DirectionalLight(Vector3f color_, float intensity_)
+        : Light(color_, intensity_)
+    {
+    }
+
+    const Vector3f RenderToy::DirectionalLight::GetSamplePoint() const
+    {
+        return O2WTransform(kFloatInfinity * Vector3f(0.0f,0.0f,1.0f));
     }
 }

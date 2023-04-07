@@ -30,7 +30,6 @@ namespace RenderToy
     const Vector3f ToLocal(const Vector3f X, const Vector3f Y, const Vector3f Z, const Vector3f V);
     const Vector3f Refract(const Vector3f &incident_vec, const Vector3f &normal, float eta);
     const Vector3f Reflect(const Vector3f &incident_vec, const Vector3f &normal);
-
 #pragma endregion PBR
 
 }
