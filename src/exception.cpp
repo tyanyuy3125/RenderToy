@@ -1,16 +1,16 @@
 #include <RenderToy/exception.h>
 
-virtual const char *RenderToy::Exception::IRenderToyException::what() const noexcept
+const char *RenderToy::Exception::IRenderToyException::what() const noexcept
 {
     return exception_what.c_str();
 }
 
-RenderToy::Exception::IRenderToyException::IRenderToyException(std::string exception_what_) noexcept
+RenderToy::Exception::IRenderToyException::IRenderToyException(const std::string &exception_what_) noexcept
     : exception_what(exception_what_)
 {
 }
 
-RenderToy::Exception::ImageSizeNotMatchException::ImageSizeNotMatchException(std::string exception_what_) noexcept
-    : exception_what(exception_what_)
+RenderToy::Exception::ImageSizeNotMatchException::ImageSizeNotMatchException(const std::string &exception_what_) noexcept
+    : IRenderToyException(exception_what_)
 {
 }

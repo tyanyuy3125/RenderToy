@@ -24,17 +24,17 @@ int main()
 
     world.meshes[0]->tex = &mat_white;
     world.meshes[3]->tex = &mat_red;
-    world.meshes[4]->tex = &mat_light;
+    world.meshes[4]->tex = &mat_green;
     world.meshes[1]->tex = &mat_white;
     world.meshes[2]->tex = &mat_glass;
-    world.meshes[5]->tex = &mat_white;
+    world.meshes[5]->tex = &mat_light;
     world.PrepareDirectLightSampling();
 
     std::cout << "Imported " << world.triangles.size() << " triangle(s) and " << world.meshes.size() << " mesh(es).\n";
     world.cameras.push_back(academy_format);
 
     Matrix4x4f camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 10.0f});
-    camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 1.0f}) * AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(-90)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(90), 0.0f, 0.0f}) * camera_mat4;
+    camera_mat4 = AffineTransformation::Translation({0.0f, 0.0f, 2.0f}) * AffineTransformation::RotationEulerXYZ({0.0f, 0.0f, Convert::DegreeToRadians(-90)}) * AffineTransformation::RotationEulerXYZ({Convert::DegreeToRadians(90), 0.0f, 0.0f}) * camera_mat4;
     world.cameras[0].SetO2W(camera_mat4);
 
     std::cout << "Begin rendering...\n";
@@ -60,7 +60,7 @@ int main()
     // img.EdgeDetection<Orientation::All>();
     // auto newimg = img.Extract([](const Vector3f &_) -> bool
     //                           { return Convert::Luma(_) > 1.0f; });
-    // img.Bloom(500, 50.0f, 1.0f);
+    img.Bloom(500, 50.0f, 1.0f);
     // img.GaussianBlur(200, 20.0f);
     img.Tonemap();
     img.GammaCorrection();

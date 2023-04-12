@@ -9,13 +9,13 @@ namespace RenderToy::Exception
         std::string exception_what;
 
     public:
-        IRenderToyException(std::string exception_what_) noexcept;
+        IRenderToyException(const std::string &exception_what_) noexcept;
         virtual const char *what() const noexcept;
     };
 
     class ImageSizeNotMatchException : public IRenderToyException
     {
     public:
-        ImageSizeNotMatchException(std::string exception_what_) noexcept;
+        ImageSizeNotMatchException(const std::string &exception_what_) noexcept;
     };
 }
