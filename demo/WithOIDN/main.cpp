@@ -57,10 +57,10 @@ auto main() -> int
     Image oidn_output(SizeN(1280, 720));
 
     oidn::FilterRef filter = device.newFilter("RT");
-    filter.setImage("color", img.buffer, oidn::Format::Float3, 1280, 720); // beauty
+    filter.setImage("color", img.GetBuffer(), oidn::Format::Float3, 1280, 720); // beauty
     // filter.setImage("albedo", albedoPtr, oidn::Format::Float3, width, height); // auxiliary
     // filter.setImage("normal", normalPtr, oidn::Format::Float3, width, height); // auxiliary
-    filter.setImage("output", oidn_output.buffer, oidn::Format::Float3, 1280, 720); // denoised beauty
+    filter.setImage("output", oidn_output.GetBuffer(), oidn::Format::Float3, 1280, 720); // denoised beauty
     filter.set("hdr", true);                                                        // beauty image is HDR
     filter.commit();
 

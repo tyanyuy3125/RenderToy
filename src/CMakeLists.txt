@@ -10,7 +10,8 @@ add_library(RenderToy
             bvh.cpp
             material.cpp
             surfacepoint.cpp 
-            compositor.cpp)
+            compositor.cpp
+            exception.cpp)
 
 set_property(TARGET RenderToy PROPERTY CXX_STANDARD 20)
 target_compile_features(RenderToy PRIVATE cxx_std_20)

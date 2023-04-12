@@ -62,6 +62,8 @@ namespace RenderToy
             static_assert("No viable wrapper type specified.");
         }
 
+        Vector3f *buffer;
+
     public:
         /// @brief Sample mode for sampling and resizing.
         enum class SampleMode
@@ -71,10 +73,15 @@ namespace RenderToy
         };
 
         const SizeN resolution;
-        Vector3f *buffer;
 
+        /// @brief Construct an image with given resolution.
+        /// @param resolution_ 
         Image(const SizeN &resolution_);
+        /// @brief Construct an image with given render context.
+        /// @param render_context_ 
         Image(const RenderContext *const render_context_);
+        /// @brief Construct an image with another image.
+        /// @param image 
         Image(const Image &image);
 
         Vector3f &operator()(const std::size_t x, const std::size_t y);
@@ -277,6 +284,9 @@ namespace RenderToy
         // const Image Resize(const SizeN &new_size) const
         // {
         // }
+
+        Vector3f *&GetBuffer();
+        const Vector3f * const &GetBuffer() const;
 
         ~Image();
     };

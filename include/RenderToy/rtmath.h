@@ -1212,6 +1212,9 @@ namespace RenderToy
         /// @brief Get the center coordinate of the rectangular area.
         /// @return 
         const PointN Center() const;
+
+        const bool operator==(const SizeN &a) const;
+        const bool operator!=(const SizeN &a) const;
     };
 
 #pragma endregion Drawing

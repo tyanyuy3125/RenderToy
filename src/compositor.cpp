@@ -1,4 +1,5 @@
 #include <RenderToy/compositor.h>
+#include <RenderToy/exception.h>
 
 using namespace RenderToy;
 
@@ -75,6 +76,16 @@ Image &RenderToy::Image::Bloom(const std::size_t size, const float sigma, const 
     return (*this);
 }
 
+Vector3f *&RenderToy::Image::GetBuffer()
+{
+    return buffer;
+}
+
+const Vector3f *const &RenderToy::Image::GetBuffer() const
+{
+    return buffer;
+}
+
 RenderToy::Image::~Image()
 {
     delete[] buffer;
@@ -90,7 +101,11 @@ Image &RenderToy::Image::GammaCorrection(const float gamma)
 
 const Image Image::operator+(const Image &img)
 {
-    // TODO: exception.
+    if (resolution != img.resolution)
+    {
+        throw Exception::ImageSizeNotMatchException("The + operator of two images requires two images have the same resolution.");
+    }
+
     Image ret(resolution);
     for (int i = 0; i < resolution.Area(); ++i)
     {
@@ -101,7 +116,11 @@ const Image Image::operator+(const Image &img)
 
 const Image Image::operator-(const Image &img)
 {
-    // TODO: exception.
+    if (resolution != img.resolution)
+    {
+        throw Exception::ImageSizeNotMatchException("The - operator of two images requires two images have the same resolution.");
+    }
+
     Image ret(resolution);
     for (int i = 0; i < resolution.Area(); ++i)
     {
@@ -112,7 +131,11 @@ const Image Image::operator-(const Image &img)
 
 const Image Image::operator*(const Image &img)
 {
-    // TODO: exception.
+    if (resolution != img.resolution)
+    {
+        throw Exception::ImageSizeNotMatchException("The * operator of two images requires two images have the same resolution.");
+    }
+
     Image ret(resolution);
     for (int i = 0; i < resolution.Area(); ++i)
     {
@@ -123,7 +146,11 @@ const Image Image::operator*(const Image &img)
 
 const Image Image::operator/(const Image &img)
 {
-    // TODO: exception.
+    if (resolution != img.resolution)
+    {
+        throw Exception::ImageSizeNotMatchException("The / operator of two images requires two images have the same resolution.");
+    }
+
     Image ret(resolution);
     for (int i = 0; i < resolution.Area(); ++i)
     {
@@ -135,7 +162,11 @@ const Image Image::operator/(const Image &img)
 const void Image::operator=(const Image &img)
 {
     // resolution = img.resolution;
-    // TODO: exception
+    if (resolution != img.resolution)
+    {
+        throw Exception::ImageSizeNotMatchException("The = operator of two images requires two images have the same resolution.");
+    }
+
     for (int i = 0; i < resolution.Area(); ++i)
     {
         buffer[i] = img.buffer[i];

@@ -371,4 +371,14 @@ namespace RenderToy
         std::uniform_real_distribution<float> distrib(0.0f, 1.0f);
         return distrib(random_device);
     }
+
+    const bool SizeN::operator==(const SizeN &a) const
+    {
+        return (width == a.width) && (height == a.height);
+    }
+
+    const bool SizeN::operator!=(const SizeN &a) const
+    {
+        return !((*this) == a);
+    }
 }
