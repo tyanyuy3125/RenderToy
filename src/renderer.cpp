@@ -242,7 +242,7 @@ namespace RenderToy
         float div_resolution_width = 1.0f / float(render_context->format_settings.resolution.width);
         float div_resolution_height = 1.0f / float(render_context->format_settings.resolution.height);
 
-        int finished_iterations = 0;
+        // int finished_iterations = 0;
 
 #pragma omp parallel for
         for (int i = 0; i < iteration_count; ++i)
@@ -261,11 +261,11 @@ namespace RenderToy
                     BUFFER(x, y, render_context->format_settings.resolution.width) += Radiance(cast_ray, nullptr, state, 0, 0.0f) / static_cast<float>(iteration_count);
                 }
             }
-            #pragma omp critical
-            {
-                ++finished_iterations;
-                std::cout<<finished_iterations<<std::endl;
-            }
+            // #pragma omp critical
+            // {
+            //     ++finished_iterations;
+            //     std::cout<<finished_iterations<<std::endl;
+            // }
         }
     }
 
