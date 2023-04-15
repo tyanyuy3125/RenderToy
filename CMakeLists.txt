@@ -1,9 +1,3 @@
-#
-# CMakeLists.txt for the whole RenderToy project
-# File created on 2023/1/10
-# Last edited on 2023/1/16
-# Tianyu Huang <tianyu@illumiart.net>
-#
 #                    _ooOoo_
 #                   o8888888o
 #                   88" . "88
